@@ -10,6 +10,7 @@ import lib
 import math
 import numpy
 import cgi
+import urllib
 
 import SVG
 
@@ -58,7 +59,12 @@ class libsvg(lib.lib):
   def cb_DEF (self, arg):
     name,reference,unused,text_offset,draw_pinnumber,draw_pinname,unit_count,units_locked,option_flag = arg
 
-    munged_name = re.sub('\/', 'whack', str(arg[0]) )
+
+    munged_name = re.sub('\/', '#', arg[0] )
+    #munged_name = re.sub('\/', 'whack', str(arg[0]) )
+    munged_name = urllib.quote( munged_name );
+
+    print "  making:", arg[0], "->", munged_name
 
     #self.svg_file = self.svg_prefix + str(arg[0]) + self.svg_suffix 
     self.svg_file = self.svg_prefix + munged_name + self.svg_suffix 
@@ -396,6 +402,13 @@ class libsvg(lib.lib):
   #  like all the other parts, with pin number over the line and name rendered next to the line.
   #  Also looks like AD620 from linear.lib isn't being rendered properly.  How does KiCAD know that it
   #  needs to do this?  Does it see that the text is getting jumbled?
+  #
+  #  UPDATE 2013-09-29: OK, it looks like it's the text_offset field in the DEF.  Right now I ignore it
+  #  (I think), but it should be used.  When it's non-zero, the text is in the format I'm rendering it now
+  #  (with the extra text_offset added maybe?) and when it's 0, it's rendered in the other format of
+  #  name on top, pin underneath.  
+  #
+  # TODO: render pin properly with DEF text_offset
   def cb_X(self, arg):
     #name, num, posx, posy, length, direction, name_text_size, num_text_size, unit, convert, electrical_type, pin_type = arg
     name, num, posx, posy, length, direction, num_text_size, name_text_size, unit, convert, electrical_type, pin_type = arg
