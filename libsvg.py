@@ -64,8 +64,6 @@ class libsvg(lib.lib):
     #munged_name = re.sub('\/', 'whack', str(arg[0]) )
     munged_name = urllib.quote( munged_name );
 
-    print "  making:", arg[0], "->", munged_name
-
     #self.svg_file = self.svg_prefix + str(arg[0]) + self.svg_suffix 
     self.svg_file = self.svg_prefix + munged_name + self.svg_suffix 
     self.svg_scene = SVG.Scene( self.svg_file )
