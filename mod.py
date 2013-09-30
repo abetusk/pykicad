@@ -47,7 +47,7 @@ class mod(object):
     "MODULE_Po" : [ "Po", "posx", "posy", "orientation", "layer", "timestamp", "attribute", "attribute" ], # position?
     "MODULE_Li" : [ "Li", "name" ], # module name lib
     "MODULE_Sc" : [ "Sc", "timestamp" ], # timestamp
-    "MODULE_AR" : [ "AR" ], # ??
+    "MODULE_AR" : [ "AR", "?name"  ], # ??
     "MODULE_Op" : [ "Op", "rotation_cost_90", "rotation_cost_180", "unknown" ], # rotation cost?
     #"MODULE_Tn" : [ "T(\d+)", "posx", "posy", "sizex", "sizey", "rotation", "penwidth", "flag", "visible", "layer", "flag", "\"name" ], # text
     "MODULE_Tn" : [ "T(\d+)", "posx", "posy", "sizex", "sizey", "rotation", "penwidth", "flag", "visible", "layer", "*name" ], # text

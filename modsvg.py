@@ -44,7 +44,7 @@ class modsvg(mod.mod):
 
     self.counter=0
 
-    self.pixel_per_mil = 150/1000.0
+    self.pixel_per_mil = 150.0/1000.0
 
     self.buffer_pixel = 40
 
@@ -224,6 +224,12 @@ class modsvg(mod.mod):
     w = abs(self.bounding_box[1][0] - self.bounding_box[0][0])
     h = abs(self.bounding_box[1][1] - self.bounding_box[0][1])
 
+    #s_x = -self.bounding_box[0][0]
+    #s_y = -self.bounding_box[0][1]
+
+    s_x = (self.bounding_box[1][0] - self.bounding_box[0][0]) / 2.0
+    s_y = (self.bounding_box[1][1] - self.bounding_box[0][1]) / 2.0
+
     w *= self.pixel_per_mil
     h *= self.pixel_per_mil
 
@@ -232,11 +238,11 @@ class modsvg(mod.mod):
     #s_x += self.bounding_box[0][0]
     #s_y -= self.bounding_box[0][1]
 
-    s_x = -self.bounding_box[0][0]
-    s_y = -self.bounding_box[0][1]
-
     s_x *= self.pixel_per_mil
     s_y *= self.pixel_per_mil
+
+    s_x += self.buffer_pixel/2
+    s_y += self.buffer_pixel/2
 
     w += self.buffer_pixel
     h += self.buffer_pixel
