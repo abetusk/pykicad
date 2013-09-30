@@ -1,0 +1,15 @@
+
+libsvg.py:
+  - render pin name/number properly when DEF text_offset 0
+  - use DEF text_offset when rendering pin name
+  - change bounding box for circles/arcs properly
+  - render text after graphics.  FSQUARE3 in graphic lib is not rendering
+    properly
+
+modsvg.py:
+  - bounds are a little funky, parts look shifted to the upper left.  Need to
+    recenter properly
+
+mod.py:
+  - process files when units are in mm, not just deci-mils
+
