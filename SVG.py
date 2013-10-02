@@ -83,6 +83,11 @@ class Circle:
         return
 
     def strarray(self):
+#        r = float(self.radius)
+#        return ["  <circle transform=\" translate(%d,%d) translate(%d,%d) rotate(%d) translate(%d,%d)\" r=\"%d\"\n" %\
+#                (self.center[0],self.center[1], r/2.0, r/2.0, self.rot_deg, -r/2.0, -r/.20, r),
+#                "    style=\"fill:%s;stroke:%s;stroke-width:%d\"  />\n" % (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)]
+
         return ["  <circle cx=\"%d\" cy=\"%d\" r=\"%d\"\n" %\
                 (self.center[0],self.center[1],self.radius),
                 "    style=\"fill:%s;stroke:%s;stroke-width:%d\"  />\n" % (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)]
@@ -132,21 +137,104 @@ class Polygon:
                "\" \nstyle=\"fill:%s;stroke:%s;stroke-width:%d\"/>\n" %\
                (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)]
 
-class Rectangle:
-    def __init__(self,origin,height,width,fill_color,line_color,line_width):
+class Obround:
+    def __init__(self, origin, height, width, fill_color, line_color, line_width, rot_deg = 0):
         self.origin = origin
         self.height = height
         self.width = width
         self.fill_color = fill_color
         self.line_color = line_color
         self.line_width = line_width
+        self.t_x = 0
+        self.t_y = 0
+        self.rot_deg = rot_deg
+        return
+
+#        return ["  <circle cx=\"%d\" cy=\"%d\" r=\"%d\"\n" %\
+#                (self.center[0],self.center[1],self.radius),
+#                "    style=\"fill:%s;stroke:%s;stroke-width:%d\"  />\n" % (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)]
+
+    def strarray(self):
+        w = float(self.width)
+        h = float(self.height)
+        x = float(self.origin[0])
+        y = float(self.origin[1])
+        rot_deg = float(self.rot_deg)
+
+        if w > h:
+        #if False:
+          dx = w/2
+          r = h/2
+
+          rect_w = w - 2*r
+          rect_h = h
+
+          c0  = "<circle transform=\" translate(%d,%d) rotate(%d) translate(%d,%d)\" r=\"%d\"\n" %\
+              ( x, y, self.rot_deg, - dx + r, 0, r)
+          c0 += "    style=\"fill:%s;stroke:%s;stroke-width:%d\"  />\n" % (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)
+
+          rect  = "  <rect transform=\" translate(%d,%d) rotate(%d) translate(%d,%d)\" height=\"%d\"\n" %\
+              ( x, y, rot_deg, -rect_w/2, -rect_h/2, rect_h)
+          rect += "    width=\"%d\" style=\"fill:%s;stroke:%s;stroke-width:%d\" /> \n" %\
+                (rect_w ,colorstr(self.fill_color),colorstr(self.line_color),self.line_width)
+
+          c1  = "<circle transform=\" translate(%d,%d) rotate(%d) translate(%d,%d)\" r=\"%d\"\n" %\
+              ( x, y, rot_deg, + dx - r, 0, r)
+          c1 += "    style=\"fill:%s;stroke:%s;stroke-width:%d\"  />\n" % (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)
+
+        else:
+          dy = h/2
+          r = w/2
+
+          rect_w = w
+          rect_h = h - 2*r
+
+          c0  = "<circle transform=\" translate(%d,%d) rotate(%d) translate(%d,%d)\" r=\"%d\"\n" %\
+              ( x, y, rot_deg, 0, - dy + r, r)
+          c0 += "    style=\"fill:%s;stroke:%s;stroke-width:%d\"  />\n" % (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)
+
+          rect  = "  <rect transform=\" translate(%d,%d) rotate(%d) translate(%d,%d)\" height=\"%d\"\n" %\
+              ( x, y, rot_deg, -rect_w/2, -rect_h/2, rect_h)
+          rect += "    width=\"%d\" style=\"fill:%s;stroke:%s;stroke-width:%d\" /> \n" %\
+                (rect_w ,colorstr(self.fill_color),colorstr(self.line_color),self.line_width)
+
+          c1  = "<circle transform=\" translate(%d,%d) rotate(%d) translate(%d,%d)\" r=\"%d\"\n" %\
+              ( x, y, rot_deg, 0, dy - r, r)
+          c1 += "    style=\"fill:%s;stroke:%s;stroke-width:%d\"  />\n" % (colorstr(self.fill_color),colorstr(self.line_color),self.line_width)
+
+        return [ c0, rect, c1 ]
+
+#        return ["  <rect transform=\" translate(%d,%d) translate(%d,%d) rotate(%d) translate(%d,%d)\" height=\"%d\"\n" %\
+#                ( self.origin[0], self.origin[1], float(self.width)/2, float(self.height)/2, self.rot_deg, -float(self.width)/2, -float(self.height)/2, self.height),
+#                "    width=\"%d\" style=\"fill:%s;stroke:%s;stroke-width:%d\" /> \n" %\
+#                (self.width,colorstr(self.fill_color),colorstr(self.line_color),self.line_width)]
+
+
+
+
+class Rectangle:
+    def __init__(self,origin,height,width,fill_color,line_color,line_width,rot_deg = 0):
+        self.origin = origin
+        self.height = height
+        self.width = width
+        self.fill_color = fill_color
+        self.line_color = line_color
+        self.line_width = line_width
+        self.t_x = 0
+        self.t_y = 0
+        self.rot_deg = rot_deg
         return
 
     def strarray(self):
-        return ["  <rect x=\"%d\" y=\"%d\" height=\"%d\"\n" %\
-                (self.origin[0],self.origin[1],self.height),
-                "    width=\"%d\" style=\"fill:%s;stroke:%s;stroke-width:%d\" />\n" %\
+        return ["  <rect transform=\" translate(%d,%d) translate(%d,%d) rotate(%d) translate(%d,%d)\" height=\"%d\"\n" %\
+                ( self.origin[0], self.origin[1], float(self.width)/2, float(self.height)/2, self.rot_deg, -float(self.width)/2, -float(self.height)/2, self.height),
+                "    width=\"%d\" style=\"fill:%s;stroke:%s;stroke-width:%d\" /> \n" %\
                 (self.width,colorstr(self.fill_color),colorstr(self.line_color),self.line_width)]
+
+#        return ["  <g transform=\"translate(%d,%d) rotate(%d)\"> <rect x=\"%d\" y=\"%d\" height=\"%d\"\n" %\
+#                (self.t_x, self.t_y, self.rot_deg,  self.origin[0],self.origin[1],self.height),
+#                "    width=\"%d\" style=\"fill:%s;stroke:%s;stroke-width:%d\" /> </g>\n" %\
+#                (self.width,colorstr(self.fill_color),colorstr(self.line_color),self.line_width)]
 
 class Text:
     def __init__(self,origin,text,size,color,angle_deg = 0):

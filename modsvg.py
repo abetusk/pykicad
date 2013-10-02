@@ -45,6 +45,7 @@ class modsvg(mod.mod):
     self.counter=0
 
     self.pixel_per_mil = 150.0/1000.0
+    #self.pixel_per_mil = 30.0/1000.0
 
     self.buffer_pixel = 40
 
@@ -55,7 +56,11 @@ class modsvg(mod.mod):
 
     self.svg_art = []
 
+    self.units = "deci-mils"
+
     mod.mod.__init__(self)
+
+
 
 
 
@@ -92,11 +97,20 @@ class modsvg(mod.mod):
     pass
 
 
+  def cb_UNITS(self, arg):
+    self.units = arg[0]
+
+    print "units:", self.units
+
+    pass
 
   def cb_MODULE(self, arg):
 
 
     name = arg[0]
+
+    name = re.sub(' *', '', name)
+    name = re.sub('\/', '#', name)
 
     self.svg_file = self.svg_prefix + str( name ) + self.svg_suffix
     self.svg_scene = SVG.Scene( self.svg_file )
@@ -128,12 +142,11 @@ class modsvg(mod.mod):
     name = re.sub('^\s*N\s*', '', name)
     name = re.sub('"', '', name)
 
-    font_size = float(sizex)/0.6
+    # what is happening with these fonts?
+    font_size = float(sizex) / 0.6
 
-    shift_x = 0.6 * font_size * len(name) / 2
-    #shift_x = font_size * len(name) / 2
-    shift_y = 0.6 * font_size / 2
-    #shift_y = font_size / 2
+    shift_x =  0.6 * float(font_size) * float(len(name)-1) / 2.0
+    shift_y = 0.6 * float(font_size) / 2.0
 
     sx = int(posx)
     sy = int(posy)
@@ -221,22 +234,21 @@ class modsvg(mod.mod):
 
     self.svg_art = []
 
+    x0 = self.bounding_box[0][0]
+    y0 = self.bounding_box[0][1]
+    x1 = self.bounding_box[1][0]
+    y1 = self.bounding_box[1][1]
+
     w = abs(self.bounding_box[1][0] - self.bounding_box[0][0])
     h = abs(self.bounding_box[1][1] - self.bounding_box[0][1])
 
-    #s_x = -self.bounding_box[0][0]
-    #s_y = -self.bounding_box[0][1]
-
-    s_x = (self.bounding_box[1][0] - self.bounding_box[0][0]) / 2.0
-    s_y = (self.bounding_box[1][1] - self.bounding_box[0][1]) / 2.0
+    s_x = -x0
+    s_y = -y0
 
     w *= self.pixel_per_mil
     h *= self.pixel_per_mil
 
-    #s_x = (self.bounding_box[1][0] - self.bounding_box[0][0]) / 2.0
-    #s_y = (self.bounding_box[1][1] - self.bounding_box[0][1]) / 2.0
-    #s_x += self.bounding_box[0][0]
-    #s_y -= self.bounding_box[0][1]
+    self.svg_scene.add( SVG.Circle( (0, 0), 5, (128, 128, 128), None, 0) )
 
     s_x *= self.pixel_per_mil
     s_y *= self.pixel_per_mil
@@ -246,9 +258,6 @@ class modsvg(mod.mod):
 
     w += self.buffer_pixel
     h += self.buffer_pixel
-
-    #s_x += self.buffer_pixel/2
-    #s_y += self.buffer_pixel/2
 
 
     self.svg_scene.height = h
@@ -333,23 +342,26 @@ class modsvg(mod.mod):
     name_shiftx = len(p.name)*font_size/2
 
     if p.shape == "R":
-      self.svg_scene.add( SVG.Rectangle( (p.posx - p.sizex/2, p.posy - p.sizey/2), p.sizey, p.sizex, color, None, 0 ) )
+      self.svg_scene.add( SVG.Rectangle( (p.posx - p.sizex/2, p.posy - p.sizey/2), p.sizey, p.sizex, color, None, 0, float(p.orientation)/10.0 ) )
     elif p.shape == "C":
       #self.svg_scene.add( SVG.Circle( (p.posx - p.sizex/2, p.posy - p.sizey/2), p.sizex, color, None, 0 ) )
       self.svg_scene.add( SVG.Circle( (p.posx, p.posy), p.sizex/2, color, None, 0 ) )
-    elif p.shape == "O":
-      if p.sizex > p.sizey:
-        dx = p.sizex/2
-        ry = p.sizey/2
-        self.svg_scene.add( SVG.Circle( (p.posx + dx - ry, p.posy), ry, color, None, 0) )
-        self.svg_scene.add( SVG.Circle( (p.posx - dx + ry, p.posy), ry, color, None, 0) )
-        self.svg_scene.add( SVG.Rectangle( (p.posx - dx + ry, p.posy - ry), 2*ry, 2*(dx-ry), color, None, 0 ) )
-      elif p.sizey > p.sizex:
-        dy = p.sizey/2
-        rx = p.sizex/2
-        self.svg_scene.add( SVG.Circle( (p.posx, p.posy + dy - rx), rx, color, None, 0) )
-        self.svg_scene.add( SVG.Circle( (p.posx, p.posy - dy + rx), rx, color, None, 0) )
-        self.svg_scene.add( SVG.Rectangle( (p.posx - rx, p.posy - dy + rx), 2*(dy-rx), 2*rx, color, None, 0 ) )
+    elif p.shape == "O":  #obround
+
+      self.svg_scene.add( SVG.Obround( (p.posx, p.posy), p.sizey, p.sizex, color, None, 0, float(p.orientation)/10.0 ) )
+
+#      if p.sizex > p.sizey:
+#        dx = p.sizex/2
+#        ry = p.sizey/2
+#        self.svg_scene.add( SVG.Circle( (p.posx + dx - ry, p.posy), ry, color, None, 0) )
+#        self.svg_scene.add( SVG.Circle( (p.posx - dx + ry, p.posy), ry, color, None, 0) )
+#        self.svg_scene.add( SVG.Rectangle( (p.posx - dx + ry, p.posy - ry), 2*ry, 2*(dx-ry), color, None, 0, float(p.orientation)/10.0 ) )
+#      elif p.sizey > p.sizex:
+#        dy = p.sizey/2
+#        rx = p.sizex/2
+#        self.svg_scene.add( SVG.Circle( (p.posx, p.posy + dy - rx), rx, color, None, 0) )
+#        self.svg_scene.add( SVG.Circle( (p.posx, p.posy - dy + rx), rx, color, None, 0) )
+#        self.svg_scene.add( SVG.Rectangle( (p.posx - rx, p.posy - dy + rx), 2*(dy-rx), 2*rx, color, None, 0, float(p.orientation)/10.0 ) )
 
 
     if p.drill_diam:
@@ -383,11 +395,48 @@ class modsvg(mod.mod):
       else:
         self.svg_scene.add( SVG.Circle( (p.posx + p.drill_x, p.posy + p.drill_y), p.drill_diam/2, (0,0,0), None, 0) )
 
-    self.svg_scene.add( SVG.Text( (p.posx - name_shiftx, p.posy + font_size/2), p.name, p.sizex/2, (255,255,255) ) )
+    name_s_x = -name_shiftx
+    name_s_y = font_size/2
+
+    angle_deg = float(p.orientation)/10.0
+
+    text_view_angle_deg = angle_deg
+    other_ang = 0
+    if p.orientation == 900:
+      text_view_angle_deg = -90.0
+      other_ang = 90.0
+    elif p.orientation == 1800:
+      text_view_angle_deg = 0
+    elif p.orientation == 2700:
+      other_ang = 90.0
+
+    ca = math.cos(math.radians(other_ang))
+    sa = math.sin(math.radians(other_ang))
+
+    a = -name_shiftx
+    b = font_size/2
+
+    name_s_x =  ca * a + sa * b
+    name_s_y = -sa * a + ca * b
 
 
-    self.update_bounds( p.posx - p.sizex/2, p.posy - p.sizey/2 )
-    self.update_bounds( p.posx + p.sizex/2, p.posy + p.sizey/2 )
+#    if p.orientation == 900:
+#      name_s_y = name_shiftx
+#      name_s_x = font_size/2
+#    elif p.orientation == 2700:
+#      name_s_y = name_shiftx
+#      name_s_x = font_size/2
+
+
+    #self.svg_scene.add( SVG.Text( (p.posx - name_shiftx, p.posy + font_size/2), p.name, p.sizex/2, (255,255,255), text_view_angle_deg ) )
+    self.svg_scene.add( SVG.Text( (p.posx + name_s_x, p.posy + name_s_y), p.name, p.sizex/2, (255,255,255), text_view_angle_deg ) )
+
+
+    #self.update_bounds( p.posx - p.sizex/2, p.posy - p.sizey/2 )
+    #self.update_bounds( p.posx + p.sizex/2, p.posy + p.sizey/2 )
+
+    self.update_bounds( p.posx - p.sizex, p.posy - p.sizey )
+    self.update_bounds( p.posx + p.sizex, p.posy + p.sizey )
 
 
   def cb_LIBRARY_end(self, arg):

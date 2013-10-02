@@ -43,9 +43,9 @@ class mod(object):
     "INDEX_item" : [ "", "name" ],
     "INDEX_end" : [ "\$EndINDEX" ],
 
-    "MODULE" : [ "\$MODULE", "name" ],
+    "MODULE" : [ "\$MODULE", "*name" ],
     "MODULE_Po" : [ "Po", "posx", "posy", "orientation", "layer", "timestamp", "attribute", "attribute" ], # position?
-    "MODULE_Li" : [ "Li", "name" ], # module name lib
+    "MODULE_Li" : [ "Li", "*name" ], # module name lib
     "MODULE_Sc" : [ "Sc", "timestamp" ], # timestamp
     "MODULE_AR" : [ "AR", "?name"  ], # ??
     "MODULE_Op" : [ "Op", "rotation_cost_90", "rotation_cost_180", "unknown" ], # rotation cost?
@@ -61,7 +61,7 @@ class mod(object):
     "MODULE_DP" : [ "DP", "zero", "zero", "zero", "zero", "corners_count", "width", "layer" ], # draw polygon
     "MODULE_DI" : [ "DI", "cornerx", "cornery" ], # polygon point 
 
-    "MODULE_end" : [ "\$EndMODULE", "name" ],
+    "MODULE_end" : [ "\$EndMODULE", "*name" ],
 
     "SHAPE3D" : [ "\$SHAPE3D" ],
     "SHAPE3D_Na" : [ "Na", "\"filename" ],
