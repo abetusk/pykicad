@@ -255,7 +255,8 @@ class Text:
 #                "  </text>\n"]
 
 #        return ["  <g transform=\"translate(%d,%d) rotate(%d)\" > <text font-size=\"%s\" fill=\"%s\" font-family=\"monospace\" style=\"text-decoration: overline;\" >\n" %\
-        return ["  <g transform=\"translate(%d,%d) rotate(%d)\" > <text font-size=\"%s\" fill=\"%s\" font-family=\"monospace\"  >\n" %\
+      #return ["  <g transform=\"translate(%d,%d) rotate(%d)\" > <text font-size=\"%s\" fill=\"%s\" font-family=\"monospace\"  font-weight=\"bold\" style=\"stroke-width:0px;stroke:#fff;\" >\n" %\
+      return ["  <g transform=\"translate(%d,%d) rotate(%d)\" > <text font-size=\"%s\" fill=\"%s\" font-family=\"monospace\" style=\"stroke-width:0px;stroke:#fff;\" >\n" %\
                 (self.origin[0],self.origin[1],self.angle_deg,self.size,colorstr(self.color)),
 #                " <tspan text-decoration=\"underline\"> ",
                 "   %s\n" % self.text,
