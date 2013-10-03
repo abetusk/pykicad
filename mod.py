@@ -37,6 +37,8 @@ class mod(object):
   op_descr = {
     "header" : [ "PCBNEW-LibModule-V1", "*text" ],
 
+    "dollar_hash" : [ "\$#", "*text" ],
+
     "UNITS" : [ "Units", "unit" ],
 
     "INDEX" : [ "\$INDEX" ],
@@ -61,6 +63,10 @@ class mod(object):
     "MODULE_DP" : [ "DP", "zero", "zero", "zero", "zero", "corners_count", "width", "layer" ], # draw polygon
     "MODULE_DI" : [ "DI", "cornerx", "cornery" ], # polygon point 
 
+    "MODULE_SolderMask" : [ "\.SolderMask", "layer" ],
+    "MODULE_SolderPaste" : [ "\.SolderPaste", "layer" ],
+    "MODULE_SolderPasteRatio" : [ "\.SolderPasteRatio", "layer" ],
+
     "MODULE_end" : [ "\$EndMODULE", "*name" ],
 
     "SHAPE3D" : [ "\$SHAPE3D" ],
@@ -78,6 +84,9 @@ class mod(object):
     "PAD_At" : [ "At", "pad_type", "n", "layer_mask" ], # attribute
     "PAD_Ne" : [ "Ne", "net_number", "net_name" ], # net
     "PAD_Po" : [ "Po", "posx", "posy" ], # position
+
+    "PAD_SolderMask" : [ "\.SolderMask", "layer" ],
+
     "PAD_end" : [ "\$EndPAD" ],
 
     "LIBRARY_end" : [ "\$EndLIBRARY" ]
@@ -92,6 +101,9 @@ class mod(object):
 
   def cb_header(self, arg): 
     pass 
+
+  def cb_dollar_hash(self, arg):
+    pass
 
   def cb_UNITS(self, arg): 
     pass 
@@ -150,6 +162,15 @@ class mod(object):
   def cb_MODULE_DI(self, arg): 
     pass 
 
+  def cb_MODULE_SolderMask(self, arg): 
+    pass 
+
+  def cb_MODULE_SolderPaste(self, arg): 
+    pass 
+
+  def cb_MODULE_SolderPasteRatio(self, arg): 
+    pass 
+
 
   def cb_MODULE_end(self, arg): 
     pass 
@@ -194,6 +215,9 @@ class mod(object):
   def cb_PAD_Po(self, arg): 
     pass 
 
+  def cb_PAD_SolderMask(self, arg): 
+    pass 
+
   def cb_PAD_end(self, arg): 
     pass 
 
@@ -213,7 +237,8 @@ class mod(object):
     "start" : { "INDEX" : "index" ,
                 "MODULE" : "module",
                 "LIBRARY_end" : "header",
-                "UNITS" : "start" },
+                "UNITS" : "start" ,
+                "dollar_hash" : "start" },
 
     "index" : { "INDEX_item" : "index",
                 "INDEX_end" : "start" },
@@ -235,6 +260,10 @@ class mod(object):
                  "MODULE_DP"  : "module",
                  "MODULE_DI"  : "module",
 
+                 "MODULE_SolderMask"  : "module",
+                 "MODULE_SolderPaste"  : "module",
+                 "MODULE_SolderPasteRatio"  : "module",
+
                  "MODULE_end" : "start",
 
                  "SHAPE3D" : "shape3d",
@@ -253,6 +282,7 @@ class mod(object):
               "PAD_At" : "pad", 
               "PAD_Ne" : "pad", 
               "PAD_Po" : "pad", 
+              "PAD_SolderMask" : "pad", 
               "PAD_end" : "module" }
   }
 
@@ -275,6 +305,7 @@ class mod(object):
   def __init__(self):
     self.op_callback = {
       "header"  : self.cb_header,
+      "dollar_hash"  : self.cb_dollar_hash,
 
       "UNITS" : self.cb_UNITS,
 
@@ -298,6 +329,9 @@ class mod(object):
       "MODULE_DA" : self.cb_MODULE_DA,
       "MODULE_DP" : self.cb_MODULE_DP,
       "MODULE_DI" : self.cb_MODULE_DI,
+      "MODULE_SolderMask" : self.cb_MODULE_SolderMask,
+      "MODULE_SolderPaste" : self.cb_MODULE_SolderPaste,
+      "MODULE_SolderPasteRatio" : self.cb_MODULE_SolderPasteRatio,
 
       "MODULE_end" : self.cb_MODULE_end,
 
@@ -314,6 +348,7 @@ class mod(object):
       "PAD_At" : self.cb_PAD_At,
       "PAD_Ne" : self.cb_PAD_Ne,
       "PAD_Po" : self.cb_PAD_Po,
+      "PAD_SolderMask" : self.cb_PAD_SolderMask ,
       "PAD_end" : self.cb_PAD_end,
 
       "LIBRARY_end" : self.cb_LIBRARY_end
