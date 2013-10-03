@@ -44,25 +44,28 @@ class modsvg(mod.mod):
 
     self.counter=0
 
-    self.pixel_per_mil = 150.0/1000.0
+    self.pixel_per_mil = 300.0/1000.0
     #self.pixel_per_mil = 30.0/1000.0
 
     self.buffer_pixel = 40
 
     self.bounding_box = [ [ 0, 0], [100, 100] ]
-    #self.bounding_box = [ [ 0, 0], [5000, 1000] ]
 
     self.line_width = 10
-
     self.svg_art = []
-
     self.units = "deci-mils"
 
     mod.mod.__init__(self)
 
+  def thou(self, x):
+    if self.units == "mm":
+      return 1000.0 * float(x) / 25.4
+    return x
 
-
-
+  def mm(self, x):
+    if self.units == "mm":
+      return x
+    return float(x)*25.4
 
   def reset_bounds(self):
     self.bounding_box = [ [ 0, 0], [100, 100] ]
@@ -100,10 +103,6 @@ class modsvg(mod.mod):
   def cb_UNITS(self, arg):
     self.units = arg[0]
 
-    print "units:", self.units
-
-    pass
-
   def cb_MODULE(self, arg):
 
 
@@ -139,30 +138,47 @@ class modsvg(mod.mod):
     #n, posx, posy, sizex, sizey, rotation, penwidth, flag, visible, layer, flag, name = arg
     n, posx, posy, sizex, sizey, rotation, penwidth, flag, visible, layer, name = arg
 
+    px = self.thou( float(posx) )
+    py = self.thou( float(posy) )
+
     name = re.sub('^\s*N\s*', '', name)
     name = re.sub('"', '', name)
 
     # what is happening with these fonts?
-    font_size = float(sizex) / 0.6
+    font_size = self.thou( float(sizex) ) / 0.6
 
-    shift_x =  0.6 * float(font_size) * float(len(name)-1) / 2.0
-    shift_y = 0.6 * float(font_size) / 2.0
+    shift_x =  0.6 * font_size * float(len(name)-1) / 2.0
+    shift_y = 0.6 * font_size / 2.0
 
-    sx = int(posx)
-    sy = int(posy)
+    ang_deg = float(rotation)/10.0
+    if rotation == "900":
+      ang_deg = -90.0
+    elif rotation == "1800":
+      ang_deg = 0
+    elif rotation == "2700":
+      ang_deg = 90.0
 
-    self.svg_art.append( SVG.Text( (int(posx) - shift_x, int(posy) + shift_y), name, font_size, (192,192,192), int(rotation) ) )
 
-    self.update_bounds( sx - shift_x, sy - shift_y )
-    #self.update_bounds( sx + 2*shift_x, sy + shift_y ) 
-    self.update_bounds( sx + shift_x, sy + shift_y ) 
+    ca = math.cos( -math.radians(ang_deg) )
+    sa = math.sin( -math.radians(ang_deg) )
+    u = -shift_x
+    v =  shift_y
+    s_x =  ca*u + sa*v
+    s_y = -sa*u + ca*v
+
+    #self.svg_art.append( SVG.Text( (int(posx) - shift_x, int(posy) + shift_y), name, font_size, (192,192,192), int(rotation) ) )
+    #self.svg_art.append( SVG.Text( (px - shift_x, py + shift_y), name, font_size, (192,192,192), ang_deg ) )
+    self.svg_art.append( SVG.Text( (px + s_x, py + s_y), name, font_size, (192,192,192), ang_deg ) )
+
+    self.update_bounds( px - shift_x, py - shift_y )
+    self.update_bounds( px + shift_x, py + shift_y ) 
 
 
   def cb_MODULE_DS(self, arg):
     startx,starty,endx,endy,stroke_width,layer = arg
 
-    sx,sy = int(startx),int(starty)
-    ex,ey = int(endx),int(endy)
+    sx,sy = self.thou( float(startx) ), self.thou( float(starty) )
+    ex,ey = self.thou( float(endx) ), self.thou( float(endy) )
 
     opacity = 0.9
     color=(255,255,255)
@@ -170,8 +186,7 @@ class modsvg(mod.mod):
       color = (0, 160, 160)
 
     #self.svg_scene.add( SVG.Line( (sx,sy), (ex,ey), color, int(stroke_width) ) )
-    self.svg_art.append( SVG.Line( (sx,sy), (ex,ey), color, int(stroke_width), opacity ) )
-
+    self.svg_art.append( SVG.Line( (sx,sy), (ex,ey), color, self.thou( float(stroke_width) ), opacity ) )
 
     self.update_bounds( sx, sy )
     self.update_bounds( ex, ey )
@@ -186,8 +201,8 @@ class modsvg(mod.mod):
       color = (0, 160, 160)
 
 
-    cx,cy = int(centerx),int(centery)
-    sx,sy = int(startx),int(starty)
+    cx,cy = self.thou( float(centerx) ), self.thou( float(centery) )
+    sx,sy = self.thou( float(startx) ), self.thou( float(starty) )
     a_rad = math.radians( float(angle)/10.0 )
 
     r = math.sqrt( (cx-sx)*(cx-sx) + (cy-sy)*(cy-sy) )
@@ -195,13 +210,15 @@ class modsvg(mod.mod):
 
     a_start_rad = math.atan2( sy - cy, sx - cx )
 
+    # Can't SVG to render semi-circles properly (don't know what I'm doing wrong).
+    # Interpolating instead
     prev_x, prev_y = None, None
     if a_rad > 0:
 
       for a in numpy.linspace(a_start_rad, a_start_rad + a_rad, 50):
         cur_x,cur_y = cx + r * math.cos(a), cy + r * math.sin(a)
         if prev_x is not None:
-          self.svg_art.append( SVG.Line( (prev_x, prev_y), (cur_x, cur_y), color, int(stroke_width), opacity ) )
+          self.svg_art.append( SVG.Line( (prev_x, prev_y), (cur_x, cur_y), color, self.thou( float(stroke_width) ), opacity ) )
         prev_x, prev_y = cur_x, cur_y
         self.update_bounds( cur_x, cur_y )
 
@@ -210,7 +227,7 @@ class modsvg(mod.mod):
       for a in numpy.linspace(a_start_rad, a_start_rad - a_rad, 50):
         cur_x,cur_y = cx + r * math.cos(a), cy + r * math.sin(a)
         if prev_x is not None:
-          self.svg_art.append( SVG.Line( (prev_x, prev_y), (cur_x, cur_y), color, int(stroke_width), opacity ) )
+          self.svg_art.append( SVG.Line( (prev_x, prev_y), (cur_x, cur_y), color, self.thou( float(stroke_width) ), opacity ) )
         prev_x, prev_y = cur_x, cur_y
         self.update_bounds( cur_x, cur_y )
 
@@ -248,7 +265,7 @@ class modsvg(mod.mod):
     w *= self.pixel_per_mil
     h *= self.pixel_per_mil
 
-    self.svg_scene.add( SVG.Circle( (0, 0), 5, (128, 128, 128), None, 0) )
+    #self.svg_scene.add( SVG.Circle( (0, 0), 5, (128, 128, 128), None, 0) )
 
     s_x *= self.pixel_per_mil
     s_y *= self.pixel_per_mil
@@ -285,27 +302,27 @@ class modsvg(mod.mod):
 
     self.pad.name = re.sub('"', '', pad_name)
     self.pad.shape = shape
-    self.pad.sizex = int(sizex)
-    self.pad.sizey = int(sizey)
+    self.pad.sizex = self.thou( float(sizex) )
+    self.pad.sizey = self.thou( float(sizey) )
     self.pad.orientation = int(orientation)
 
   def cb_PAD_Dr(self, arg):
-
     pad_drill, offsetx, offsety = arg[0], arg[1], arg[2]
+
     hole_shape, pad_drill_x, pad_drill_y = None, None, None
     if len(arg) > 3 and arg[3] is not None:
       hole_shape = arg[3]
       self.pad.hole_shape = re.sub(' ', '', hole_shape)
     if len(arg) > 4 and arg[4] is not None:
       pad_drill_x = arg[4]
-      self.pad.drill_hole_extra_x = int(pad_drill_x)
+      self.pad.drill_hole_extra_x = self.thou( float(pad_drill_x) )
     if len(arg) > 5 and arg[5] is not None:
       pad_drill_y = arg[5]
-      self.pad.drill_hole_extra_y = int(pad_drill_y)
+      self.pad.drill_hole_extra_y = self.thou( float(pad_drill_y) )
 
-    self.pad.drill_diam = int(pad_drill)
-    self.pad.drill_x = int(offsetx)
-    self.pad.drill_y = int(offsety)
+    self.pad.drill_diam = self.thou( float(pad_drill) )
+    self.pad.drill_x = self.thou( float(offsetx) )
+    self.pad.drill_y = self.thou( float(offsety) )
 
 
   def cb_PAD_At(self, arg):
@@ -321,9 +338,10 @@ class modsvg(mod.mod):
   def cb_PAD_Po(self, arg):
     posx, posy = arg
 
-    self.pad.posx = int(posx)
-    self.pad.posy = int(posy)
+    self.pad.posx = self.thou( float(posx) )
+    self.pad.posy = self.thou( float(posy) )
 
+  # units converted by thet ime we get here
   def cb_PAD_end(self, arg):
     p = self.pad
 
