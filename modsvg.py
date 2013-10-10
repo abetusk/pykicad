@@ -44,8 +44,7 @@ class modsvg(mod.mod):
 
     self.counter=0
 
-    self.pixel_per_mil = 300.0/1000.0
-    #self.pixel_per_mil = 30.0/1000.0
+    self.pixel_per_mil = 150.0/1000.0
 
     self.buffer_pixel = 40
 
@@ -56,6 +55,11 @@ class modsvg(mod.mod):
     self.units = "deci-mils"
 
     mod.mod.__init__(self)
+
+  def decithou(self, x):
+    if self.units == "mm":
+      return 10000.0 * float(x) / 25.4
+    return x
 
   def thou(self, x):
     if self.units == "mm":
@@ -138,14 +142,14 @@ class modsvg(mod.mod):
     #n, posx, posy, sizex, sizey, rotation, penwidth, flag, visible, layer, flag, name = arg
     n, posx, posy, sizex, sizey, rotation, penwidth, flag, visible, layer, name = arg
 
-    px = self.thou( float(posx) )
-    py = self.thou( float(posy) )
+    px = self.decithou( float(posx) )
+    py = self.decithou( float(posy) )
 
     name = re.sub('^\s*N\s*', '', name)
     name = re.sub('"', '', name)
 
     # what is happening with these fonts?
-    font_size = self.thou( float(sizex) ) / 0.6
+    font_size = self.decithou( float(sizex) ) / 0.6
 
     shift_x =  0.6 * font_size * float(len(name)-1) / 2.0
     shift_y = 0.6 * font_size / 2.0
@@ -177,8 +181,8 @@ class modsvg(mod.mod):
   def cb_MODULE_DS(self, arg):
     startx,starty,endx,endy,stroke_width,layer = arg
 
-    sx,sy = self.thou( float(startx) ), self.thou( float(starty) )
-    ex,ey = self.thou( float(endx) ), self.thou( float(endy) )
+    sx,sy = self.decithou( float(startx) ), self.decithou( float(starty) )
+    ex,ey = self.decithou( float(endx) ), self.decithou( float(endy) )
 
     opacity = 0.9
     color=(255,255,255)
@@ -186,7 +190,7 @@ class modsvg(mod.mod):
       color = (0, 160, 160)
 
     #self.svg_scene.add( SVG.Line( (sx,sy), (ex,ey), color, int(stroke_width) ) )
-    self.svg_art.append( SVG.Line( (sx,sy), (ex,ey), color, self.thou( float(stroke_width) ), opacity ) )
+    self.svg_art.append( SVG.Line( (sx,sy), (ex,ey), color, self.decithou( float(stroke_width) ), opacity ) )
 
     self.update_bounds( sx, sy )
     self.update_bounds( ex, ey )
@@ -201,8 +205,8 @@ class modsvg(mod.mod):
       color = (0, 160, 160)
 
 
-    cx,cy = self.thou( float(centerx) ), self.thou( float(centery) )
-    sx,sy = self.thou( float(startx) ), self.thou( float(starty) )
+    cx,cy = self.decithou( float(centerx) ), self.decithou( float(centery) )
+    sx,sy = self.decithou( float(startx) ), self.decithou( float(starty) )
     a_rad = math.radians( float(angle)/10.0 )
 
     r = math.sqrt( (cx-sx)*(cx-sx) + (cy-sy)*(cy-sy) )
@@ -218,7 +222,7 @@ class modsvg(mod.mod):
       for a in numpy.linspace(a_start_rad, a_start_rad + a_rad, 50):
         cur_x,cur_y = cx + r * math.cos(a), cy + r * math.sin(a)
         if prev_x is not None:
-          self.svg_art.append( SVG.Line( (prev_x, prev_y), (cur_x, cur_y), color, self.thou( float(stroke_width) ), opacity ) )
+          self.svg_art.append( SVG.Line( (prev_x, prev_y), (cur_x, cur_y), color, self.decithou( float(stroke_width) ), opacity ) )
         prev_x, prev_y = cur_x, cur_y
         self.update_bounds( cur_x, cur_y )
 
@@ -227,7 +231,7 @@ class modsvg(mod.mod):
       for a in numpy.linspace(a_start_rad, a_start_rad - a_rad, 50):
         cur_x,cur_y = cx + r * math.cos(a), cy + r * math.sin(a)
         if prev_x is not None:
-          self.svg_art.append( SVG.Line( (prev_x, prev_y), (cur_x, cur_y), color, self.thou( float(stroke_width) ), opacity ) )
+          self.svg_art.append( SVG.Line( (prev_x, prev_y), (cur_x, cur_y), color, self.decithou( float(stroke_width) ), opacity ) )
         prev_x, prev_y = cur_x, cur_y
         self.update_bounds( cur_x, cur_y )
 
@@ -302,8 +306,8 @@ class modsvg(mod.mod):
 
     self.pad.name = re.sub('"', '', pad_name)
     self.pad.shape = shape
-    self.pad.sizex = self.thou( float(sizex) )
-    self.pad.sizey = self.thou( float(sizey) )
+    self.pad.sizex = self.decithou( float(sizex) )
+    self.pad.sizey = self.decithou( float(sizey) )
     self.pad.orientation = int(orientation)
 
   def cb_PAD_Dr(self, arg):
@@ -315,14 +319,14 @@ class modsvg(mod.mod):
       self.pad.hole_shape = re.sub(' ', '', hole_shape)
     if len(arg) > 4 and arg[4] is not None:
       pad_drill_x = arg[4]
-      self.pad.drill_hole_extra_x = self.thou( float(pad_drill_x) )
+      self.pad.drill_hole_extra_x = self.decithou( float(pad_drill_x) )
     if len(arg) > 5 and arg[5] is not None:
       pad_drill_y = arg[5]
-      self.pad.drill_hole_extra_y = self.thou( float(pad_drill_y) )
+      self.pad.drill_hole_extra_y = self.decithou( float(pad_drill_y) )
 
-    self.pad.drill_diam = self.thou( float(pad_drill) )
-    self.pad.drill_x = self.thou( float(offsetx) )
-    self.pad.drill_y = self.thou( float(offsety) )
+    self.pad.drill_diam = self.decithou( float(pad_drill) )
+    self.pad.drill_x = self.decithou( float(offsetx) )
+    self.pad.drill_y = self.decithou( float(offsety) )
 
 
   def cb_PAD_At(self, arg):
@@ -338,8 +342,8 @@ class modsvg(mod.mod):
   def cb_PAD_Po(self, arg):
     posx, posy = arg
 
-    self.pad.posx = self.thou( float(posx) )
-    self.pad.posy = self.thou( float(posy) )
+    self.pad.posx = self.decithou( float(posx) )
+    self.pad.posy = self.decithou( float(posy) )
 
   # units converted by thet ime we get here
   def cb_PAD_end(self, arg):
