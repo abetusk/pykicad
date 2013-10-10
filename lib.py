@@ -59,7 +59,9 @@ class lib(object):
     "T" : [ "T", "direction", "posx", "posy", "text_size", "text_type", "unit", "convert", "*text" ],
 
     #### NOTE: though the reference says 'name_text_size' comes before 'num_text_size', I think they might actually be reversed
-    "X" : [ "X", "name", "num", "posx", "posy", "length", "direction", "name_text_size", "num_text_size", "unit", "convert", "electrical_type", "?pin_type" ]
+    "X" : [ "X", "name", "num", "posx", "posy", "length", "direction", "name_text_size", "num_text_size", "unit", "convert", "electrical_type", "?pin_type" ],
+
+    "EOF" : [ "EOF" ]
   }
 
   # A arc
@@ -135,6 +137,8 @@ class lib(object):
   def cb_X(self, arg): 
     pass
 
+  def cb_EOF(self, arg):
+    pass
 
   op_callback = {}
 
@@ -164,7 +168,8 @@ class lib(object):
                    "P" : "def.draw", 
                    "S" : "def.draw", 
                    "T" : "def.draw", 
-                   "X" : "def.draw" }
+                   "X" : "def.draw" },
+    "eof" : { "EOF" : "eof" }
   }
 
   # Build the RE from the op_descr hash as described above.
@@ -206,7 +211,8 @@ class lib(object):
       "P"  : self.cb_P,
       "S"  : self.cb_S,
       "T"  : self.cb_T,
-      "X"  : self.cb_X
+      "X"  : self.cb_X,
+      "EOF" : self.cb_EOF
     }
 
   def debug(self):
@@ -270,4 +276,5 @@ class lib(object):
 
       self.op_callback[ op ]( matched_arg )
 
+    self.op_callback[ "EOF" ]( "" )
 
