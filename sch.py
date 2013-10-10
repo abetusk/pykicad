@@ -35,6 +35,7 @@ class sch(object):
   #     ;  - match non-whitespace 2-tuples (that is, '((\s*\S+\s+\S+)*)').
   #          note that this must be followed by a '#' field to get rid of extraneous RE match
   #     #  - ignore (that is, "")
+  #     =  - real number
   #
   op_descr = {
     "header" : [ "EESchema\s+Schematic", "*text" ],
@@ -65,7 +66,8 @@ class sch(object):
     "comp_P" : [ "P", "posx", "posy" ],
     "comp_F" : [ "F", "field_number", "\"text", "#dummy", "orientation", "posx", "posy", "size", "*flags" ],
     "comp_redundant" : [ "", "1", "posx", "posy" ],
-    "comp_matrix" : [ "", "A", "B", "C", "D" ],
+    #"comp_matrix" : [ "", "A", "B", "C", "D" ],
+    "comp_matrix" : [ "", "=A", "=B", "=C", "=D" ],
     "comp_end" : [ "\$EndComp" ],
 
     # a note on theboard
@@ -482,6 +484,8 @@ class sch(object):
       elif re.match('^;', descr):  op_re_search += "((" + re_prefix + "\S+\s+\S+)+)"
       elif re.match('^"', descr): op_re_search += re_prefix + '("(\\"|[^"])*")'
       elif re.match('^\*', descr): op_re_search += "(.*)"
+      #elif re.match('^=', descr): op_re_search += re_prefix + "(-?\s*\d+\.|-?\s*\d+(\.\d+)?|-?\s*\.\d+)"
+      elif re.match('^=', descr): op_re_search += re_prefix + "(-?\s*\d+\.\d+|-?\s*\d+\.|-?\s*\.\d+|-?\s*\d+)"
       else: op_re_search += re_prefix + "(\S+)"
       re_prefix = '\s+'
     op_re_search += "\s*$"
