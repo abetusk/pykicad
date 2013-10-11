@@ -44,7 +44,7 @@ class schjson(sch.sch):
 
   def cb_comp(self, args):
     self.cur_component = {}
-    self.cur_component["text_field"] = []
+    self.cur_component["text"] = []
     self.cur_component["transform"] = [ [ 1, 0], [0, 1] ]
 
   def cb_comp_L(self, args):
@@ -85,7 +85,7 @@ class schjson(sch.sch):
     #F["flags"] = flags
     F["flags"] = munged_flags
 
-    self.cur_component["text_field"].append( F )
+    self.cur_component["text"].append( F )
 
   def cb_comp_matrix(self, args):
     x00, x01, x10, x11 = args

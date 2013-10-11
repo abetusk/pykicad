@@ -140,8 +140,10 @@ class libjson(lib.lib):
   def cb_F0 (self, arg):
     reference, posx, posy, text_size, text_orient, visible, htext_justify, vtext_justify = arg
 
-    htext_justify = htext_justify.strip()
-    vtext_justify = vtext_justify.strip()
+    if htext_justify:
+      htext_justify = htext_justify.strip()
+    if vtext_justify:
+      vtext_justify = vtext_justify.strip()
 
     is_visible = True
     if visible == "I":
@@ -168,15 +170,20 @@ class libjson(lib.lib):
     self.update_bounds( x - w/2, y - h/2 )
     self.update_bounds( x + w/2, y + h/2 )
 
+    htext_justify_token = 'C'
     vtext_justify_token = 'C'
     text_italic = 'N'
     text_bold = 'N'
 
-    r = re.search("\s*([CLRT])([IN])([BN])", vtext_justify)
-    if r:
-      vtext_justify_token = r.group(1)
-      text_italic = r.group(2)
-      text_bold = r.group(3)
+    if vtext_justify:
+      r = re.search("\s*([CLRT])([IN])([BN])", vtext_justify)
+      if r:
+        vtext_justify_token = r.group(1)
+        text_italic = r.group(2)
+        text_bold = r.group(3)
+
+    if htext_justify:
+      htext_justify_token = htext_justify
 
 
     f0 = {}
@@ -196,6 +203,11 @@ class libjson(lib.lib):
   def cb_F1 (self, arg):
     reference, posx, posy, text_size, text_orient, visible, htext_justify, vtext_justify = arg
 
+    if vtext_justify:
+      vtext_justify = vtext_justify.strip()
+    if htext_justify:
+      htext_justify = htext_justify.strip()
+
     is_visible = True
     if visible == "I":
       is_visible = False
@@ -221,19 +233,23 @@ class libjson(lib.lib):
     self.update_bounds( x - w/2, y - h/2 )
     self.update_bounds( x + w/2, y + h/2 )
 
+    htext_justify_token = 'C'
     vtext_justify_token = 'C'
     text_italic = 'N'
     text_bold = 'N'
 
-    r = re.search("\s*([CLRT])([IN])([BN])", vtext_justify)
-    if r:
-      if len(r.groups()) > 1:
-        vtext_justify_token = r.group(1)
-      if len(r.groups()) > 2:
-        text_italic = r.group(2)
-      if len(r.groups()) > 3:
-        text_bold = r.group(3)
+    if vtext_justify:
+      r = re.search("\s*([CLRT])([IN])([BN])", vtext_justify)
+      if r:
+        if len(r.groups()) > 1:
+          vtext_justify_token = r.group(1)
+        if len(r.groups()) > 2:
+          text_italic = r.group(2)
+        if len(r.groups()) > 3:
+          text_bold = r.group(3)
 
+    if htext_justify:
+      htext_justify_token = htext_justify
 
     f1 = {}
     f1["reference"] = reference
@@ -267,19 +283,22 @@ class libjson(lib.lib):
 
   def cb_ENDDEF(self, arg):
 
-    if self.first:
-      print '{ "library" : "' + self.lib_file + '" , '
 
-    if not self.first:
-      print ", "
+    munged_name = re.sub('\/', '#', self.json_obj["name"])
+    json_file = self.json_prefix + urllib.quote( munged_name ) + self.json_suffix 
 
-    print ' "' + self.json_obj["name"] + '" : ' + json.dumps( self.json_obj, indent=2 )
+    print json_file
+
+    f = open( json_file, "w" )
+    f.write( json.dumps( self.json_obj, indent=2 ) )
+    f.close()
 
     self.first = False
     self.clear()
 
   def cb_EOF(self, arg):
-    print "}"
+    #print "}"
+    pass
 
 
   def cb_A(self, arg):

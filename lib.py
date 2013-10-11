@@ -248,7 +248,9 @@ class lib(object):
     self.read_lib(fn)
     line_no = 0
 
-    for l in self.lib_lines:
+    #for l in self.lib_lines:
+    for latin_line in self.lib_lines:
+      l = latin_line.decode('latin1').encode('utf-8')
       line_no += 1
 
       l = l.strip()
