@@ -19,6 +19,7 @@ Loads KiCAD lib file, parses it with lib, writes to json format.
 
 import re
 import sys
+import os
 import lib
 import math
 import numpy
@@ -37,6 +38,7 @@ class libjson(lib.lib):
     self.json_suffix = ".json"
 
     self.counter = 0
+    self.alias = []
 
     # bounding box is rough
     self.bounding_box = [ [0,0], [0, 0] ]
@@ -92,6 +94,12 @@ class libjson(lib.lib):
 
   def cb_header(self, arg):
     pass
+
+
+  def cb_ALIAS(self, arg):
+    s = arg[0].strip()
+
+    self.alias = re.sub('  *', ' ', s).split(' ')
 
 
   def cb_DEF (self, arg):
@@ -193,8 +201,8 @@ class libjson(lib.lib):
     f0["size"] = text_size
     f0["orientation"] = text_orient
     f0["visible"] = is_visible
-    f0["horizontal_justify"] = htext_justify  # (C)enter, (L)eft, (R)ight, (T)op
-    f0["vertical_justify"] = vtext_justify_token  # (C)enter, (L)eft, (R)ight, (T)op
+    f0["hjustify"] = htext_justify  # (C)enter, (L)eft, (R)ight, (T)op
+    f0["vjustify"] = vtext_justify_token  # (C)enter, (L)eft, (R)ight, (T)op
     f0["italic"] = text_italic      # (I)italic, (N)one
     f0["bold"] = text_bold          # (B)old, (N)one
 
@@ -258,8 +266,8 @@ class libjson(lib.lib):
     f1["size"] = text_size
     f1["orientation"] = text_orient
     f1["visible"] = is_visible
-    f1["horizontal_justify"] = htext_justify  # (C)enter, (L)eft, (R)ight, (T)op
-    f1["vertical_justify"] = vtext_justify_token  # (C)enter, (L)eft, (R)ight, (T)op
+    f1["hjustify"] = htext_justify  # (C)enter, (L)eft, (R)ight, (T)op
+    f1["vjustify"] = vtext_justify_token  # (C)enter, (L)eft, (R)ight, (T)op
     f1["italic"] = text_italic      # (I)italic, (N)one
     f1["bold"] = text_bold          # (B)old, (N)one
 
@@ -285,7 +293,8 @@ class libjson(lib.lib):
 
 
     munged_name = re.sub('\/', '#', self.json_obj["name"])
-    json_file = self.json_prefix + urllib.quote( munged_name ) + self.json_suffix 
+    json_base_fn = urllib.quote( munged_name ) + self.json_suffix 
+    json_file = self.json_prefix + json_base_fn
 
     print json_file
 
@@ -293,8 +302,19 @@ class libjson(lib.lib):
     f.write( json.dumps( self.json_obj, indent=2 ) )
     f.close()
 
+    # fails because we're creating duplicate symlinks.
+    # this is self contradictory, as two different parts
+    # can have the same alias.  take it out for now.
+#    for comp in self.alias:
+#      fn = self.json_prefix + urllib.quote( re.sub('\/', '#', comp) ) + self.json_suffix
+#      if fn == json_file:
+#        continue
+#      print "base:", json_base_fn, " sym:", fn
+#      os.symlink( json_base_fn , fn )
+
     self.first = False
     self.clear()
+
 
   def cb_EOF(self, arg):
     #print "}"
@@ -421,7 +441,7 @@ class libjson(lib.lib):
     fill_opt = "N"
     if fill is not None:
       fill_opt = fill.strip()
-    rect_obj["fill"] = fill
+    rect_obj["fill"] = fill_opt
 
     rect_obj["line_width"] = thickness
 

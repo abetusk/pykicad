@@ -28,6 +28,7 @@ class schjson(sch.sch):
     self.json_obj["connection"] = []
     self.json_obj["noconnect"] = []
     self.json_obj["component"] = []
+    self.json_obj["header"] = None
 
     self.cur_component = {}
 
@@ -85,6 +86,24 @@ class schjson(sch.sch):
     #F["flags"] = flags
     F["flags"] = munged_flags
 
+    if munged_flags:
+      F["visible"] = True
+      if re.search("^0*1", munged_flags):
+        F["visible"] = False
+
+      g = re.search("([01])*\s*([LRCBT])\s*([LRCBT])([IN])?([BN])?", munged_flags);
+      if g:
+        F["hjustify"] = g.group(2)
+        F["vjustify"] = g.group(3)
+
+        F["italic"] = False
+        F["bold"] = False
+
+        if g.group(4) == "I":
+          F["italic"] = True
+        if g.group(5) == "B":
+          F["bold"] = True
+
     self.cur_component["text"].append( F )
 
   def cb_comp_matrix(self, args):
@@ -102,11 +121,11 @@ class schjson(sch.sch):
 
   def cb_noconn(self, args):
     posx, posy = args
-    self.json_obj["noconnect"].append( [ posx, posy ] )
+    self.json_obj["noconnect"].append( { "x" : posx, "y" : posy } )
 
   def cb_connection(self, args):
     posx, posy = args
-    self.json_obj["connection"].append( [ posx, posy ] )
+    self.json_obj["connection"].append( { "x" : posx, "y" : posy } )
 
   def cb_wireline_segment(self, args):
     startx, starty, endx, endy = args
