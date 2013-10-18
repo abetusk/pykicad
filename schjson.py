@@ -1,4 +1,22 @@
 #!/usr/bin/python
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+"""
+Loads KiCAD sch file (schematic file), parses it with sch.py, writes to json format.
+"""
+
 
 import re
 import sys
@@ -24,11 +42,13 @@ class schjson(sch.sch):
     self.bounding_box = [ [0,0], [0, 0] ]
 
     self.json_obj = {}
-    self.json_obj["line"] = []
-    self.json_obj["connection"] = []
-    self.json_obj["noconnect"] = []
-    self.json_obj["component"] = []
-    self.json_obj["header"] = None
+    self.json_obj["element"] = []
+#    self.json_obj = {}
+#    self.json_obj["line"] = []
+#    self.json_obj["connection"] = []
+#    self.json_obj["noconnect"] = []
+#    self.json_obj["component"] = []
+#    self.json_obj["header"] = None
 
     self.cur_component = {}
 
@@ -47,6 +67,7 @@ class schjson(sch.sch):
     self.cur_component = {}
     self.cur_component["text"] = []
     self.cur_component["transform"] = [ [ 1, 0], [0, 1] ]
+    self.cur_component["type"] = "component"
 
   def cb_comp_L(self, args):
     name, reference = args
@@ -115,49 +136,60 @@ class schjson(sch.sch):
     self.cur_component["transform"][1][1] = x11
 
   def cb_comp_end(self, args):
-    self.json_obj["component"].append( self.cur_component )
+    #self.json_obj["component"].append( self.cur_component )
+    self.json_obj["element"].append( self.cur_component )
     self.cur_component = {}
 
 
   def cb_noconn(self, args):
     posx, posy = args
-    self.json_obj["noconnect"].append( { "x" : posx, "y" : posy } )
+    #self.json_obj["noconnect"].append( { "x" : posx, "y" : posy } )
+    self.json_obj["element"].append( { "type" : "noconn", "x" : posx, "y" : posy } )
 
   def cb_connection(self, args):
     posx, posy = args
-    self.json_obj["connection"].append( { "x" : posx, "y" : posy } )
+    #self.json_obj["connection"].append( { "x" : posx, "y" : posy } )
+    self.json_obj["element"].append( { "type" : "connection", "x" : posx, "y" : posy } )
 
   def cb_wireline_segment(self, args):
     startx, starty, endx, endy = args
-    self.json_obj["line"].append( { "type" : "wireline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    #self.json_obj["line"].append( { "type" : "wireline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    self.json_obj["element"].append( { "type" : "wireline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
   def cb_busline_segment(self, args):
     startx, starty, endx, endy = args
-    self.json_obj["line"].append( { "type" : "busline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    #self.json_obj["line"].append( { "type" : "busline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    self.json_obj["element"].append( { "type" : "busline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
   def cb_notesline_segment(self, args):
     startx, starty, endx, endy = args
-    self.json_obj["line"].append( { "type" : "notesline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    #self.json_obj["line"].append( { "type" : "notesline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    self.json_obj["element"].append( { "type" : "notesline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
   def cb_wirebus_segment(self, args):
     startx, starty, endx, endy = args
-    self.json_obj["line"].append( { "type" : "wirebus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    #self.json_obj["line"].append( { "type" : "wirebus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    self.json_obj["element"].append( { "type" : "wirebus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
   def cb_busbus_segment(self, args):
     startx, starty, endx, endy = args
-    self.json_obj["line"].append( { "type" : "busbus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    #self.json_obj["line"].append( { "type" : "busbus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    self.json_obj["element"].append( { "type" : "busbus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
   def cb_entrywirebus_segment(self, args):
     startx, starty, endx, endy = args
-    self.json_obj["line"].append( { "type" : "entrywirebus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    #self.json_obj["line"].append( { "type" : "entrywirebus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    self.json_obj["element"].append( { "type" : "entrywirebus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
   def cb_entrybusbus_segment(self, args):
     startx, starty, endx, endy = args
-    self.json_obj["line"].append( { "type" : "entrybusbus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    #self.json_obj["line"].append( { "type" : "entrybusbus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    self.json_obj["element"].append( { "type" : "entrybusbus", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
   def cb_entrywireline_segment(self, args):
     startx, starty, endx, endy = args
-    self.json_obj["line"].append( { "type" : "entrywireline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    #self.json_obj["line"].append( { "type" : "entrywireline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
+    self.json_obj["element"].append( { "type" : "entrywireline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
 
 

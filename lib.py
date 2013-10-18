@@ -1,4 +1,18 @@
 #!/usr/bin/python
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 """
 Parses KiCAD .lib files.
 Access state by callbacks.
@@ -41,10 +55,10 @@ class lib(object):
     "ENDDEF" : [ "ENDDEF" ],
     "F0" : [ "F0", "reference", "posx", "posy", "text_size", "text_orient", "visible", "?htext_justify", "?vtext_justify" ],
     "F1" : [ "F1", "name", "posx", "posy", "text_size", "text_orient", "visible", "?htext_justify", "?vtext_justify" ],
-    "F2" : [ "F2", "*text" ],
-    "F3" : [ "F3", "*text" ],
-    "F4" : [ "F4", "*text" ],
-    "F5" : [ "F5", "*text" ],
+    #"F2" : [ "F2", "*text" ],
+    #"F3" : [ "F3", "*text" ],
+    #"F4" : [ "F4", "*text" ],
+    #"F5" : [ "F5", "*text" ],
     "Fn" : [ "F(\d+)", "#dummy", "*text" ],
     "DRAW" : [ "DRAW" ] ,
     "ENDDRAW" : [ "ENDDRAW" ] ,
@@ -86,17 +100,17 @@ class lib(object):
   def cb_F1(self, arg): 
     pass
 
-  def cb_F2(self, arg): 
-    pass
+  #def cb_F2(self, arg): 
+  #  pass
 
-  def cb_F3(self, arg): 
-    pass
+  #def cb_F3(self, arg): 
+  #  pass
 
-  def cb_F4(self, arg): 
-    pass
+  #def cb_F4(self, arg): 
+  #  pass
 
-  def cb_F5(self, arg): 
-    pass
+  #def cb_F5(self, arg): 
+  #  pass
 
   def cb_Fn(self, arg): 
     pass
@@ -152,10 +166,10 @@ class lib(object):
     "def" :  { "ENDDEF" : "start" , 
                "F0" : "def" , 
                "F1" : "def", 
-               "F2" : "def", 
-               "F3" : "def",
-               "F4" : "def",
-               "F5" : "def",
+               #"F2" : "def", 
+               #"F3" : "def",
+               #"F4" : "def",
+               #"F5" : "def",
                "Fn" : "def",
                "ALIAS" : "def",
                "DRAW" : "def.draw", 
@@ -195,10 +209,10 @@ class lib(object):
       "ENDDEF"  : self.cb_ENDDEF,
       "F0"  : self.cb_F0,
       "F1"  : self.cb_F1,
-      "F2"  : self.cb_F2,
-      "F3"  : self.cb_F3,
-      "F4"  : self.cb_F4,
-      "F5"  : self.cb_F5,
+      #"F2"  : self.cb_F2,
+      #"F3"  : self.cb_F3,
+      #"F4"  : self.cb_F4,
+      #"F5"  : self.cb_F5,
       "Fn"  : self.cb_Fn,
       "DRAW"  : self.cb_DRAW,
       "ENDDRAW"  : self.cb_ENDDRAW,

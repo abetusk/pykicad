@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 """
-Loads KiCAD lib file, parses it with lib, writes to json format.
+Loads KiCAD lib file (library file), parses it with lib.py, writes to json format.
 """
 
 import re
@@ -44,7 +44,7 @@ class libjson(lib.lib):
     self.bounding_box = [ [0,0], [0, 0] ]
 
     self.json_obj = {}
-    self.json_obj["text"] = {}
+    self.json_obj["text"] = []
     #self.json_obj["text"]["description"] = " horizontal and vertical justify - (C)entered (L)eft (R)ight (T)op, bold - (B)old (N)one, italic - (I)talic (N)one, orientation - (H)oriztonal (V)ertical" 
     self.json_obj["units"] = "deci-mils"
 
@@ -58,7 +58,7 @@ class libjson(lib.lib):
 
   def clear(self):
     self.json_obj = {}
-    self.json_obj["text"] = {}
+    self.json_obj["text"] = []
     #self.json_obj["text"]["description"] = " horizontal and vertical justify - (C)entered (L)eft (R)ight (T)op, bold - (B)old (N)one, italic - (I)talic (N)one, orientation - (H)oriztonal (V)ertical" 
 
     self.json_obj["art"] = []
@@ -195,6 +195,7 @@ class libjson(lib.lib):
 
 
     f0 = {}
+    f0["number"] = 0
     f0["reference"] = reference
     f0["x"] = posx
     f0["y"] = posy
@@ -206,7 +207,8 @@ class libjson(lib.lib):
     f0["italic"] = text_italic      # (I)italic, (N)one
     f0["bold"] = text_bold          # (B)old, (N)one
 
-    self.json_obj["text"]["F0"] = f0
+    #self.json_obj["text"]["F0"] = f0
+    self.json_obj["text"].append(f0)
 
   def cb_F1 (self, arg):
     reference, posx, posy, text_size, text_orient, visible, htext_justify, vtext_justify = arg
@@ -260,6 +262,7 @@ class libjson(lib.lib):
       htext_justify_token = htext_justify
 
     f1 = {}
+    f1["number"] = 1
     f1["reference"] = reference
     f1["x"] = posx
     f1["y"] = posy
@@ -271,23 +274,19 @@ class libjson(lib.lib):
     f1["italic"] = text_italic      # (I)italic, (N)one
     f1["bold"] = text_bold          # (B)old, (N)one
 
-    self.json_obj["text"]["F1"] = f1
+    #self.json_obj["text"]["F1"] = f1
+    self.json_obj["text"].append(f1)
 
-
-  def cb_F2 (self, arg): 
-    pass
-
-  def cb_F3 (self, arg): 
-    pass
-
-  def cb_F4 (self, arg): 
-    pass
-
-  def cb_F5 (self, arg): 
-    pass
 
   def cb_Fn (self, arg): 
-    pass
+    num, text = arg
+
+    fn = {}
+    fn["number"] = num
+    fn["text"] = text
+
+    self.json_obj["text"].append(fn)
+
 
   def cb_ENDDEF(self, arg):
 
@@ -303,7 +302,7 @@ class libjson(lib.lib):
     f.close()
 
     # fails because we're creating duplicate symlinks.
-    # this is self contradictory, as two different parts
+    # this is an inconsistency in the .lib files, as two different parts
     # can have the same alias.  take it out for now.
 #    for comp in self.alias:
 #      fn = self.json_prefix + urllib.quote( re.sub('\/', '#', comp) ) + self.json_suffix
