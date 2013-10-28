@@ -426,12 +426,15 @@ class libjson(lib.lib):
     width  = abs( float(ex-sx) )
 
     px = min(sx, ex)
-    py = min(sy, ey)
+    #py = min(sy, ey)
+    py = max(sy, ey)
 
     rect_obj = {}
     rect_obj["shape"] = "rectangle"
-    rect_obj["x"] = float(startx)
-    rect_obj["y"] = float(starty)
+    #rect_obj["x"] = float(startx)
+    #rect_obj["y"] = float(starty)
+    rect_obj["x"] = float(px)
+    rect_obj["y"] = float(py)
     rect_obj["width"] = width
     rect_obj["height"] = height
     rect_obj["unit"] = unit
