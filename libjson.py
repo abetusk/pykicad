@@ -106,8 +106,11 @@ class libjson(lib.lib):
     name,reference,unused,text_offset,draw_pinnumber,draw_pinname,unit_count,units_locked,option_flag = arg
 
     # replace '/' with '#' and url ecnode the rest of the string
-    munged_name = re.sub('\/', '#', arg[0] )
+    #munged_name = re.sub('\/', '#', arg[0] )
+
+    munged_name = arg[0] 
     munged_name = urllib.quote( munged_name );
+    munged_name = re.sub('\/', '%2F', arg[0] )
 
     self.json_file = self.json_prefix + munged_name + self.json_suffix 
 
@@ -291,8 +294,14 @@ class libjson(lib.lib):
   def cb_ENDDEF(self, arg):
 
 
-    munged_name = re.sub('\/', '#', self.json_obj["name"])
-    json_base_fn = urllib.quote( munged_name ) + self.json_suffix 
+    #munged_name = re.sub('\/', '#', self.json_obj["name"])
+    munged_name = self.json_obj["name"]
+    munged_name = urllib.quote( munged_name )
+    munged_name = re.sub('\/', '%2F', self.json_obj["name"])
+
+    #json_base_fn = urllib.quote( munged_name ) + self.json_suffix 
+    json_base_fn = munged_name  + self.json_suffix 
+
     json_file = self.json_prefix + json_base_fn
 
     print json_file
@@ -323,8 +332,31 @@ class libjson(lib.lib):
   def cb_A(self, arg):
     posx,posy,radius,start_angle,end_angle,unit,convert,thickness,fill,startx,starty,endx,endy = arg
 
+    sa_deg = float(start_angle)/10.0 
+    ea_deg = float(end_angle)/10.0 
+
+
+    if ea_deg > sa_deg:
+      deg_se_f = ea_deg - sa_deg
+      deg_es_f = 360 - deg_se_f
+    else:
+      deg_es_f = sa_deg - ea_deg
+      deg_se_f = 360 - deg_es_f
+
+    if deg_se_f < deg_es_f:
+      sa_rad = math.radians(sa_deg)
+      ea_rad = math.radians(ea_deg)
+    else:
+      sa_rad = math.radians(ea_deg)
+      ea_rad = math.radians(sa_deg)
+
+
+
+
     sa = math.radians( float(start_angle)/10.0 )
     ea = math.radians( float(end_angle)/10.0 )
+
+    # I think KiCAD is just taking the minor arc
 
     ccw = True
     if abs(ea - sa) > (math.pi/2.0):
@@ -335,8 +367,14 @@ class libjson(lib.lib):
     arc_obj["x"] = float(posx)
     arc_obj["y"] = float(posy)
     arc_obj["r"] = float(radius)
-    arc_obj["start_angle"] = math.radians( float(start_angle)/10.0 )
-    arc_obj["end_angle"] = math.radians( float(end_angle)/10.0 )
+
+    #arc_obj["start_angle"] = math.radians( float(start_angle)/10.0 )
+    #arc_obj["end_angle"] = math.radians( float(end_angle)/10.0 )
+    #arc_obj["counterclockwise"] = ccw
+    arc_obj["start_angle"] = sa_rad
+    arc_obj["end_angle"]   = ea_rad
+    arc_obj["counterclockwise"] = True
+
     arc_obj["unit"] = unit
     arc_obj["de_morgan_alternate_shape"] = convert
     arc_obj["line_width"] = int(thickness)
@@ -346,7 +384,6 @@ class libjson(lib.lib):
       fill_opt = fill.strip()
     arc_obj["fill"] = fill_opt
 
-    arc_obj["counterclockwise"] = ccw
 
     self.json_obj["art"].append( arc_obj )
 
@@ -504,10 +541,12 @@ class libjson(lib.lib):
     pin_obj["de_morgan_alternate_shape"] = convert
     pin_obj["electrical_type"] = electrical_type
 
+
     visible_flag = True
     if pin_type:
       if re.search( "^ *N", pin_type):
         visible_flag = False
+      pin_obj["pin_type"] = pin_type.strip()
 
     pin_obj["shape"] = pin_type
     pin_obj["visible"] = visible_flag

@@ -8,12 +8,11 @@ import urllib
 
 for lib_fn in os.listdir('library'):
 
-  print lib_fn
-
   if re.search('\.lib$', lib_fn):
     print "converting:", lib_fn
 
     base = re.sub('\.lib$', '', lib_fn)
+
 
     odn = urllib.quote( 'eeschema/json/' + base + '/' )
 
