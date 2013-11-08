@@ -6,3 +6,4 @@ eeschema
 modules
 pcbnew
 tmp/
+*.swp
