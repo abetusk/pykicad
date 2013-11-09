@@ -1402,9 +1402,5 @@ if __name__ == "__main__":
   s.parrot_flag = True
   #s.read_brd(sys.argv[1])
   s.parse_brd(sys.argv[1])
-  def cb_header(self, arg):
-    if self.header:
-      print "header",arg
-    pass
 
 
