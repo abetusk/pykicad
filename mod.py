@@ -504,6 +504,12 @@ class mod(object):
   def parse_mod(self, fn):
 
     self.read_mod(fn)
+    #line_no = 0
+
+    self.parse_mod_lines()
+
+  def parse_mod_lines(self):
+
     line_no = 0
 
     for l in self.mod_lines:

@@ -108,12 +108,15 @@ class modjson(mod.mod):
   def cb_MODULE(self, arg):
     name = arg[0]
 
+    clean_name = name.strip()
+
     munged_name = name
     munged_name = re.sub( '^\s*', '', munged_name )
     munged_name = re.sub( '\s*$', '', munged_name )
     munged_name = urllib.quote( munged_name )
     munged_name = re.sub( '\/', '%2F', munged_name )
     self.json_obj["units"] = self.units
+    self.json_obj["name"] = clean_name
 
     self.json_file = self.json_prefix + str( munged_name ) + self.json_suffix
 
