@@ -46,7 +46,7 @@ class modjson(mod.mod):
   def decithou(self, x):
     if self.units == "mm":
       return 10000.0 * float(x) / 25.4
-    return x
+    return float(x)
 
   def thou(self, x):
     if self.units == "mm":
@@ -126,8 +126,8 @@ class modjson(mod.mod):
   def cb_MODULE_Po(self, arg):
     posx, posy, orientation, layer, timestamp, attribute0, attribute1 = arg
 
-    self.json_obj["x"] = posx
-    self.json_obj["y"] = posy
+    self.json_obj["x"] = self.decithou(posx)
+    self.json_obj["y"] = self.decithou(posy)
 
     self.json_obj["orientation"] = orientation
     self.json_obj["layer"] = layer
@@ -178,15 +178,21 @@ class modjson(mod.mod):
 
     text_field = {}
     text_field["number"] = n
-    text_field["x"] = posx
-    text_field["y"] = posy
-    text_field["sizex"] = sizex
-    text_field["sizey"] = sizey
+    text_field["x"] = self.decithou(posx)
+    text_field["y"] = self.decithou(posy)
+    text_field["sizex"] = self.decithou(sizex)
+    text_field["sizey"] = self.decithou(sizey)
     text_field["rotation"] = rotation
-    text_field["penwidth"] = penwidth
-    text_field["penwidth"] = penwidth
+    text_field["penwidth"] = self.decithou(penwidth)
     text_field["flag"] = flag
-    text_field["visible"] = visible
+
+    #text_field["visible"] = visible
+    if visible == "V":
+      text_field["visible"] = True
+    else:
+      text_field["visible"] = False
+
+
     text_field["layer"] = layer
     text_field["misc"] = name
 
@@ -204,13 +210,13 @@ class modjson(mod.mod):
 
     art_field = {}
     art_field["shape"] = "segment"
-    art_field["startx"] = startx
-    art_field["starty"] = starty
+    art_field["startx"] = self.decithou(startx)
+    art_field["starty"] = self.decithou(starty)
 
-    art_field["endx"] = endx
-    art_field["endy"] = endy
+    art_field["endx"] = self.decithou(endx)
+    art_field["endy"] = self.decithou(endy)
 
-    art_field["line_width"] = stroke_width
+    art_field["line_width"] = self.decithou(stroke_width)
     art_field["layer"] = layer
 
     self.json_obj["art"].append( art_field )
@@ -221,13 +227,15 @@ class modjson(mod.mod):
 
     art_field = {}
     art_field["shape"] = "arc"
+
+    cx = self.decithou( centerx )
+    cy = self.decithou( centery )
+
     art_field["x"] = centerx
     art_field["y"] = centery
 
-    cx = float(centerx)
-    cy = float(centery)
-    sx = float(startx)
-    sy = float(starty)
+    sx = self.decithou( startx )
+    sy = self.decithou( starty )
     dx = (cx - sx)
     dy = (cy - sy)
     dx2 = dx*dx
@@ -240,7 +248,7 @@ class modjson(mod.mod):
     art_field["angle"] = ang
 
     art_field["start_angle"] = math.atan2(dy, dx)
-    art_field["line_width"] = stroke_width
+    art_field["line_width"] = self.decithou(stroke_width)
     art_field["layer"] = layer
 
     self.json_obj["art"].append( art_field )
@@ -251,13 +259,15 @@ class modjson(mod.mod):
 
     art_field = {}
     art_field["shape"] = "circle"
-    art_field["x"] = centerx
-    art_field["y"] = centery
 
-    cx = float(centerx)
-    cy = float(centery)
-    px = float(pointx)
-    py = float(pointy)
+    cx = self.decithou( centerx )
+    cy = self.decithou( centery )
+
+    art_field["x"] = cx
+    art_field["y"] = cy
+
+    px = self.decithou( pointx )
+    py = self.decithou( pointy )
     dx = (cx - px)
     dy = (cy - py)
     dx2 = dx*dx
@@ -266,7 +276,7 @@ class modjson(mod.mod):
 
     art_field["r"] = r
 
-    art_field["line_width"] = stroke_width
+    art_field["line_width"] = self.decithou(stroke_width)
     art_field["layer"] = layer
 
     self.json_obj["art"].append( art_field )
@@ -313,10 +323,10 @@ class modjson(mod.mod):
 
     self.pad["shape"] = shape_lookup[ shape ]
 
-    self.pad["sizex"] = self.decithou( float(sizex) )
-    self.pad["sizey"] = self.decithou( float(sizey) )
-    self.pad["deltax"] = deltax
-    self.pad["deltay"] = deltay
+    self.pad["sizex"] = self.decithou( sizex )
+    self.pad["sizey"] = self.decithou( sizey )
+    self.pad["deltax"] = self.decithou( deltax )
+    self.pad["deltay"] = self.decithou( deltay )
     self.pad["orientation"] = int(orientation)
 
   def cb_PAD_Dr(self, arg):
@@ -328,14 +338,14 @@ class modjson(mod.mod):
       self.pad["hole_shape"] = re.sub(' ', '', hole_shape)
     if len(arg) > 4 and arg[4] is not None:
       pad_drill_x = arg[4]
-      self.pad["drill_hole_extra_x"] = self.decithou( float(pad_drill_x) )
+      self.pad["drill_hole_extra_x"] = self.decithou( pad_drill_x )
     if len(arg) > 5 and arg[5] is not None:
       pad_drill_y = arg[5]
-      self.pad["drill_hole_extra_y"] = self.decithou( float(pad_drill_y) )
+      self.pad["drill_hole_extra_y"] = self.decithou( pad_drill_y )
 
-    self.pad["drill_diam"] = self.decithou( float(pad_drill) )
-    self.pad["drill_x"] = self.decithou( float(offsetx) )
-    self.pad["drill_y"] = self.decithou( float(offsety) )
+    self.pad["drill_diam"] = self.decithou( pad_drill )
+    self.pad["drill_x"] = self.decithou( offsetx )
+    self.pad["drill_y"] = self.decithou( offsety )
 
 
   def cb_PAD_At(self, arg):
@@ -356,8 +366,8 @@ class modjson(mod.mod):
   def cb_PAD_Po(self, arg):
     posx, posy = arg
 
-    self.pad["posx"] = self.decithou( float(posx) )
-    self.pad["posy"] = self.decithou( float(posy) )
+    self.pad["posx"] = self.decithou( posx )
+    self.pad["posy"] = self.decithou( posy )
 
   # units converted by thet ime we get here
   def cb_PAD_end(self, arg):
