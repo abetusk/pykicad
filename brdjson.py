@@ -62,7 +62,7 @@ class brdjson(brd.brd):
     
   def decithou(self, x):
     if self.units == "mm":
-      return 10000.0 * float(x) / 25.4
+      return round( 10000.0 * float(x) / 25.4 )
     return x
 
   def thou(self, x):

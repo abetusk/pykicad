@@ -45,12 +45,12 @@ class modjson(mod.mod):
 
   def decithou(self, x):
     if self.units == "mm":
-      return 10000.0 * float(x) / 25.4
+      return round( 10000.0 * float(x) / 25.4 )
     return float(x)
 
   def thou(self, x):
     if self.units == "mm":
-      return 1000.0 * float(x) / 25.4
+      return  1000.0 * float(x) / 25.4 
     return x
 
   def mm(self, x):
