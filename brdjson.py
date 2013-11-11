@@ -42,14 +42,8 @@ class brdjson(brd.brd):
 
     self.json_obj = {}
 
-    self.json_obj["art"] = []
     self.json_obj["units"] = "deci-mils"
-    self.json_obj["pad"] = []
-    self.json_obj["text"] = []
-    self.json_obj["module"] = []
-
-    self.json_obj["segment"] = []
-    self.json_obj["track"] = []
+    self.json_obj["element"] = []
 
     # equipot maps internal net name to textual net name
     #
@@ -90,15 +84,25 @@ class brdjson(brd.brd):
     pass
 
   def cb_track_po(self, arg):
-    shape,x0,y0,x1,y1,width,extra = arg
-    self.cur_track["shape"] = shape
+    shape_code,x0,y0,x1,y1,width,extra = arg
+    self.cur_track["shape_code"] = shape_code
+
+    sc = int(shape_code)
+    if  (sc == 0):
+      self.cur_track["shape"] = "track"
+    if  (sc == 1):
+      self.cur_track["shape"] = "buried"
+    if  (sc == 2):
+      self.cur_track["shape"] = "blind"
+    if  (sc == 3):
+      self.cur_track["shape"] = "through"
+
     self.cur_track["x0"] = x0
     self.cur_track["y0"] = y0
     self.cur_track["x1"] = x1
     self.cur_track["y1"] = y1
     self.cur_track["width"] =  width
     self.cur_track["extra"] = extra
-    pass
 
   def cb_track_de(self, arg):
     layer,track_type, netcode, timestamp, status = arg
@@ -107,7 +111,12 @@ class brdjson(brd.brd):
     self.cur_track["netcode"] = netcode
     self.cur_track["timestamp"] = timestamp
     self.cur_track["status"] = status
-    self.json_obj["track"].append( self.cur_track )
+
+    self.cur_track["type"] = "track"
+
+    #self.json_obj["track"].append( self.cur_track )
+    self.json_obj["element"].append( self.cur_track )
+
     self.cur_track = {}
 
   def cb_track_end(self, arg):
@@ -127,15 +136,28 @@ class brdjson(brd.brd):
     self.cur_segment["width"] = width
 
   def cb_drawsegment_de(self, arg):
-    layer,segment_type,angle,timestamp,status = arg
+    layer,shape_code,angle,timestamp,status = arg
     self.cur_segment["layer"] = layer
-    self.cur_segment["type"] = segment_type
+    self.cur_segment["shape_code"] = shape_code
+
+    sc = int(shape_code)
+    if   (sc == 0):
+      self.cur_segment["shape"] = "line"
+    elif (sc == 1):
+      self.cur_segment["shape"] = "circle"
+    elif (sc == 2):
+      self.cur_segment["shape"] = "arc"
+
     self.cur_segment["angle"] = angle
     self.cur_segment["timestamp"] = timestamp
     self.cur_segment["status"] = status
 
   def cb_drawsegment_end(self, arg):
-    self.json_obj["segment"].append( self.cur_segment )
+
+    self.cur_segment["type"] = "drawsegment"
+    self.json_obj["element"].append( self.cur_segment )
+
+    #self.json_obj["segment"].append( self.cur_segment )
     self.cur_segment = {}
 
 
@@ -168,6 +190,10 @@ class brdjson(brd.brd):
     self.cur_mod["y"] = posy
 
     self.cur_mod["orientation"] = orientation
+
+    rad_ang = math.radians( float(orientation)/10.0 )
+    self.cur_mod["angle"] = rad_ang
+
     self.cur_mod["layer"] = layer
     self.cur_mod["timestamp"] = timestamp
     self.cur_mod["attribute1"] = attribute0
@@ -312,7 +338,10 @@ class brdjson(brd.brd):
 
   def cb_MODULE_end(self, arg):
 
-    self.json_obj["module"].append( self.cur_mod )
+    #self.json_obj["module"].append( self.cur_mod )
+
+    self.cur_mod["type"] = "module"
+    self.json_obj["element"].append( self.cur_mod )
 
     #f = open( self.json_file, "w" )
     #f.write( json.dumps( self.cur_mod, indent=2 ))
@@ -341,6 +370,10 @@ class brdjson(brd.brd):
     self.cur_pad["deltax"] = deltax
     self.cur_pad["deltay"] = deltay
     self.cur_pad["orientation"] = int(orientation)
+
+    rad_ang = math.radians( float(orientation)/10.0 )
+
+    self.cur_pad["angle"] = rad_ang
 
   def cb_PAD_Dr(self, arg):
     pad_drill, offsetx, offsety = arg[0], arg[1], arg[2]
@@ -390,9 +423,6 @@ class brdjson(brd.brd):
 
 
   def cb_endboard(self, arg):
-
-    print "#finishing up:"
-
     print json.dumps( self.json_obj, indent=2 )
 
 
