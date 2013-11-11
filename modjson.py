@@ -130,6 +130,11 @@ class modjson(mod.mod):
     self.json_obj["y"] = self.decithou(posy)
 
     self.json_obj["orientation"] = orientation
+
+    rad_ang = math.radians( float(orientation)/10.0 )
+    self.json_obj["angle"] = rad_ang
+
+
     self.json_obj["layer"] = layer
     self.json_obj["timestamp"] = timestamp
     self.json_obj["attribute1"] = attribute0
@@ -328,6 +333,10 @@ class modjson(mod.mod):
     self.pad["deltax"] = self.decithou( deltax )
     self.pad["deltay"] = self.decithou( deltay )
     self.pad["orientation"] = int(orientation)
+
+    rad_ang = math.radians( float(orientation)/10.0 )
+    self.pad["angle"] = rad_ang
+
 
   def cb_PAD_Dr(self, arg):
     pad_drill, offsetx, offsety = arg[0], arg[1], arg[2]
