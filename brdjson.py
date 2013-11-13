@@ -247,10 +247,19 @@ class brdjson(brd.brd):
     text_field["sizex"] = sizex
     text_field["sizey"] = sizey
     text_field["rotation"] = rotation
+
+    text_field["angle"] = float(rotation) * math.pi / 1800.0
+
     text_field["penwidth"] = penwidth
     text_field["penwidth"] = penwidth
     text_field["flag"] = flag
-    text_field["visible"] = visible
+
+    #text_field["visible"] = visible
+    if (visible == "V"):
+      text_field["visible"] = True
+    else:
+      text_field["visible"] = False
+
     text_field["layer"] = layer
     text_field["misc"] = name
 
@@ -403,8 +412,8 @@ class brdjson(brd.brd):
   def cb_PAD_Ne(self, arg):
     net_number, net_name = arg
 
-    cleaned_net_name = re.sub( '^\s*N?\s*"?', '', net_name );
-    cleaned_net_name = re.sub( '"?\s*$', '', cleaned_net_name );
+    cleaned_net_name = re.sub( '^\s*N?\s*"?', '', net_name )
+    cleaned_net_name = re.sub( '"?\s*$', '', cleaned_net_name )
 
     self.cur_pad["net_number"] = net_number
     self.cur_pad["net_name"] = cleaned_net_name

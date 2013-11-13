@@ -188,6 +188,9 @@ class modjson(mod.mod):
     text_field["sizex"] = self.decithou(sizex)
     text_field["sizey"] = self.decithou(sizey)
     text_field["rotation"] = rotation
+  
+    text_field["angle"] = float(rotation) * math.pi / 1800.0
+
     text_field["penwidth"] = self.decithou(penwidth)
     text_field["flag"] = flag
 
@@ -308,7 +311,7 @@ class modjson(mod.mod):
 
     f = open( self.json_file, "w" )
     f.write( json.dumps( self.json_obj, indent=2 ))
-    f.close();
+    f.close()
 
     self.reset_bounds()
     self.first = False
@@ -366,8 +369,8 @@ class modjson(mod.mod):
   def cb_PAD_Ne(self, arg):
     net_number, net_name = arg
 
-    cleaned_net_name = re.sub( '^\s*N?\s*"?', '', net_name );
-    cleaned_net_name = re.sub( '"?\s*$', '', cleaned_net_name );
+    cleaned_net_name = re.sub( '^\s*N?\s*"?', '', net_name )
+    cleaned_net_name = re.sub( '"?\s*$', '', cleaned_net_name )
 
     self.pad["net_number"] = net_number
     self.pad["net_name"] = cleaned_net_name
