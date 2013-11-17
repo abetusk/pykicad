@@ -244,8 +244,8 @@ class modjson(mod.mod):
 
     sx = self.decithou( startx )
     sy = self.decithou( starty )
-    dx = (cx - sx)
-    dy = (cy - sy)
+    dx = (sx - cx)
+    dy = (sy - cy)
     dx2 = dx*dx
     dy2 = dy*dy
     r = math.sqrt( dx2 + dy2 )

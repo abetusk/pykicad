@@ -42,6 +42,7 @@ class brd(object):
 
     "general" : [ "\$GENERAL" ],
     "general_encoding" : [ "encoding", "encoding" ],
+    "general_units" : [ "Units", "units" ],
     "general_layercount" : [ "LayerCount", "layer_count" ],
     "general_ly" : [ "Ly", "ly" ],
     "general_enabledlayers" : [ "EnabledLayers", "enabled_layers" ],
@@ -72,6 +73,7 @@ class brd(object):
     "setup_trackwidth"          : [ "TrackWidth", "width" ],
     "setup_trackclearence"      : [ "TrackClearence", "clearence" ],
     "setup_zoneclearence"       : [ "ZoneClearence", "clearence" ],
+    "setup_zone45only"          : [ "Zone_45_Only", "value" ],
     "setup_trackminwidth"       : [ "TrackMinWidth", "width" ],
     "setup_drawsegmwidth"       : [ "DrawSegmWidth", "width" ],
     "setup_edgesegmwidth"       : [ "EdgeSegmWidth", "width" ],
@@ -92,6 +94,8 @@ class brd(object):
     "setup_padsize"             : [ "PadSize", "size",  "size"],
     "setup_paddrill"            : [ "PadDrill", "size"],
     "setup_pad2maskclearance"   : [ "Pad2MaskClearance", "size"],
+    "setup_soldermaskminwidth"  : [ "SolderMaskMinWidth", "width"],
+    "setup_visibleelements"     : [ "VisibleElements", "mask"],
     "setup_auxiliaryaxisorg"    : [ "AuxiliaryAxisOrg", "size",  "size" ],
     "setup_pcbplotparams"       : [ "PcbPlotParams", "*text" ],
     "setup_end"                 : [ "\$EndSETUP" ],
@@ -163,6 +167,7 @@ class brd(object):
 
     "textpcb" : [ "\$TEXTPCB" ],
     "textpcb_te" : [ "Te", "\"string", "#dummy" ],
+    "textpcb_nl" : [ "nl", "\"string", "#dummy" ],
     "textpcb_po" : [ "Po", "x0", "y0", "x1", "y1", "width", "rotation" ],
     "textpcb_de" : [ "De", "layer", "normal_flag", "timestamp", "style" ],
     "textpcb_end" : [ "\$EndTEXTPCB" ],
@@ -197,13 +202,14 @@ class brd(object):
     "czone_zaux" : [ "ZAux", "corner_count", "hatching_option" ],
     "czone_clearance" : [ "ZClearance", "clearance", "pad_option" ],
     "czone_zminthickness" : [ "ZMinThickness", "thickness" ],
-    "czone_zoptions" : [ "ZOptions", "fill", "arc", "antipad_thickness", "thermal_stub_width" ],
+    "czone_zoptions" : [ "ZOptions", "fill", "arc", "F", "antipad_thickness", "thermal_stub_width" ],
     "czone_zcorner" : [ "ZCorner", "x", "y", "end_flag" ],
-    "czone_end" : [ "\$EndCZONE_OUTLINE" ],
+    "czone_zsmoothing" : [ "ZSmoothing", "x", "y" ],
+    "czone_end" : [ "\$[Ee]ndCZONE_OUTLINE" ],
 
     "polyscorners" : [ "\$POLYSCORNERS" ],
     "polyscorners_corner" : [ "", "x0", "y0", "x1", "y1" ],
-    "polyscorners_end" : [ "\$EndPOLYSCORNERS" ],
+    "polyscorners_end" : [ "\$[Ee]ndPOLYSCORNERS" ],
 
     "endboard" : [ "\$EndBOARD" ]
 
@@ -230,6 +236,11 @@ class brd(object):
   def cb_general_encoding(self, arg):
     if self.parrot_flag:
       print "cb_general_encoding",arg
+    pass
+
+  def cb_general_units(self, arg):
+    if self.parrot_flag:
+      print "cb_general_units",arg
     pass
 
   def cb_general_layercount(self, arg):
@@ -375,6 +386,11 @@ class brd(object):
       print "cb_setup_zoneclearence",arg
     pass
 
+  def cb_setup_zone45only(self, arg):
+    if self.parrot_flag:
+      print "cb_setup_zone45only",arg
+    pass
+
   def cb_setup_trackminwidth(self, arg):
     if self.parrot_flag:
       print "cb_setup_trackminwidth",arg
@@ -473,6 +489,16 @@ class brd(object):
   def cb_setup_pad2maskclearance(self, arg):
     if self.parrot_flag:
       print "cb_setup_pad2maskclearance",arg
+    pass
+
+  def cb_setup_soldermaskminwidth(self, arg):
+    if self.parrot_flag:
+      print "cb_setup_soldermaskminwidth",arg
+    pass
+
+  def cb_setup_visibleelements(self, arg):
+    if self.parrot_flag:
+      print "cb_setup_visibleelements",arg
     pass
 
   def cb_setup_auxiliaryaxisorg(self, arg):
@@ -767,6 +793,11 @@ class brd(object):
       print "cb_textpcb_te",arg
     pass
 
+  def cb_textpcb_nl(self, arg):
+    if self.parrot_flag:
+      print "cb_textpcb_nl",arg
+    pass
+
   def cb_textpcb_po(self, arg):
     if self.parrot_flag:
       print "cb_textpcb_po",arg
@@ -927,6 +958,11 @@ class brd(object):
       print "cb_czone_zcorner",arg
     pass
 
+  def cb_czone_zsmoothing(self, arg):
+    if self.parrot_flag:
+      print "cb_czone_zsmoothing",arg
+    pass
+
   def cb_czone_end(self, arg):
     if self.parrot_flag:
       print "cb_czone_end",arg
@@ -983,13 +1019,13 @@ class brd(object):
                 "track" : "track",
                 "zone" : "zone",
                 "czone" : "czone",
-                "polyscorners" : "polyscorners",
 
                 "endboard" : "header" },
 
 
     "general" : { "general_end" : "main",
                   "general_encoding"        : "general",
+                  "general_units"           : "general",
                   "general_layercount"      : "general",
                   "general_ly"              : "general",
                   "general_enabledlayers"   : "general",
@@ -1018,6 +1054,7 @@ class brd(object):
                 "setup_trackwidth"          : "setup",
                 "setup_trackclearence"      : "setup",
                 "setup_zoneclearence"       : "setup",
+                "setup_zone45only"          : "setup",
                 "setup_trackminwidth"       : "setup",
                 "setup_drawsegmwidth"       : "setup",
                 "setup_edgesegmwidth"       : "setup",
@@ -1038,6 +1075,8 @@ class brd(object):
                 "setup_padsize"             : "setup",
                 "setup_paddrill"            : "setup",
                 "setup_pad2maskclearance"   : "setup",
+                "setup_soldermaskminwidth"  : "setup",
+                "setup_visibleelements"     : "setup",
                 "setup_auxiliaryaxisorg"    : "setup",
                 "setup_pcbplotparams"       : "setup",
                 "setup_end"                 : "main" },
@@ -1108,6 +1147,7 @@ class brd(object):
                       "drawsegment_end" : "main" },
 
     "textpcb" : { "textpcb_te" : "textpcb",
+                  "textpcb_nl" : "textpcb",
                   "textpcb_po" : "textpcb",
                   "textpcb_de" : "textpcb",
                   "textpcb_end" : "main" }, 
@@ -1132,17 +1172,19 @@ class brd(object):
                "zone_de" : "zone",
                "zone_end" : "main" },
 
-    "czone" : { "czone_zinfo" : "zone",
-                "czone_zlayer" : "zone",
-                "czone_zaux" : "zone",
-                "czone_clearance" : "zone",
-                "czone_zminthickness" : "zone",
-                "czone_zoptions" : "zone",
-                "czone_zcorner" : "zone",
+    "czone" : { "czone_zinfo" : "czone",
+                "czone_zlayer" : "czone",
+                "czone_zaux" : "czone",
+                "czone_clearance" : "czone",
+                "czone_zminthickness" : "czone",
+                "czone_zoptions" : "czone",
+                "czone_zcorner" : "czone",
+                "czone_zsmoothing" : "czone",
+                "polyscorners" : "polyscorners",
                 "czone_end" : "main" },
  
-    "polyscorners" : { "polyscorners_corner" : "polyscorner",
-                       "polyscorners_end" : "main" }
+    "polyscorners" : { "polyscorners_corner" : "polyscorners",
+                       "polyscorners_end" : "czone" }
 
 
   }
@@ -1173,6 +1215,7 @@ class brd(object):
 
     "general" :  self.cb_general,
     "general_encoding" :  self.cb_general_encoding,
+    "general_units" :  self.cb_general_units,
     "general_layercount" :  self.cb_general_layercount,
     "general_ly" :  self.cb_general_ly,
     "general_enabledlayers" :  self.cb_general_enabledlayers,
@@ -1203,6 +1246,7 @@ class brd(object):
     "setup_trackwidth" :  self.cb_setup_trackwidth,
     "setup_trackclearence" :  self.cb_setup_trackclearence,
     "setup_zoneclearence" :  self.cb_setup_zoneclearence,
+    "setup_zone45only" :  self.cb_setup_zone45only,
     "setup_trackminwidth" :  self.cb_setup_trackminwidth,
     "setup_drawsegmwidth" :  self.cb_setup_drawsegmwidth,
     "setup_edgesegmwidth" :  self.cb_setup_edgesegmwidth,
@@ -1223,6 +1267,8 @@ class brd(object):
     "setup_padsize" :  self.cb_setup_padsize,
     "setup_paddrill" :  self.cb_setup_paddrill,
     "setup_pad2maskclearance" :  self.cb_setup_pad2maskclearance,
+    "setup_soldermaskminwidth" :  self.cb_setup_soldermaskminwidth,
+    "setup_visibleelements" :  self.cb_setup_visibleelements,
     "setup_auxiliaryaxisorg" :  self.cb_setup_auxiliaryaxisorg,
     "setup_pcbplotparams" :  self.cb_setup_pcbplotparams,
     "setup_end" :  self.cb_setup_end,
@@ -1287,6 +1333,7 @@ class brd(object):
 
     "textpcb" :  self.cb_textpcb,
     "textpcb_te" :  self.cb_textpcb_te,
+    "textpcb_nl" :  self.cb_textpcb_nl,
     "textpcb_po" :  self.cb_textpcb_po,
     "textpcb_de" :  self.cb_textpcb_de,
     "textpcb_end" :  self.cb_textpcb_end,
@@ -1323,6 +1370,7 @@ class brd(object):
     "czone_zminthickness" :  self.cb_czone_zminthickness,
     "czone_zoptions" :  self.cb_czone_zoptions,
     "czone_zcorner" :  self.cb_czone_zcorner,
+    "czone_zsmoothing" :  self.cb_czone_zsmoothing,
     "czone_end" :  self.cb_czone_end,
 
     "polyscorners" :  self.cb_polyscorners,

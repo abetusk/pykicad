@@ -63,12 +63,12 @@ class brdjson(brd.brd):
   def decithou(self, x):
     if self.units == "mm":
       return round( 10000.0 * float(x) / 25.4 )
-    return x
+    return float(x)
 
   def thou(self, x):
     if self.units == "mm":
       return 1000.0 * float(x) / 25.4
-    return x
+    return float(x)
 
   def mm(self, x):
     if self.units == "mm":
@@ -97,11 +97,12 @@ class brdjson(brd.brd):
     if  (sc == 3):
       self.cur_track["shape"] = "through"
 
-    self.cur_track["x0"] = x0
-    self.cur_track["y0"] = y0
-    self.cur_track["x1"] = x1
-    self.cur_track["y1"] = y1
-    self.cur_track["width"] =  width
+    self.cur_track["x0"] = self.decithou( float(x0) )
+    self.cur_track["y0"] = self.decithou( float(y0) )
+    self.cur_track["x1"] = self.decithou( float(x1) )
+    self.cur_track["y1"] = self.decithou( float(y1) )
+    self.cur_track["width"] = self.decithou( float( width) )
+
     self.cur_track["extra"] = extra
 
   def cb_track_de(self, arg):
@@ -114,7 +115,6 @@ class brdjson(brd.brd):
 
     self.cur_track["type"] = "track"
 
-    #self.json_obj["track"].append( self.cur_track )
     self.json_obj["element"].append( self.cur_track )
 
     self.cur_track = {}
@@ -129,11 +129,12 @@ class brdjson(brd.brd):
   def cb_drawsegment_po(self, arg):
     shape, x0, y0, x1, y1, width = arg
     self.cur_segment["shape"] = shape
-    self.cur_segment["x0"] = x0
-    self.cur_segment["y0"] = y0
-    self.cur_segment["x1"] = x1
-    self.cur_segment["y1"] = y1
-    self.cur_segment["width"] = width
+
+    self.cur_segment["x0"] = self.decithou( float(x0) )
+    self.cur_segment["y0"] = self.decithou( float(y0) )
+    self.cur_segment["x1"] = self.decithou( float(x1) )
+    self.cur_segment["y1"] = self.decithou( float(y1) )
+    self.cur_segment["width"] = self.decithou( float(width) )
 
   def cb_drawsegment_de(self, arg):
     layer,shape_code,angle,timestamp,status = arg
@@ -157,9 +158,12 @@ class brdjson(brd.brd):
     self.cur_segment["type"] = "drawsegment"
     self.json_obj["element"].append( self.cur_segment )
 
-    #self.json_obj["segment"].append( self.cur_segment )
     self.cur_segment = {}
 
+
+  def cb_general_units(self, arg):
+    self.units = arg[0]
+    self.json_obj["units"] = self.units
 
 
   def cb_UNITS(self, arg):
@@ -176,7 +180,6 @@ class brdjson(brd.brd):
     munged_name = re.sub( '\s*$', '', munged_name )
     munged_name = urllib.quote( munged_name )
     munged_name = re.sub( '\/', '%2F', munged_name )
-    #self.cur_mod["units"] = self.units
     self.cur_mod["name"] = clean_name
 
 
@@ -186,8 +189,8 @@ class brdjson(brd.brd):
   def cb_MODULE_Po(self, arg):
     posx, posy, orientation, layer, timestamp, attribute0, attribute1 = arg
 
-    self.cur_mod["x"] = posx
-    self.cur_mod["y"] = posy
+    self.cur_mod["x"] = self.decithou( float(posx) )
+    self.cur_mod["y"] = self.decithou( float(posy) )
 
     self.cur_mod["orientation"] = orientation
 
@@ -242,19 +245,20 @@ class brdjson(brd.brd):
 
     text_field = {}
     text_field["number"] = n
-    text_field["x"] = posx
-    text_field["y"] = posy
-    text_field["sizex"] = sizex
-    text_field["sizey"] = sizey
+
+    text_field["x"] = self.decithou( float(posx) )
+    text_field["y"] = self.decithou( float(posy) )
+    text_field["sizex"] = self.decithou( float(sizex) )
+    text_field["sizey"] = self.decithou( float(sizey) )
+
     text_field["rotation"] = rotation
 
     text_field["angle"] = float(rotation) * math.pi / 1800.0
 
-    text_field["penwidth"] = penwidth
-    text_field["penwidth"] = penwidth
+    text_field["penwidth"] = self.decithou( float(penwidth) )
+
     text_field["flag"] = flag
 
-    #text_field["visible"] = visible
     if (visible == "V"):
       text_field["visible"] = True
     else:
@@ -277,13 +281,14 @@ class brdjson(brd.brd):
 
     art_field = {}
     art_field["shape"] = "segment"
-    art_field["startx"] = startx
-    art_field["starty"] = starty
 
-    art_field["endx"] = endx
-    art_field["endy"] = endy
+    art_field["startx"] = self.decithou( float(startx) )
+    art_field["starty"] = self.decithou( float(starty) )
 
-    art_field["line_width"] = stroke_width
+    art_field["endx"] = self.decithou( float(endx) )
+    art_field["endy"] = self.decithou( float(endy) )
+
+    art_field["line_width"] = self.decithou( float(stroke_width) )
     art_field["layer"] = layer
 
     self.cur_mod["art"].append( art_field )
@@ -294,8 +299,9 @@ class brdjson(brd.brd):
 
     art_field = {}
     art_field["shape"] = "arc"
-    art_field["x"] = centerx
-    art_field["y"] = centery
+
+    art_field["x"] = self.decithou( float(centerx) )
+    art_field["y"] = self.decithou( float(centery) )
 
     cx = float(centerx)
     cy = float(centery)
@@ -313,7 +319,8 @@ class brdjson(brd.brd):
     art_field["angle"] = ang
 
     art_field["start_angle"] = math.atan2(dy, dx)
-    art_field["line_width"] = stroke_width
+    #art_field["line_width"] = stroke_width
+    art_field["line_width"] = self.decithou( float(stroke_width) )
     art_field["layer"] = layer
 
     self.cur_mod["art"].append( art_field )
@@ -324,8 +331,9 @@ class brdjson(brd.brd):
 
     art_field = {}
     art_field["shape"] = "circle"
-    art_field["x"] = centerx
-    art_field["y"] = centery
+
+    art_field["x"] = self.decithou( float(centerx) )
+    art_field["y"] = self.decithou( float(centery) )
 
     cx = float(centerx)
     cy = float(centery)
@@ -339,7 +347,7 @@ class brdjson(brd.brd):
 
     art_field["r"] = r
 
-    art_field["line_width"] = stroke_width
+    art_field["line_width"] = self.decithou( float(stroke_width) )
     art_field["layer"] = layer
 
     self.cur_mod["art"].append( art_field )
@@ -347,17 +355,9 @@ class brdjson(brd.brd):
 
   def cb_MODULE_end(self, arg):
 
-    #self.json_obj["module"].append( self.cur_mod )
-
     self.cur_mod["type"] = "module"
     self.json_obj["element"].append( self.cur_mod )
 
-    #f = open( self.json_file, "w" )
-    #f.write( json.dumps( self.cur_mod, indent=2 ))
-    #f.close();
-
-    #self.reset_bounds()
-    #self.first = False
     self.clear_mod()
 
 
@@ -376,8 +376,8 @@ class brdjson(brd.brd):
 
     self.cur_pad["sizex"] = self.decithou( float(sizex) )
     self.cur_pad["sizey"] = self.decithou( float(sizey) )
-    self.cur_pad["deltax"] = deltax
-    self.cur_pad["deltay"] = deltay
+    self.cur_pad["deltax"] = self.decithou( float(deltax) )
+    self.cur_pad["deltay"] = self.decithou( float(deltay) )
     self.cur_pad["orientation"] = int(orientation)
 
     rad_ang = math.radians( float(orientation)/10.0 )
@@ -429,6 +429,76 @@ class brdjson(brd.brd):
 
     self.cur_mod["pad"].append( self.cur_pad )
     self.cur_pad = {}
+
+
+  def cb_czone(self, arg):
+    self.cur_czone = { "zcorner" : [], "polyscorners" : [], "type" : "czone" }
+
+  def cb_czone_zinfo(self, arg):
+    timestamp, netcode, name, dummy = arg
+
+    self.cur_czone["timestamp"] = timestamp
+    self.cur_czone["netcode"] = netcode
+    self.cur_czone["name"] = name
+
+  def cb_czone_zaux(self, arg):
+    corner_count, hatching_option = arg
+
+    self.cur_czone["corner_count"] = corner_count
+    self.cur_czone["hatching_option"] = hatching_option
+
+  def cb_czone_clearance(self, arg):
+    clearance, pad_option = arg
+
+    self.cur_czone["clearance"] = self.decithou( clearance )
+    self.cur_czone["pad_option"] = pad_option
+
+  def cb_czone_zminthickness(self, arg):
+    min_thickness = arg[0]
+
+    self.cur_czone["min_thickness"] = self.decithou( min_thickness )
+
+  def cb_czone_zoptions(self, arg):
+    fill, arc, f, antipad_thickness, thermal_stub_width = arg
+
+    self.cur_czone["fill"] = fill
+    self.cur_czone["arc"] = arc
+    self.cur_czone["F"] = f
+    self.cur_czone["antipad_thickness"] = self.decithou( antipad_thickness )
+    self.cur_czone["thermal_stub_width"] = self.decithou( thermal_stub_width )
+
+  def cb_czone_zsmoothing(self, arg):
+    x, y = arg
+
+    self.cur_czone["zsmoothing_x"] = self.decithou( x )
+    self.cur_czone["zsmoothing_y"] = self.decithou( y )
+
+
+  def cb_czone_zcorner(self, arg):
+    x, y, flag = arg
+
+    p = { }
+    p["x"] = self.decithou( x );
+    p["y"] = self.decithou( y );
+
+    self.cur_czone["zcorner"].append( p )
+
+  def cb_polyscorners(self, arg):
+    pass
+
+  def cb_polyscorners_corner(self, arg):
+    x0, y0, x1, y1 = arg
+
+    p = {}
+    p["x0"] = self.decithou( x0 );
+    p["y0"] = self.decithou( y0 );
+    p["x1"] = self.decithou( x1 );
+    p["y1"] = self.decithou( y1 );
+
+    self.cur_czone["polyscorners"].append(p)
+
+  def cb_czone_end(self, arg):
+    self.json_obj["element"].append( self.cur_czone );
 
 
   def cb_endboard(self, arg):
