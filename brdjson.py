@@ -127,8 +127,49 @@ class brdjson(brd.brd):
     pass
 
   def cb_drawsegment_po(self, arg):
-    shape, x0, y0, x1, y1, width = arg
-    self.cur_segment["shape"] = shape
+    shape_code, x0, y0, x1, y1, width = arg
+
+    self.cur_segment["shape_code"] = shape_code
+
+    tx0 = self.decithou( float(x0) )
+    ty0 = self.decithou( float(y0) )
+    tx1 = self.decithou( float(x1) )
+    ty1 = self.decithou( float(y1) )
+
+    sc = int(shape_code)
+
+    if   (sc == 0):
+      self.cur_segment["shape"] = "line"
+    # Either the documentation is wrong or KiCAD is wrong..
+    # 2 appears to be arc, 3 appears to be circle
+    # ( as opposed to 2 being arc, 1 being circle )
+    #elif (sc == 1) or (sc == 2):
+    elif (sc == 2) or (sc == 3):
+
+      if   (sc == 3):
+        self.cur_segment["shape"] = "circle"
+      elif (sc == 2):
+        self.cur_segment["shape"] = "arc"
+
+      r = math.sqrt( (tx0-tx1)*(tx0-tx1) + (ty0-ty1)*(ty0-ty1) )
+
+      self.cur_segment["x"] = tx0
+      self.cur_segment["y"] = ty0
+      self.cur_segment["r"] = r
+
+      # also, documentation is defintely lying about
+      # point interpreationg.  For arcs, x0,y0 are center,
+      # x1,y1 are start point, 90 degree clockwise.
+      if (sc == 2):
+        dx = tx1 - tx0
+        dy = ty1 - ty0
+
+        # start angle is clockwise, going counter clocwise from
+        # start angle
+        self.cur_segment["start_angle"] = math.atan2(dy,dx)
+        self.cur_segment["angle"] = math.pi / 2.0
+        self.cur_segment["counterclockwise_flag"] = False
+
 
     self.cur_segment["x0"] = self.decithou( float(x0) )
     self.cur_segment["y0"] = self.decithou( float(y0) )
@@ -137,19 +178,13 @@ class brdjson(brd.brd):
     self.cur_segment["width"] = self.decithou( float(width) )
 
   def cb_drawsegment_de(self, arg):
-    layer,shape_code,angle,timestamp,status = arg
+    layer,type_code,angle,timestamp,status = arg
+
+    self.cur_segment["type_code"] = type_code
     self.cur_segment["layer"] = layer
-    self.cur_segment["shape_code"] = shape_code
 
-    sc = int(shape_code)
-    if   (sc == 0):
-      self.cur_segment["shape"] = "line"
-    elif (sc == 1):
-      self.cur_segment["shape"] = "circle"
-    elif (sc == 2):
-      self.cur_segment["shape"] = "arc"
-
-    self.cur_segment["angle"] = angle
+    self.cur_segment["rotation"] = angle
+    self.cur_segment["angle"] = math.radians( float(angle)/10.0 )
     self.cur_segment["timestamp"] = timestamp
     self.cur_segment["status"] = status
 
