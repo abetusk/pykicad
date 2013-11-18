@@ -426,10 +426,10 @@ class brdjson(brd.brd):
 
     drill_hole_shape, pad_drill_x, pad_drill_y = None, None, None
     if len(arg) > 3 and arg[3] is not None:
-      drill_hole_shape = arg[3]
+      drill_hole_shape = arg[3].strip()
       self.cur_pad["drill_shape_code"] = re.sub(' ', '', drill_hole_shape)
 
-      if (drill_hole_shape == 'C'):
+      if (drill_hole_shape == 'O'):
         self.cur_pad["drill_shape"] = 'oblong'
 
     if len(arg) > 4 and arg[4] is not None:
