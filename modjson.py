@@ -344,10 +344,16 @@ class modjson(mod.mod):
   def cb_PAD_Dr(self, arg):
     pad_drill, offsetx, offsety = arg[0], arg[1], arg[2]
 
-    hole_shape, pad_drill_x, pad_drill_y = None, None, None
+    self.pad['drill_shape'] = 'circle'
+
+    hole_shape_code, pad_drill_x, pad_drill_y = None, None, None
     if len(arg) > 3 and arg[3] is not None:
-      hole_shape = arg[3]
-      self.pad["hole_shape"] = re.sub(' ', '', hole_shape)
+      hole_shape_code = arg[3]
+      self.pad["drill_shape_code"] = re.sub(' ', '', hole_shape_code)
+
+      if (hole_shape_code == 'O'):
+        self.pad["drill_shape"] = 'oblong'
+
     if len(arg) > 4 and arg[4] is not None:
       pad_drill_x = arg[4]
       self.pad["drill_hole_extra_x"] = self.decithou( pad_drill_x )

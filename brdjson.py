@@ -338,10 +338,10 @@ class brdjson(brd.brd):
     art_field["x"] = self.decithou( float(centerx) )
     art_field["y"] = self.decithou( float(centery) )
 
-    cx = float(centerx)
-    cy = float(centery)
-    sx = float(startx)
-    sy = float(starty)
+    cx = self.decithou( float(centerx) )
+    cy = self.decithou( float(centery) )
+    sx = self.decithou( float(startx) )
+    sy = self.decithou( float(starty) )
     dx = (cx - sx)
     dy = (cy - sy)
     dx2 = dx*dx
@@ -370,10 +370,10 @@ class brdjson(brd.brd):
     art_field["x"] = self.decithou( float(centerx) )
     art_field["y"] = self.decithou( float(centery) )
 
-    cx = float(centerx)
-    cy = float(centery)
-    px = float(pointx)
-    py = float(pointy)
+    cx = self.decithou( float(centerx) )
+    cy = self.decithou( float(centery) )
+    px = self.decithou( float(pointx) )
+    py = self.decithou( float(pointy) )
     dx = (cx - px)
     dy = (cy - py)
     dx2 = dx*dx
@@ -422,10 +422,16 @@ class brdjson(brd.brd):
   def cb_PAD_Dr(self, arg):
     pad_drill, offsetx, offsety = arg[0], arg[1], arg[2]
 
-    hole_shape, pad_drill_x, pad_drill_y = None, None, None
+    self.cur_pad["drill_shape"] = 'circle'
+
+    drill_hole_shape, pad_drill_x, pad_drill_y = None, None, None
     if len(arg) > 3 and arg[3] is not None:
-      hole_shape = arg[3]
-      self.cur_pad["hole_shape"] = re.sub(' ', '', hole_shape)
+      drill_hole_shape = arg[3]
+      self.cur_pad["drill_shape_code"] = re.sub(' ', '', drill_hole_shape)
+
+      if (drill_hole_shape == 'C'):
+        self.cur_pad["drill_shape"] = 'oblong'
+
     if len(arg) > 4 and arg[4] is not None:
       pad_drill_x = arg[4]
       self.cur_pad["drill_hole_extra_x"] = self.decithou( float(pad_drill_x) )
