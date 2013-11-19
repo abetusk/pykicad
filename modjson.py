@@ -346,20 +346,13 @@ class modjson(mod.mod):
 
     self.pad['drill_shape'] = 'circle'
 
-    print "wtf?"
-    print arg
-
-
     hole_shape_code, pad_drill_x, pad_drill_y = None, None, None
     if len(arg) > 3 and arg[3] is not None:
-      hole_shape_code = arg[3]
+      hole_shape_code = arg[3].strip()
       self.pad["drill_shape_code"] = re.sub(' ', '', hole_shape_code)
-
 
       if (hole_shape_code == 'O'):
         self.pad["drill_shape"] = 'oblong'
-
-      print "###???? ", hole_shape_code, self.pad["drill_shape"]
 
     if len(arg) > 4 and arg[4] is not None:
       pad_drill_x = arg[4]
