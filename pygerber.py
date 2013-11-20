@@ -1,10 +1,13 @@
 #!/usr/bin/python
+#
 """
 Helper library to genreate gerber files
 """
 
 
 import sys, os, re
+
+
 
 class pygerber(object):
 
@@ -268,13 +271,15 @@ class pygerber(object):
     self.formatSpecification( 'L', 'A', 2, 4, 2, 4)
     self.mode("IN")
 
+  def end(self):
+    self._command.append( "M02*" )
 
   def _print(self):
 
     for l in self._command:
       print l
 
-    print "M02*"
+    #print "M02*"
 
 
 if __name__ == "__main__":
@@ -292,6 +297,7 @@ if __name__ == "__main__":
   grb.moveLightsOn( 0, 1 )
   grb.moveLightsOn( 0, 0 )
   grb.flash(0.5,0.5)
+  grb.end()
 
   grb._print()
 

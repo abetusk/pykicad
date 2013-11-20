@@ -543,19 +543,20 @@ class brdjson(brd.brd):
 
 
   def cb_endboard(self, arg):
-    print json.dumps( self.json_obj, indent=2 )
+    #print json.dumps( self.json_obj, indent=2 )
+    pass
 
 
 if __name__ == "__main__":
 
   infile = None
-  outbase = None
+  outfile = None
 
   if len(sys.argv) >= 2:
     infile = sys.argv[1]
 
   if len(sys.argv) >= 3:
-    outbase = sys.argv[2]
+    outfile = sys.argv[2]
 
   if infile is None:
     print "provide infile"
@@ -563,9 +564,9 @@ if __name__ == "__main__":
 
   b = brdjson()
 
-  if outbase is not None:
-    b.json_prefix = outbase
-
   b.parse_brd(infile)
+
+  if outfile is None:
+    print json.dumps( b.json_obj, indent = 2 )
 
 
