@@ -110,8 +110,8 @@ class pygerber(object):
     if hole_a is not None: extra += "X" + str(hole_a) 
     if hole_b is not None: extra += "X" + str(hole_b)
 
-    self._aperture.append( "%ADD" + str(name) + "R," + "{:10.4f}".format(x) + "X" + "{:10.4f}".format(y) + "*%" )
-    self._command.append( "%ADD" + str(name) + "R," + "{:10.4f}".format(x) + "X" + "{:10.4f}".format(y) + "*%" )
+    self._aperture.append( "%ADD" + str(name) + "R," + "{:0.4f}".format(x) + "X" + "{:0.4f}".format(y) + "*%" )
+    self._command.append( "%ADD" + str(name) + "R," + "{:0.4f}".format(x) + "X" + "{:0.4f}".format(y) + "*%" )
 
   def defineApertureObround(self, name, x, y, hole_a = None, hole_b = None ):
     extra = ""
