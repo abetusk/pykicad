@@ -72,6 +72,26 @@ class pygerber(object):
 
     return lead_char + v
 
+  def _Ifmt (self, x ):
+    n = self.Xdig + self.Xfrac + 1
+
+    if (self.Xdig == 0): n -= 1
+    if (self.Xfrac == 0): n -= 1
+
+    if n<=0: return
+
+    return "I" + self._fmt(n, self.Xfrac, x)
+
+  def _Jfmt (self, x ):
+    n = self.Ydig + self.Yfrac + 1
+
+    if (self.Ydig == 0): n -= 1
+    if (self.Yfrac == 0): n -= 1
+
+    if n<=0: return
+
+    return "J" + self._fmt(n, self.Yfrac, x)
+
 
   def _Xfmt( self, x ):
     n = self.Xdig + self.Xfrac + 1
@@ -262,10 +282,10 @@ class pygerber(object):
     self.lineTo(x,y,"02")
 
 
-  def arcTo( self, x, y, cw_flag = True, move_type = "01" ):
+  def arcTo( self, x, y, I, J, cw_flag = True, move_type = "01" ):
     code = "02"
     if (not cw_flag): code = "03"
-    self._command.append( "G" + code + self._Xfmt(x) + self._Yfmt(y) + "D" + str(move_type) + "*" )
+    self._command.append( "G" + code + self._Xfmt(x) + self._Yfmt(y) + self._Ifmt(I) + self._Jfmt(J) + "D" + str(move_type) + "*" )
 
   def quickSetup(self):
     self.formatSpecification( 'L', 'A', 2, 4, 2, 4)

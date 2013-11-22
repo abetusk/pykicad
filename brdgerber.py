@@ -17,6 +17,15 @@
 Loads KiCAD brd file (pcb(new?) file), parses it with brd.py, writes to gerber format.
 """
 
+
+# TODO: 
+#  - contours and regions (somewhat done, needs to be more inteligent about how it splits
+#       up regions so nasty strands don't leave trails)
+#  - art for modules (arc, polygon )
+#  - arcs for segments
+#  - text
+#  - trapeze (if ever)
+
 import re
 import sys
 import os
@@ -98,10 +107,14 @@ class brdgerber(brdjson.brdjson):
 
         if key in aperture_set:
           ap_name = aperture_set[key]["aperture_name"]
-          v["aperture_name"] = ap_name
-          v["aperture_key"] = key
         else:
           aperture_set[ key ] = { "type" : "circle", "d" : self.toUnit(v["width"] ), "aperture_name" : self.genApertureName() }
+
+        v["aperture_name"] = ap_name
+        v["aperture_key"] = key
+
+      elif v["type"] == "text":
+        pass
 
       elif v["type"] == "module":
 
@@ -110,10 +123,18 @@ class brdgerber(brdjson.brdjson):
           pass
 
         for art in v["art"]:
-          if art["shape"] == "segment": pass
-          elif art["shape"] == "circle": pass
-          elif art["shape"] == "arc": pass
-          elif art["shape"] == "polygon": pass
+          shape = art["shape"]
+          if (shape == "segment") or (shape == "circle") or (shape == "arc") or (shape == "polygon"):
+          #if art["shape"] == "segment": 
+            d = self.toUnit( art["line_width"] )
+            key = "circle:" + "{0:011.5f}".format(d) 
+            if key not in aperture_set:
+              aperture_set[key] = { "type" : "circle", "d" : d, "aperture_name" : self.genApertureName() }
+            
+            ap_name = aperture_set[key]["aperture_name"]
+            art["aperture_name"] = ap_name
+            art["aperture_key"] = key
+
         for pad in v["pad"]:
           pad["id"] = self.genId()
 
@@ -194,8 +215,10 @@ class brdgerber(brdjson.brdjson):
 
     x = self.toUnit( pad["posx"] )
     y = self.toUnit( pad["posy"] )
+    #a = float( pad["angle"] )
 
     v = self._rot( mod_a, [ x, y ] )
+    #v = self._rot( a, [ x, y ] )
 
     key = pad["aperture_key"]
     ap = self.aperture[key]
@@ -211,26 +234,221 @@ class brdgerber(brdjson.brdjson):
 
     x = self.toUnit( pad["posx"] )
     y = self.toUnit( pad["posy"] )
+
+    sx = self.toUnit( pad["sizex"] )
+    sy = self.toUnit( pad["sizey"] )
+
     a = float( pad["angle"] )
 
-    v = self._rot( mod_a, [ x, y ] )
+    #v = self._rot( mod_a, [ x, y ] )
+    v = self._rot( a, [ x, y ] )
+
+    if "aperture_key" in pad:
+
+      key = pad["aperture_key"]
+      ap = self.aperture[key]
+
+      self.grb.apertureSet( ap["aperture_name"] )
+      self.grb.flash( v[0,0] + mod_x , v[0,1] + mod_y )
+    else:
+      dx = sx/2
+      dy = sy/2
+
+      p0 = self._rot( a, [ x - dx, y - dy ] )
+      p1 = self._rot( a, [ x + dx, y - dy ] )
+      p2 = self._rot (a, [ x + dx, y + dy ] )
+      p3 = self._rot (a, [ x - dx, y + dy ] )
+
+      self.grb.regionStart()
+      self.grb.moveTo( p0[0,0] + mod_x , p0[0,1] + mod_y )
+      self.grb.lineTo( p1[0,0] + mod_x , p1[0,1] + mod_y )
+      self.grb.lineTo( p2[0,0] + mod_x , p2[0,1] + mod_y )
+      self.grb.lineTo( p3[0,0] + mod_x , p3[0,1] + mod_y )
+      self.grb.lineTo( p0[0,0] + mod_x , p0[0,1] + mod_y )
+      self.grb.regionEnd()
+
+
+  def pad_oblong(self, mod, pad):
+
+    mod_x = self.toUnit( mod["x"] )
+    mod_y = self.toUnit( mod["y"] )
+    mod_a = float( mod["angle"] )
+
+    x = self.toUnit( pad["posx"] )
+    y = self.toUnit( pad["posy"] )
+    a = float( pad["angle"] )
+
+    sx = self.toUnit( pad["sizex"] )
+    sy = self.toUnit( pad["sizey"] )
+
+    if sx > sy:
+      obR = sy
+      obS = sx - sy
+      dx = obS
+      dy = 0
+    else:
+      obR = sx
+      obS = sy - sx
+      dx = 0
+      dy = obS
+
+    da = a - mod_a
+
+    u = self._rot( a, [ x, y ] )
+    v = self._rot( a, [ x, y ] )
 
     if "aperture_key" in pad:
       key = pad["aperture_key"]
       ap = self.aperture[key]
 
       self.grb.apertureSet( ap["aperture_name"] )
-      self.grb.flash( v[0,0] + mod_x , v[0,1] + mod_y )
-
+      self.moveTo( u[0,0], u[0,1] )
+      self.lineTo( v[0,0], v[0,1] )
     else:
+      print "# WARNING, no aperture for pad_oblong:", pad
 
-      pass
+
+  def pad_trapeze(self, mod, pad):
+    print "# WARNIGN: pad_trapeze not implemented"
 
 
-  def pad_oblong(self, pad):
+  def track_line(self, track):
+
+    x0 = self.toUnit( track["x0"] )
+    y0 = self.toUnit( track["y0"] )
+
+    x1 = self.toUnit( track["x1"] )
+    y1 = self.toUnit( track["y1"] )
+
+    if "aperture_key" in track:
+      key = track["aperture_key"]
+      ap = self.aperture[key]
+
+      self.grb.apertureSet( ap["aperture_name"] )
+      self.grb.moveTo( x0, y0 )
+      self.grb.lineTo( x1, y1 )
+    else:
+      print "# WARNING: no aperture for track: ", track
+
+
+  def drawsegment_line(self, segment):
+
+    x0 = self.toUnit( segment["x0"] )
+    y0 = self.toUnit( segment["y0"] )
+
+    x1 = self.toUnit( segment["x1"] )
+    y1 = self.toUnit( segment["y1"] )
+
+    if "aperture_key" in segment:
+      key = segment["aperture_key"]
+      ap = self.aperture[key]
+
+      self.grb.apertureSet( ap["aperture_name"] )
+      self.grb.moveTo( x0, y0 )
+      self.grb.lineTo( x1, y1 )
+    else:
+      print "# WARNING: no aperture for segment: ", segment
+
+  def drawsegment_circle(self, segment):
     pass
 
-  def pad_trapeze(self, pad):
+  def drawsegment_arc(self, segment):
+    pass
+
+  def czone(self, czone):
+    first = True
+
+    polyscorners = czone["polyscorners"]
+    for pc in polyscorners:
+
+      x = self.toUnit( pc["x0"] )
+      y = self.toUnit( pc["y0"] )
+
+      if first:
+        self.grb.regionStart()
+        self.grb.moveTo( x, y )
+        first = False
+
+      else:
+        self.grb.lineTo( x, y )
+
+    if not first:
+      self.grb.regionEnd()
+
+
+  def track_via(self, via):
+    x0 = self.toUnit( via["x0"] )
+    y0 = self.toUnit( via["y0"] )
+
+    if "aperture_key" in via:
+      key = via["aperture_key"]
+      ap = self.aperture[key]
+
+      self.grb.apertureSet( ap["aperture_name"] )
+      self.grb.flash( x0, y0 )
+    else:
+      print "# WARNING: no aperture for via: ", via
+
+
+  def art_segment(self, mod, art):
+
+    mod_x = self.toUnit( mod["x"] )
+    mod_y = self.toUnit( mod["y"] )
+    mod_a = float( mod["angle"] )
+
+    sx = self.toUnit( art["startx"] )
+    sy = self.toUnit( art["starty"] )
+
+    ex = self.toUnit( art["endx"] )
+    ey = self.toUnit( art["endy"] )
+
+    u = self._rot( mod_a, [ sx , sy ] )
+    x0 = u[0,0] + mod_x
+    y0 = u[0,1] + mod_y
+
+    v = self._rot( mod_a, [ ex , ey ] )
+    x1 = v[0,0] + mod_x
+    y1 = v[0,1] + mod_y
+
+    if "aperture_key" in art:
+      key = art["aperture_key"]
+      ap = self.aperture[key]
+
+      self.grb.apertureSet( ap["aperture_name"] )
+      self.grb.moveTo( x0, y0 )
+      self.grb.lineTo( x1, y1 )
+    else:
+      print "# WARNING: no aperture for art_segment: ", art
+
+
+  def art_circle(self, mod, art):
+    mod_x = self.toUnit( mod["x"] )
+    mod_y = self.toUnit( mod["y"] )
+    mod_a = float( mod["angle"] )
+
+    cx = self.toUnit( art["x"] )
+    cy = self.toUnit( art["y"] )
+    r = self.toUnit( art["r"] )
+
+    u = self._rot( mod_a, [ cx , cy ] )
+    x = u[0,0] + mod_x
+    y = u[0,1] + mod_y
+
+    if "aperture_key" in art:
+      key = art["aperture_key"]
+      ap = self.aperture[key]
+
+      self.grb.apertureSet( ap["aperture_name"] )
+      self.grb.moveTo( x + r, y )
+      self.grb.arcTo(x + r, y, -r, 0  )
+    else:
+      print "# WARNING: no aperture for art_circle: ", art
+
+
+  def art_arc(self, mod, art):
+    pass
+
+  def art_polygon(self, mod, art):
     pass
 
   def second_pass(self):
@@ -242,37 +460,44 @@ class brdgerber(brdjson.brdjson):
 
       if ele_type == "module":
 
+        for art in v["art"]:
+          shape = art["shape"]
+          if shape == "segment":      self.art_segment(v, art)
+          if shape == "circle":       self.art_circle(v, art)
+          if shape == "arc":          self.art_arc(v, art)
+          if shape == "polygon":      self.art_polygon(v, art)
+
         for pad in v["pad"]:
-
-
           shape = pad["shape"]
+          if   shape == "circle":     self.pad_circle(v, pad)
+          elif shape == "rectangle":  self.pad_rectangle(v, pad)
+          elif shape == "oblong":     self.pad_oblong(v, pad)
+          elif shape == "trapeze":    self.pad_trapeze(v, pad)
+      elif ele_type == "track":
+        shape = v["shape"]
+        if   shape == "track":      self.track_line(v)
+        elif shape == "through":    self.track_via(v)
+      elif ele_type == "drawsegment":
+        shape = v["shape"]
 
-          if shape == "circle": self.pad_circle(v, pad)
-          elif shape == "rectangle": self.pad_rectangle(v, pad)
-          elif shape == "oblong": self.pad_oblong(pad)
-          elif shape == "trapeze": self.pad_trapeze(pad)
-
-
-
-
-
-          shape = pad["shape"]
-
-          if shape == "circle":
-            pass
-
-
-
+        if shape == "line":         self.drawsegment_line(v)
+        elif shape == "circle":     self.drawsegment_circle(v)
+        elif shape == "arc":        self.drawsegment_arc(v)
+      elif ele_type == "czone":
+        self.czone(v)
 
 
   def dump_gerber(self):
 
+    # first pass to get apertures that are used
+    #
     self.first_pass()
 
     self.grb.mode("IN")
     self.grb.formatSpecification( 'L', 'A', 3, 4, 3, 4 )
 
     # define apertures
+    #
     for key in self.aperture:
       ap = self.aperture[key]
       typ = ap["type"] 
@@ -281,6 +506,8 @@ class brdgerber(brdjson.brdjson):
       elif typ == "circle": self.grb.defineApertureCircle( nam, ap["d"] )
 
 
+    # second pass to push to render
+    #
     self.second_pass()
 
     
