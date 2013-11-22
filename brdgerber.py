@@ -94,6 +94,44 @@ class brdgerber(brdjson.brdjson):
   def dump_json(self):
     print json.dumps( self.json_obj, indent=2 )
 
+  def preprocess_czone(self, czone):
+
+    czone["zone_island"] = []
+
+    pc_dict = {}
+    pos_stack = []
+    pc = czone["polyscorners"]
+
+    scalar = 10000.0
+    pos = 0
+
+    cur_list = []
+
+    while True:
+    #for p in pc:
+
+      x = int( scalar * float(p["x0"]) + 0.5 )
+      y = int( scalar * float(p["y0"]) + 0.5 )
+
+      key = str(x) + ":" + str(y)
+      cur_list.append( { "x" : x, "y" : y } )
+
+      if key in pc_dict:
+        spos = pc_dict[key]
+        pos_stack.append( spos )
+
+        czone["zone_island"] = pc[spos:pos+1]
+        pc = 
+
+        pass
+      else:
+        pc_dict[key] = pos
+
+
+      pos += 1
+
+
+      
 
   def first_pass(self):
 
@@ -115,6 +153,9 @@ class brdgerber(brdjson.brdjson):
 
       elif v["type"] == "text":
         pass
+
+      elif v["type"] == "czone":
+        self.preprocess_czone(self, v)
 
       elif v["type"] == "module":
 
