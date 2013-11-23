@@ -57,6 +57,9 @@ class brdgerber(brdjson.brdjson):
 
     self.grb = pygerber.pygerber()
 
+    self.islands = []
+    self.island_layer = []
+
   def toUnit(self, v):
     return float(v) / 10000.0
 
@@ -94,44 +97,63 @@ class brdgerber(brdjson.brdjson):
   def dump_json(self):
     print json.dumps( self.json_obj, indent=2 )
 
-  def preprocess_czone(self, czone):
 
-    czone["zone_island"] = []
 
-    pc_dict = {}
-    pos_stack = []
-    pc = czone["polyscorners"]
+  def _find_czone_islands_r( self, islands, pnts, start_pos, end_pos  ):
+
+    island = []
+
+    cur_pos = start_pos + 1
+    while cur_pos <= end_pos:
+
+      pnt = pnts[cur_pos]
+
+      if pnt["skip_pos"] >= 0:
+        self._find_czone_islands_r( islands, pnts, cur_pos, pnt["skip_pos"] )
+        cur_pos = pnt["skip_pos"]
+      else:
+        island.append( { "x" : pnt["x0"], "y" : pnt["y0"] } )
+
+      cur_pos += 1
+
+
+    # reject duplicate points
+    if len(island) == 2:
+      print "#ERROR, got length 2 for subregion"
+      sys.exit(0)
+    if len(island) > 1:
+      islands.append(island)
+
+
+  def _find_czone_islands( self, islands, czone ):
+    cur_list = []
+    pos_dict = {}
 
     scalar = 10000.0
     pos = 0
 
-    cur_list = []
+    pnts = czone["polyscorners"]
+    for pnt in pnts:
+      key_x = int( scalar * float(pnt["x0"]) + 0.5 )
+      key_y = int( scalar * float(pnt["y0"]) + 0.5 )
 
-    while True:
-    #for p in pc:
+      x = float(pnt["x0"])
+      y = float(pnt["y0"])
 
-      x = int( scalar * float(p["x0"]) + 0.5 )
-      y = int( scalar * float(p["y0"]) + 0.5 )
-
-      key = str(x) + ":" + str(y)
+      key = str(key_x) + ":" + str(key_y)
       cur_list.append( { "x" : x, "y" : y } )
 
-      if key in pc_dict:
-        spos = pc_dict[key]
-        pos_stack.append( spos )
+      pnt["skip_pos"] = -1
 
-        czone["zone_island"] = pc[spos:pos+1]
-        pc = 
-
-        pass
+      if key in pos_dict:
+        pnts[ pos_dict[key] ]["skip_pos"]  = pos
       else:
-        pc_dict[key] = pos
-
+        pos_dict[key] = pos
 
       pos += 1
 
+    self._find_czone_islands_r( islands, pnts, 0, len(pnts)-1 )
 
-      
 
   def first_pass(self):
 
@@ -155,7 +177,10 @@ class brdgerber(brdjson.brdjson):
         pass
 
       elif v["type"] == "czone":
-        self.preprocess_czone(self, v)
+        self.islands = []
+        #self.preprocess_czone(self, v)
+        self._find_czone_islands( self.islands, v)
+
 
       elif v["type"] == "module":
 
@@ -524,8 +549,22 @@ class brdgerber(brdjson.brdjson):
         if shape == "line":         self.drawsegment_line(v)
         elif shape == "circle":     self.drawsegment_circle(v)
         elif shape == "arc":        self.drawsegment_arc(v)
-      elif ele_type == "czone":
-        self.czone(v)
+      #elif ele_type == "czone": self.czone(v)
+
+    # print pours
+    #
+    for island in self.islands:
+      first = True
+      for pnt in island:
+        if first:
+          self.grb.regionStart()
+          self.grb.moveTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
+          first = False
+        else:
+          self.grb.lineTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
+      if not first:
+        self.grb.lineTo( self.toUnit(island[0]["x"]), self.toUnit(island[0]["y"]) )
+        self.grb.regionEnd()
 
 
   def dump_gerber(self):
