@@ -60,6 +60,8 @@ class brdgerber(brdjson.brdjson):
     self.islands = []
     self.island_layer = []
 
+    self.layer = 0
+
   def toUnit(self, v):
     return float(v) / 10000.0
 
@@ -99,7 +101,7 @@ class brdgerber(brdjson.brdjson):
 
 
 
-  def _find_czone_islands_r( self, islands, pnts, start_pos, end_pos  ):
+  def _find_czone_islands_r( self, islands, pnts, start_pos, end_pos , layer ):
 
     island = []
 
@@ -109,7 +111,7 @@ class brdgerber(brdjson.brdjson):
       pnt = pnts[cur_pos]
 
       if pnt["skip_pos"] >= 0:
-        self._find_czone_islands_r( islands, pnts, cur_pos, pnt["skip_pos"] )
+        self._find_czone_islands_r( islands, pnts, cur_pos, pnt["skip_pos"], layer )
         cur_pos = pnt["skip_pos"]
       else:
         island.append( { "x" : pnt["x0"], "y" : pnt["y0"] } )
@@ -122,7 +124,7 @@ class brdgerber(brdjson.brdjson):
       print "#ERROR, got length 2 for subregion"
       sys.exit(0)
     if len(island) > 1:
-      islands.append(island)
+      islands.append( { "island":island, "layer": layer } )
 
 
   def _find_czone_islands( self, islands, czone ):
@@ -152,7 +154,7 @@ class brdgerber(brdjson.brdjson):
 
       pos += 1
 
-    self._find_czone_islands_r( islands, pnts, 0, len(pnts)-1 )
+    self._find_czone_islands_r( islands, pnts, 0, len(pnts)-1, czone["layer"] )
 
 
   def first_pass(self):
@@ -527,6 +529,9 @@ class brdgerber(brdjson.brdjson):
       if ele_type == "module":
 
         for art in v["art"]:
+
+          if int(art["layer"]) != self.layer: continue
+
           shape = art["shape"]
           if shape == "segment":      self.art_segment(v, art)
           if shape == "circle":       self.art_circle(v, art)
@@ -534,16 +539,36 @@ class brdgerber(brdjson.brdjson):
           if shape == "polygon":      self.art_polygon(v, art)
 
         for pad in v["pad"]:
+
+          pad_layer_mask = int(pad["layer_mask"], 16)
+          if not (pad_layer_mask & (1<<self.layer)): continue
+
           shape = pad["shape"]
           if   shape == "circle":     self.pad_circle(v, pad)
           elif shape == "rectangle":  self.pad_rectangle(v, pad)
           elif shape == "oblong":     self.pad_oblong(v, pad)
           elif shape == "trapeze":    self.pad_trapeze(v, pad)
       elif ele_type == "track":
+
+
         shape = v["shape"]
+
+        if (shape == "track") and (self.layer != int(v["layer"])): continue
+        else:
+          a_layer = int(v["layer"]) & 0xf
+          b_layer = (int(v["layer"]) & 0xf0) >> 4
+          start_layer = min(a_layer, b_layer)
+          end_layer = max(a_layer, b_layer)
+          if ( self.layer < start_layer ) or ( self.layer > end_layer ) : continue
+
         if   shape == "track":      self.track_line(v)
         elif shape == "through":    self.track_via(v)
+        elif shape == "blind":      self.track_via(v)
+
       elif ele_type == "drawsegment":
+
+        if self.layer != int(v["layer"]): continue
+
         shape = v["shape"]
 
         if shape == "line":         self.drawsegment_line(v)
@@ -553,8 +578,13 @@ class brdgerber(brdjson.brdjson):
 
     # print pours
     #
-    for island in self.islands:
+    for ele in self.islands:
       first = True
+      island = ele["island"]
+      layer = int(ele["layer"])
+
+      if self.layer != layer: continue
+
       for pnt in island:
         if first:
           self.grb.regionStart()

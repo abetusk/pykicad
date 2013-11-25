@@ -538,6 +538,11 @@ class brdjson(brd.brd):
 
     self.cur_czone["polyscorners"].append(p)
 
+  def cb_czone_zlayer(self, arg):
+    zlayer = arg[0]
+
+    self.cur_czone["layer"] = zlayer
+
   def cb_czone_end(self, arg):
     self.json_obj["element"].append( self.cur_czone );
 
