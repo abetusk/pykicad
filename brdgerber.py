@@ -43,6 +43,7 @@ import pygerber
 
 import math
 import numpy as np
+import json
 
 class brdgerber(brdjson.brdjson):
 
@@ -61,6 +62,19 @@ class brdgerber(brdjson.brdjson):
     self.island_layer = []
 
     self.layer = 0
+
+    self.font_file = "./aux/hershey_ascii.json"
+    f = open( self.font_file, "r")
+    s = ""
+    for l in f:
+      s += l
+    f.close()
+    self.hershey_font_json = json.loads(s)
+    #print json.dumps(self.hershey_font_json, indent = 2)
+
+    self.hershey_scale_factor = float( self.hershey_font_json["scale_factor"] )
+
+
 
   def toUnit(self, v):
     return float(v) / 10000.0
@@ -186,9 +200,16 @@ class brdgerber(brdjson.brdjson):
 
       elif v["type"] == "module":
 
-
         for text in v["text"]:
-          pass
+          width = self.toUnit( text["penwidth"] )
+          key = "circle:" + "{0:011.5f}".format(width)
+          if key not in aperture_set:
+            aperture_set[key] = { "type" : "circle", "d" : width, "aperture_name" : self.genApertureName() }
+            
+          ap_name = aperture_set[key]["aperture_name"]
+          text["aperture_name"] = ap_name
+          text["aperture_key"] = key
+
 
         for art in v["art"]:
           shape = art["shape"]
@@ -519,6 +540,126 @@ class brdgerber(brdjson.brdjson):
   def art_polygon(self, mod, art):
     pass
 
+
+#  def _draw_hershey_char( self, ch, x, y, rad_angle, line_width, width, height ):
+#    c = ord(ch)
+#
+#    font = self.hershey_font_json[c]
+#
+#    for pnts in font["art"]:
+#      first = True
+#      for pnt in pnts:
+#        f_x = pnt["x"]
+#        f_y = pnt["y"]
+#
+#        if first:
+#          key = 
+#          self.grbl.apertureSet( ap["aperture_name"] )
+#          self.grb.moveTo(f_x, f_y)
+#        else:
+#          self.grb.lineTo(f_x, f_y)
+#
+#        first = False
+
+
+  def _draw_hershey_char( self, ap, font_entry, ang, x, y, sizex, sizey, flip_flag = False ):
+    for pnts in font_entry["art"]:
+      first = True
+      for pnt in pnts:
+
+        f_x = pnt["x"]
+        f_y = pnt["y"]
+
+        a = f_x * sizex
+        b = f_y * sizey
+
+        a *= self.hershey_scale_factor
+        b *= self.hershey_scale_factor
+
+        if flip_flag:
+          a *= -1
+
+        u = self._rot( ang, [a,b] )
+
+        #a += x
+        #b += y
+        u[0,0] += x
+        u[0,1] += y
+
+        #a = self.toUnit(a)
+        #b = self.toUnit(b)
+        a = self.toUnit( u[0,0] )
+        b = self.toUnit( u[0,1] )
+        
+
+        if first:
+          self.grb.apertureSet( ap["aperture_name"] )
+          self.grb.moveTo(a,b)
+        else:
+          self.grb.lineTo(a,b)
+
+        first = False
+
+
+  def text_module(self, mod, text_obj):
+
+    #flip_flag = True
+    flip_flag = False
+
+    visible_flag = text_obj["visible"]
+    if not visible_flag: return
+
+    mod_x = float(mod["x"])
+    mod_y = float(mod["y"])
+    mod_a = float(mod["angle"])
+
+    x = float(text_obj["x"])
+    y = float(text_obj["y"])
+    ang = float(text_obj["angle"])
+
+    width = float(text_obj["penwidth"])
+    text_code = text_obj["flag"]
+    text = text_obj["text"]
+
+    key = text_obj["aperture_key"]
+    ap = self.aperture[key]
+    aperture_name = ap["aperture_name"]
+
+    sizex = float(text_obj["sizex"])
+    sizey = float(text_obj["sizey"])
+
+    text_width = len(text) * sizex
+    text_height = sizey
+
+    dx = sizex
+    dy = 0
+
+    if flip_flag:
+      dx *= -1
+
+    dv = self._rot( ang, [ dx, dy ] )
+
+
+    start_x = x - text_width/2
+    if flip_flag:
+      start_x = x + text_width/2
+
+    #start_y = y - text_height
+    start_y = y
+
+    su = self._rot( ang , [ start_x, start_y ] )
+
+    cur_u = [ su[0,0], su[0,1] ]
+
+    for ch in text:
+      c = ord(ch) 
+      c_str = str(c)
+      font = self.hershey_font_json[c_str]
+      self._draw_hershey_char( ap, font, ang, mod_x + cur_u[0], mod_y + cur_u[1], sizex, sizey, flip_flag )
+      cur_u[0] += dv[0,0]
+      cur_u[1] += dv[0,1]
+
+
   def second_pass(self):
 
     for v in self.json_obj["element"]:
@@ -548,6 +689,10 @@ class brdgerber(brdjson.brdjson):
           elif shape == "rectangle":  self.pad_rectangle(v, pad)
           elif shape == "oblong":     self.pad_oblong(v, pad)
           elif shape == "trapeze":    self.pad_trapeze(v, pad)
+
+        for text in v["text"]:
+          self.text_module(v, text)
+
       elif ele_type == "track":
 
 
