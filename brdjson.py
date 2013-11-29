@@ -471,6 +471,26 @@ class brdjson(brd.brd):
     self.cur_mod["pad"].append( self.cur_pad )
     self.cur_pad = {}
 
+  def cb_equipot(self, arg):
+    pass
+ 
+  def cb_equipot_na(self, arg):
+    netcode, netname, dummy = arg
+
+    netname = re.sub('"', '', netname)
+
+    netcode = int(netcode)
+    self.json_obj["equipot"].append( { "net_number": netcode, "net_name": netname } )
+
+  def cb_equipot_st(self, arg):
+    pass
+
+  def cb_equipot_end(self, arg):
+    pass
+
+
+
+
 
   def cb_czone(self, arg):
     self.cur_czone = { "zcorner" : [], "polyscorners" : [], "type" : "czone" }
