@@ -44,6 +44,8 @@ class brdjson(brd.brd):
 
     self.json_obj["units"] = "deci-mils"
     self.json_obj["element"] = []
+    self.json_obj["equipot"] = []
+
 
     # equipot maps internal net name to textual net name
     #
@@ -471,12 +473,34 @@ class brdjson(brd.brd):
     self.cur_mod["pad"].append( self.cur_pad )
     self.cur_pad = {}
 
+  def cb_equipot(self, arg):
+    pass
+ 
+  def cb_equipot_na(self, arg):
+    netcode, netname, dummy = arg
+
+    netname = re.sub('"', '', netname)
+
+    netcode = int(netcode)
+    self.json_obj["equipot"].append( { "net_number": netcode, "net_name": netname } )
+
+  def cb_equipot_st(self, arg):
+    pass
+
+  def cb_equipot_end(self, arg):
+    pass
+
+
+
+
 
   def cb_czone(self, arg):
     self.cur_czone = { "zcorner" : [], "polyscorners" : [], "type" : "czone" }
 
   def cb_czone_zinfo(self, arg):
     timestamp, netcode, name, dummy = arg
+
+    name = re.sub( '"', '', name );
 
     self.cur_czone["timestamp"] = timestamp
     self.cur_czone["netcode"] = netcode
@@ -545,6 +569,8 @@ class brdjson(brd.brd):
 
   def cb_czone_end(self, arg):
     self.json_obj["element"].append( self.cur_czone );
+
+
 
 
   def cb_endboard(self, arg):
