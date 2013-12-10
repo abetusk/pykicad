@@ -20,9 +20,13 @@ int main(int argc, char **argv)
   int first = 0, first_line = 0;
   int art_count;
 
-  //n = newstroke_font_bufsize;
+  n = newstroke_font_bufsize;
+
+  //printf("%i\n", newstroke_font_bufsize);
+  //exit(0);
 
   printf("{\n");
+  
 
   for (i=0; i<n; i++)
   {
@@ -31,6 +35,8 @@ int main(int argc, char **argv)
 
     printf("  \"%i\" : " , i + 32);
     printf("  {\n");
+
+    printf("    \"scale_factor\" : \"%0.20f\",\n", 1.0/21.0 );
 
     pch = newstroke_font[i];
 

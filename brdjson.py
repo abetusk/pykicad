@@ -276,9 +276,14 @@ class brdjson(brd.brd):
     attribute = arg
     self.json_obj["attribute"] = attribute
   
+  # EITHER THE DOCUMENTATION IS WRONG OR THERE'S A BUG IN KiCAD
+  # KiCAD clearly renders what the documentation says as sizex as sizey
+  # and sizey as sizex.  I'm switching it here to be consistent with
+  # KiCAD....
+  # 
   def cb_MODULE_Tn(self, arg):
     #n, posx, posy, sizex, sizey, rotation, penwidth, flag, visible, layer, flag, name = arg
-    n, posx, posy, sizex, sizey, rotation, penwidth, flag, visible, layer, name = arg
+    n, posx, posy, sizey, sizex, rotation, penwidth, flag, visible, layer, name = arg
 
     text_field = {}
     text_field["number"] = n
