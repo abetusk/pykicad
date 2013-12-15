@@ -215,5 +215,8 @@ if __name__ == "__main__":
   if outbase is not None:
     s.json_prefix = outbase
 
-  s.parse_sch(infile)
+  try:
+    s.parse_sch(infile)
+  except sch.parse_exception as e:
+    print e
 
