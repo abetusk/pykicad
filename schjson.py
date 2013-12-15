@@ -220,7 +220,7 @@ if __name__ == "__main__":
   except sch.parse_exception as e:
     print e
     sys.exit(1)
-  finally:
-    print "ERROR: general exception"
+  except Exception as e:
+    print "ERROR: general exception:", e
     sys.exit(1)
 
