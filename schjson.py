@@ -219,4 +219,5 @@ if __name__ == "__main__":
     s.parse_sch(infile)
   except sch.parse_exception as e:
     print e
+    sys.exit(1)
 
