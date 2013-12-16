@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
   #print json_data
 
-  libs = [ "power", "device", "transistors", "conn", "linear", "regul", "74xx", "cmos4000", "adc-dac", "memory", "xilinx", "special", "microcontrollers", "dsp", "microchip", "analog_switches", "motorola", "texas", "intel", "audio", "interface", "digital-audio", "philips", "display", "cypress", "siliconi", "opto", "atmel", "contrib", "valves", "net_test-cache" ]
+  libs = [ "power", "device", "transistors", "conn", "linear", "regul", "74xx", "cmos4000", "adc-dac", "memory", "xilinx", "special", "microcontrollers", "dsp", "microchip", "analog_switches", "motorola", "texas", "intel", "audio", "interface", "digital-audio", "philips", "display", "cypress", "siliconi", "opto", "atmel", "contrib", "valves" ]
   print "EESchema Schematic File Version 2"
   for lib in libs:
     print "LIBS:" + lib
@@ -88,18 +88,49 @@ if __name__ == "__main__":
       for text in ele["text"]:
         print "F", text["number"], "\"" + text["text"] + "\"", text["orientation"], text["x"], text["y"], text["size"], text["flags"] 
       transform = ele["transform"]
+
+      a = str(transform[0][0])
+      b = str(transform[0][1])
+      c = str(transform[1][0])
+      d = str(transform[1][1])
+
       print "       ", str(1).ljust(4), str(ele["x"]).ljust(4), str(ele["y"]).ljust(4)
-      print "       ", str(transform[0][0]).ljust(4), str(transform[0][1]).ljust(4), str(transform[1][0]).ljust(4), str(transform[1][1]).ljust(4)
+      print "       ", a.ljust(4), b.ljust(4), c.ljust(4), d.ljust(4)
       print "$EndComp"
 
     elif ele_type == "wireline":
       print "Wire Wire Line"
-      print "       ", ele["startx"], ele["starty"], ele["endx"], ele["endy"]
+      print "     ", ele["startx"], ele["starty"], ele["endx"], ele["endy"]
     elif ele_type == "connection":
       print "Connection ~", ele["x"], ele["y"]
     elif ele_type == "noconn":
       print "NoConn ~", ele["x"], ele["y"]
+    elif ele_type == "busline":
+      print "Wire Bus Line"
+      print "     ", ele["startx"], ele["starty"], ele["endx"], ele["endy"]
+    elif ele_type == "entrybusbus":
+      print "Entry Bus Bus"
+      print "     ", ele["startx"], ele["starty"], ele["endx"], ele["endy"]
+    elif ele_type == "notesline":
+      print "Wire Notes Line"
+      print "     ", ele["startx"], ele["starty"], ele["endx"], ele["endy"]
 
-  print "$EndSCHEMATIC"
+
+    elif ele_type == "label":
+      print "Text Label", ele["x"], ele["y"], ele["orientation"], ele["dimension"], ele["shape"], "0"
+      print ele["text"]
+    elif ele_type == "labelglobal":
+      print "Text GLabel", ele["x"], ele["y"], ele["orientation"], ele["dimension"], ele["shape"], "~ 0"
+      print ele["text"]
+    elif ele_type == "labelheirarchical":
+      print "Text HLabel", ele["x"], ele["y"], ele["orientation"], ele["dimension"], ele["shape"], "~ 0"
+      print ele["text"]
+
+    elif ele_type == "textnote":
+      print "Text Notes", ele["x"], ele["y"], ele["orientation"], ele["dimension"], "~ 0"
+      print ele["text"]
+
+  #print "$EndSCHEMATIC"  #wtf
+  print "$EndSCHEMATC"
 
 

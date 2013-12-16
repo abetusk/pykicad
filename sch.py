@@ -92,10 +92,11 @@ class sch(object):
     "label" : [ "Text\s+Label", "posx", "posy", "orientation", "dimension", "shape", "~" ],
     "label_text" : [ "", "*label" ],                                                                # ^ potentially at start of line
 
-    "heirarchicallabel" : [ "Text\s+HLabel", "posx", "posy", "orientation", "dimension", "shape" ],
+    "heirarchicallabel" : [ "Text\s+HLabel", "posx", "posy", "orientation", "dimension", "shape", "*cruft" ],
     "heirarchicallabel_text" : [ "", "^label" ],
 
-    "globallabel" : [ "Text\s+GLabel", "posx", "posy", "orientation", "dimension", "shape", "shape" ],
+    #"globallabel" : [ "Text\s+GLabel", "posx", "posy", "orientation", "dimension", "shape", "text" ],
+    "globallabel" : [ "Text\s+GLabel", "posx", "posy", "orientation", "dimension", "shape", "*cruft" ],
     "globallabel_text" : [ "", "^label" ],
 
 

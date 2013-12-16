@@ -51,6 +51,8 @@ class schjson(sch.sch):
 #    self.json_obj["header"] = None
 
     self.cur_component = {}
+    self.cur_label = {}
+    self.cur_text = {}
 
     sch.sch.__init__(self)
 
@@ -191,6 +193,88 @@ class schjson(sch.sch):
     #self.json_obj["line"].append( { "type" : "entrywireline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
     self.json_obj["element"].append( { "type" : "entrywireline", "startx" : startx, "starty" : starty, "endx" : endx, "endy" : endy } )
 
+
+  def cb_heirarchicallabel(self, args):
+    posx,posy,orientation,dimension,shape,cruf = args
+
+    self.cur_label["type"] = "labelheirarchical"
+    self.cur_label["x"] = posx
+    self.cur_label["y"] = posy
+    self.cur_label["orientation"] = orientation
+    self.cur_label["dimension"] = dimension
+    self.cur_label["shape"] = shape
+
+  def cb_heirarchicallabel_text(self, args):
+    text = args[0]
+
+    self.cur_label["text"] = text;
+    self.json_obj["element"].append( self.cur_label )
+    self.cur_label = {}
+
+  def cb_globallabel(self, args):
+    posx,posy,orientation,dimension,shape,cruf = args
+
+    self.cur_label["type"] = "labelglobal"
+    self.cur_label["x"] = posx
+    self.cur_label["y"] = posy
+    self.cur_label["orientation"] = orientation
+    self.cur_label["dimension"] = dimension
+    self.cur_label["shape"] = shape
+
+  def cb_globallabel_text(self, args):
+    text = args[0]
+
+    self.cur_label["text"] = text;
+    self.json_obj["element"].append( self.cur_label )
+    self.cur_label = {}
+
+  def cb_label(self, args):
+    posx,posy,orientation,dimension,shape,cruf = args
+
+    self.cur_label["type"] = "label"
+    self.cur_label["x"] = posx
+    self.cur_label["y"] = posy
+    self.cur_label["orientation"] = orientation
+    self.cur_label["dimension"] = dimension
+    self.cur_label["shape"] = shape
+
+  def cb_label_text(self, args):
+    text = args[0]
+
+    self.cur_label["text"] = text;
+    self.json_obj["element"].append( self.cur_label )
+    self.cur_label = {}
+
+
+
+  def cb_textnote(self, args):
+    posx,posy,orientation,dimension = args[0],args[1],args[2],args[3]
+
+    self.cur_text["type"] = "textnote"
+    self.cur_text["x"] = posx
+    self.cur_text["y"] = posy
+    self.cur_text["orientation"] = orientation
+    self.cur_text["dimension"] = dimension
+
+
+  def cb_textnote_text(self, args):
+    text = args[0]
+    self.cur_text["text"] = text
+
+    self.json_obj["element"].append( self.cur_text )
+    self.cur_text = {}
+
+
+  def cb_notesline_segment(self, args):
+    startx,starty,endx,endy = args[0],args[1],args[2],args[3]
+
+    t = {}
+    t["type"] = "notesline"
+    t["startx"] = startx
+    t["starty"] = starty
+    t["endx"] = endx 
+    t["endy"] = endy
+    self.json_obj["element"].append( t )
 
 
 
