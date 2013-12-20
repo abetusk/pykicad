@@ -71,7 +71,9 @@ class sch(object):
 
     "sheet" : [ "\$Sheet" ],
     "sheet_S" : [ "S", "posx", "posy", "dimx", "dimy" ],
-    "sheet_Fn" : [ "F(\d+)", "\"text", "#dummy","#dummy",  "forms", "side", "posx", "posy", "dimension" ],
+    "sheet_U" : [ "U", "*text" ],
+    #"sheet_Fn" : [ "F(\d+)", "\"text", "#dummy","#dummy",  "forms", "side", "posx", "posy", "dimension" ],
+    "sheet_Fn" : [ "F(\d+)", "\"text", "#dummy","#dummy",  "*text" ],
     "sheet_end" : [ "\$EndSheet" ],
 
     "comp" : [ "\$Comp" ],
@@ -87,18 +89,27 @@ class sch(object):
 
     # a note on theboard
     "textnote" : [ "Text\s+Notes", "posx", "posy", "orientation", "dimension", "~", "?zero" ],
-    "textnote_text" : [ "" , "_text" ],                                                             # _ all line, potentially at start
+    #"textnote_text" : [ "" , "_text" ],                                                             # _ all line, potentially at start
+    "textnote_text" : [ "" , "*text" ],                                                             # _ all line, potentially at start
 
     "label" : [ "Text\s+Label", "posx", "posy", "orientation", "dimension", "shape", "~" ],
     "label_text" : [ "", "*label" ],                                                                # ^ potentially at start of line
 
     "heirarchicallabel" : [ "Text\s+HLabel", "posx", "posy", "orientation", "dimension", "shape", "*cruft" ],
-    "heirarchicallabel_text" : [ "", "^label" ],
+    #"heirarchicallabel_text" : [ "", "^label" ],
+    "heirarchicallabel_text" : [ "", "*label" ],
 
     #"globallabel" : [ "Text\s+GLabel", "posx", "posy", "orientation", "dimension", "shape", "text" ],
     "globallabel" : [ "Text\s+GLabel", "posx", "posy", "orientation", "dimension", "shape", "*cruft" ],
-    "globallabel_text" : [ "", "^label" ],
+    #"globallabel_text" : [ "", "^label" ],
+    "globallabel_text" : [ "", "*label" ],
 
+    "bitmap" : [ "\$Bitmap" ],
+    "bitmap_pos" : [ "Pos", "x", "y" ],
+    "bitmap_scale" : [ "Scale", "scale" ],
+    "bitmap_data_start" :  [ "Data" ],
+    "bitmap_data" : [ "", "*data" ],
+    "bitmap_end" : [ "\$EndBitmap" ],
 
     "noconn" : [ "NoConn\s+~", "posx", "posy" ],
     "connection" : [ "Connection\s+~", "posx", "posy" ],
@@ -223,9 +234,19 @@ class sch(object):
       print "cb_sheet_S", arg
     pass
 
+  def cb_sheet_U(self, arg):
+    if self.parrot_flag:
+      print "cb_sheet_U", arg
+    pass
+
   def cb_sheet_Fn(self, arg):
     if self.parrot_flag:
       print "cb_sheet_Fn", arg
+    pass
+
+  def cb_sheet_end(self, arg):
+    if self.parrot_flag:
+      print "cb_sheet_end", arg
     pass
 
   def cb_comp(self, arg):
@@ -309,6 +330,38 @@ class sch(object):
     if self.parrot_flag:
       print "cb_globallabel_text", arg
     pass
+
+
+  def cb_bitmap(self, arg):
+    if self.parrot_flag:
+      print "cb_bitmap", arg
+    pass
+
+  def cb_bitmap_pos(self, arg):
+    if self.parrot_flag:
+      print "cb_bitmap_pos", arg
+    pass
+
+  def cb_bitmap_scale(self, arg):
+    if self.parrot_flag:
+      print "cb_bitmap_scale", arg
+    pass
+
+  def cb_bitmap_data_start(self, arg):
+    if self.parrot_flag:
+      print "cb_bitmap_data_start", arg
+    pass
+
+  def cb_bitmap_data(self, arg):
+    if self.parrot_flag:
+      print "cb_bitmap_data", arg
+    pass
+
+  def cb_bitmap_end(self, arg):
+    if self.parrot_flag:
+      print "cb_bitmap_end", arg
+    pass
+
 
   def cb_noconn(self, arg):
     if self.parrot_flag:
@@ -431,6 +484,7 @@ class sch(object):
                 "label" : "label_state",
                 "heirarchicallabel" : "heirlabel_state",
                 "globallabel" : "globlabel_state",
+                "bitmap" : "bitmap_state",
                 "noconn" : "main",
                 "connection" : "main",
                 "wireline" : "wireline_state",
@@ -459,6 +513,7 @@ class sch(object):
                       "descr_end" : "main" },
 
     "sheet_state" : { "sheet_S" : "sheet_state",
+                      "sheet_U" : "sheet_state",
                       "sheet_Fn" : "sheet_state",
                       "sheet_end" : "main" },
 
@@ -474,6 +529,13 @@ class sch(object):
     "label_state" : { "label_text" : "main" },
     "heirlabel_state" : { "heirarchicallabel_text" : "main" },
     "globlabel_state" : { "globallabel_text" : "main" },
+
+    "bitmap_state" : { "bitmap_pos" : "bitmap_state",
+                       "bitmap_scale" : "bitmap_state",
+                       "bitmap_data_start" : "bitmap_state",
+                       "bitmap_data" : "bitmap_state",
+                       "bitmap_end" : "main" },
+
     "wireline_state" : { "wireline_segment" : "main" },
     "busline_state" : { "busline_segment" : "main" },
     "notesline_state" : { "notesline_segment" : "main" },
@@ -525,7 +587,9 @@ class sch(object):
       "descr_end" : self.cb_descr_end,
       "sheet" : self.cb_sheet,
       "sheet_S" : self.cb_sheet_S,
+      "sheet_U" : self.cb_sheet_U,
       "sheet_Fn" : self.cb_sheet_Fn,
+      "sheet_end" : self.cb_sheet_end,
       "comp" : self.cb_comp,
       "comp_L" : self.cb_comp_L,
       "comp_U" : self.cb_comp_U,
@@ -540,8 +604,17 @@ class sch(object):
       "label_text" : self.cb_label_text,
       "heirarchicallabel" : self.cb_heirarchicallabel,
       "heirarchicallabel_text" : self.cb_heirarchicallabel_text,
+
       "globallabel" : self.cb_globallabel,
       "globallabel_text" : self.cb_globallabel_text,
+
+      "bitmap" : self.cb_bitmap,
+      "bitmap_pos" : self.cb_bitmap_pos,
+      "bitmap_scale" : self.cb_bitmap_scale,
+      "bitmap_data_start" : self.cb_bitmap_data_start,
+      "bitmap_data" : self.cb_bitmap_data,
+      "bitmap_end" : self.cb_bitmap_end,
+
       "noconn" : self.cb_noconn,
       "connection" : self.cb_connection,
       "wireline" : self.cb_wireline,
