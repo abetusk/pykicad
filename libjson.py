@@ -183,15 +183,24 @@ class libjson(lib.lib):
 
     htext_justify_token = 'C'
     vtext_justify_token = 'C'
-    text_italic = 'N'
-    text_bold = 'N'
+    #text_italic = 'N'
+    #text_bold = 'N'
+
+    text_italic = False
+    text_bold = False
 
     if vtext_justify:
       r = re.search("\s*([CLRT])([IN])([BN])", vtext_justify)
       if r:
         vtext_justify_token = r.group(1)
-        text_italic = r.group(2)
-        text_bold = r.group(3)
+
+        if r.group(2) == "I":
+          text_italic = True
+        #text_italic = r.group(2)
+
+        if r.group(3) == "B":
+          text_bold = True
+        #text_bold = r.group(3)
 
     if htext_justify:
       htext_justify_token = htext_justify
@@ -248,8 +257,11 @@ class libjson(lib.lib):
 
     htext_justify_token = 'C'
     vtext_justify_token = 'C'
-    text_italic = 'N'
-    text_bold = 'N'
+    #text_italic = 'N'
+    #text_bold = 'N'
+
+    text_italic = False
+    text_bold = False
 
     if vtext_justify:
       r = re.search("\s*([CLRT])([IN])([BN])", vtext_justify)
@@ -257,9 +269,13 @@ class libjson(lib.lib):
         if len(r.groups()) > 1:
           vtext_justify_token = r.group(1)
         if len(r.groups()) > 2:
-          text_italic = r.group(2)
+          #text_italic = r.group(2)
+          if r.group(2) == "I":
+            text_italic = True
         if len(r.groups()) > 3:
-          text_bold = r.group(3)
+          #text_bold = r.group(3)
+          if r.group(3) == "B":
+            text_bold = True
 
     if htext_justify:
       htext_justify_token = htext_justify
