@@ -85,7 +85,14 @@ if __name__ == "__main__":
       print "U", ele["nn"], ele["mm"], ele["timestamp"]
       print "P", ele["x"], ele["y"]
 
+      textFields = [ "number", "text", "orienetation", "x", "y", "size", "flags" ]
+
       for text in ele["text"]:
+
+        for tf in textFields:
+          if tf not in text:
+            text[tf] = ""
+
         print "F", text["number"], "\"" + text["text"] + "\"", text["orientation"], text["x"], text["y"], text["size"], text["flags"] 
       transform = ele["transform"]
 
