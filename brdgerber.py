@@ -691,6 +691,7 @@ class brdgerber(brdjson.brdjson):
           elif shape == "trapeze":    self.pad_trapeze(v, pad)
 
         for text in v["text"]:
+          if int(text["layer"]) != self.layer: continue
           self.text_module(v, text)
 
       elif ele_type == "track":
@@ -818,15 +819,21 @@ class brdgerber(brdjson.brdjson):
 if __name__ == "__main__":
 
   infile = None
+  layer = 0
 
   if len(sys.argv) >= 2:
     infile = sys.argv[1]
+    if len(sys.argv) >= 3:
+      layer = int(sys.argv[2])
 
   if infile is None:
     print "provide infile"
     sys.exit(0)
 
+
   b = brdgerber()
+
+  b.layer = layer
 
   b.parse_brd(infile)
   b.dump_gerber()
