@@ -42,10 +42,12 @@ class brdjson(brd.brd):
 
     self.json_obj = {}
 
-    self.json_obj["units"] = "deci-mils"
+    self.json_obj["units"] = "deci-thou"
     self.json_obj["element"] = []
     self.json_obj["equipot"] = []
 
+
+    self.destination_units = "deci-thou"
 
     # equipot maps internal net name to textual net name
     #
@@ -59,6 +61,7 @@ class brdjson(brd.brd):
     self.clear()
 
     self.units = "deci-thou"
+    self.destination_units = "deci-thou"
 
     brd.brd.__init__(self)
     
@@ -200,12 +203,14 @@ class brdjson(brd.brd):
 
   def cb_general_units(self, arg):
     self.units = arg[0]
-    self.json_obj["units"] = self.units
+    #self.json_obj["units"] = self.units
+    self.json_obj["units"] = self.destination_units
 
 
   def cb_UNITS(self, arg):
     self.units = arg[0]
-    self.json_obj["units"] = self.units
+    #self.json_obj["units"] = self.units
+    self.json_obj["units"] = self.destination_units
 
   def cb_MODULE(self, arg):
     name = arg[0]
@@ -454,6 +459,7 @@ class brdjson(brd.brd):
   def cb_PAD_At(self, arg):
     pad_type, n, layer_mask = arg
 
+    self.cur_pad["type"] = pad_type
     if layer_mask is not None:
       self.cur_pad["layer_mask"] = layer_mask
 
@@ -575,6 +581,40 @@ class brdjson(brd.brd):
   def cb_czone_end(self, arg):
     self.json_obj["element"].append( self.cur_czone );
 
+
+  def cb_textpcb(self, arg):
+    self.cur_text = { "type" : "text", "visible" : True }
+
+  def cb_textpcb_te(self, arg):
+    text = arg[0]
+    text = re.sub( '^"|"$', '', text )
+    self.cur_text["text"] = text;
+
+  def cb_textpcb_po(self, arg):
+    x, y, sizex, sizey, width, rotation = arg
+    self.cur_text["x"] = self.decithou( x )
+    self.cur_text["y"] = self.decithou( y )
+    self.cur_text["sizex"] = self.decithou( sizex )
+    self.cur_text["sizey"] = self.decithou( sizey )
+    self.cur_text["width"] = self.decithou( width )
+    self.cur_text["rotation"] = rotation
+    self.cur_text["angle"] = math.radians( -float(rotation)/10.0 )
+
+  def cb_textpcb_de(self, arg):
+    layer, mirror_code, ts, style = arg
+
+    self.cur_text["layer"] = layer
+    self.cur_text["mirror_code"] = mirror_code
+    self.cur_text["timestamp"] = ts
+    self.cur_text["style"] = style
+
+  def cb_textpcb_nl(self, arg):
+    text = arg[0]
+    text = re.sub( '^"|"$', '', text )
+    self.cur_text["text"] += "\n" + str(text)
+
+  def cb_textpcb_end(self, arg):
+    self.json_obj["element"].append( self.cur_text )
 
 
 

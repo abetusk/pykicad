@@ -369,6 +369,7 @@ class modjson(mod.mod):
   def cb_PAD_At(self, arg):
     pad_type, n, layer_mask = arg
 
+    self.pad["type"] = pad_type
     if layer_mask is not None:
       self.pad["layer_mask"] = layer_mask
 
