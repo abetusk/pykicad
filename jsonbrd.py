@@ -212,8 +212,10 @@ if __name__ == "__main__":
         num = t["number"]
         x = uc(t["x"])
         y = uc(t["y"])
-        sizex = uc(t["sizex"])
-        sizey = uc(t["sizey"])
+        #sizex = uc(t["sizex"])
+        #sizey = uc(t["sizey"])
+        sizex = uc(t["sizey"])
+        sizey = uc(t["sizex"])
         rot = t["rotation"]
         w = uc(t["penwidth"])
         flag = t["flag"]
@@ -261,6 +263,7 @@ if __name__ == "__main__":
           r = uc(a["r"])
           layer = a["layer"]
           w = uc(a["line_width"])
+
           print "DC", x, y, x+r, y, w, layer
 
       pad = ele["pad"]
@@ -305,8 +308,8 @@ if __name__ == "__main__":
         s = 1.0
         if ele["counterclockwise_flag"]:
           s = -1.0
-        x1 = x + r*math.cos(s*a)
-        y1 = y + r*math.sin(s*a)
+        x1 = x + r*math.cos(s*sa)
+        y1 = y + r*math.sin(s*sa)
         print "Po", ele["shape_code"], uc(ele["x"]), uc(ele["y"]), x1, y1, uc(ele["width"])
         print "De", ele["layer"], 0, int(deg_a*10.0), 0, 0
 
@@ -322,8 +325,15 @@ if __name__ == "__main__":
 
     elif ele_type == "text":
       print "$TEXTPCB"
-      print "Te \"" + ele["text"] + "\""
-      print "Po", uc(ele["x"]), uc(ele["y"]), uc(ele["sizex"]), uc(ele["sizey"]), uc(ele["width"]), ele["rotation"]
+
+      texts = ele["text"].split("\n")
+      for i, t in enumerate(texts):
+        if i==0:
+          print "Te \"" + texts[i] + "\""
+        else:
+          print "nl \"" + texts[i] + "\""
+      print "Po", uc(ele["x"]), uc(ele["y"]), uc(ele["sizex"]), \
+          uc(ele["sizey"]), uc(ele["width"]), ele["rotation"]
       print "De", ele["layer"], ele["mirror_code"], ele["timestamp"], ele["style"]
       print "$EndTEXTPCB"
 
@@ -362,7 +372,8 @@ if __name__ == "__main__":
     if ele_type == "czone":
       print "$CZONE_OUTLINE"
 
-      print "ZInfo", ele["timestamp"], ele["netcode"], eqpot[ ele["netcode"] ]["net_name"]
+      nc = int( ele["netcode"] )
+      print "ZInfo", ele["timestamp"], ele["netcode"], eqpot[ nc ]["net_name"]
       print "ZLayer", ele["layer"]
       print "ZAux", len( ele["zcorner"] ), ele["hatching_option"]
       print "ZClearance", uc(ele["clearance"]), ele["pad_option"]
