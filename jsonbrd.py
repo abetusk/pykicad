@@ -363,8 +363,8 @@ if __name__ == "__main__":
 
   print "$EndTRACK"
 
-  print "$Zone"
-  print "$EndZone"
+  print "$ZONE"
+  print "$EndZONE"
 
   for ele in eles:
     ele_type = ele["type"]
@@ -373,16 +373,18 @@ if __name__ == "__main__":
       print "$CZONE_OUTLINE"
 
       nc = int( ele["netcode"] )
-      print "ZInfo", ele["timestamp"], ele["netcode"], eqpot[ nc ]["net_name"]
+      print "ZInfo", ele["timestamp"], ele["netcode"], "\"" + eqpot[ nc ]["net_name"] + "\""
       print "ZLayer", ele["layer"]
       print "ZAux", len( ele["zcorner"] ), ele["hatching_option"]
       print "ZClearance", uc(ele["clearance"]), ele["pad_option"]
       print "ZMinThickness", uc(ele["min_thickness"])
-      print "ZOptions", ele["fill"], ele["arc"], uc(ele["antipad_thickness"]), uc(ele["thermal_stub_width"])
+      print "ZOptions", ele["fill"], ele["arc"], "F", uc(ele["antipad_thickness"]), uc(ele["thermal_stub_width"])
       print "ZSmoothing", uc(ele["zsmoothing_x"]), uc(ele["zsmoothing_y"])
 
-      for z in ele["zcorner"]:
-        print "ZCorner", uc(z["x"]), uc(z["y"])
+      for i, z in enumerate(ele["zcorner"]):
+        k = 0
+        if i == len(ele["zcorner"])-1: k = 1
+        print "ZCorner", uc(z["x"]), uc(z["y"]), k
 
       print "$POLYSCORNERS"
       for i, pc in enumerate(ele["polyscorners"]):

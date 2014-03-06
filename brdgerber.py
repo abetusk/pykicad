@@ -193,7 +193,7 @@ class brdgerber(brdjson.brdjson):
         pass
 
       elif v["type"] == "czone":
-        self.islands = []
+        #self.islands = []
         #self.preprocess_czone(self, v)
         self._find_czone_islands( self.islands, v)
 
@@ -729,7 +729,7 @@ class brdgerber(brdjson.brdjson):
       island = ele["island"]
       layer = int(ele["layer"])
 
-      if self.layer != layer: continue
+      if int(self.layer) != int(layer): continue
 
       for pnt in island:
         if first:
