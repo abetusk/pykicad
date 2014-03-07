@@ -25,6 +25,8 @@ class pygerber(object):
     self.Xmax = 0
     self.Ymax = 0
 
+    self.invertY = False
+
     self.leading_zero_flag = "L"  # 'L' omit leading zeros, 'T' omit trailing
     self.coordinate_code = "A"  # 'A' absolute, 'I' incremental
     self.unit = "IN" # 'IN' inches, 'MM' mm
@@ -53,6 +55,9 @@ class pygerber(object):
     #print "_fmt:", fval, afval, lead_char, n
 
     s = "{0:0" + str(n) + "." + str(n_frac) + "f}"
+
+    #print "_fmt:", fval, afval, lead_char, n, s
+
     v = s.format( afval )
     v = v.strip()
 
@@ -90,7 +95,10 @@ class pygerber(object):
 
     if n<=0: return
 
-    return "J" + self._fmt(n, self.Yfrac, x)
+    if self.invertY:
+      return "J" + self._fmt(n, self.Yfrac, -float(x) )
+    else:
+      return "J" + self._fmt(n, self.Yfrac, x)
 
 
   def _Xfmt( self, x ):
@@ -113,7 +121,10 @@ class pygerber(object):
 
     #print "_Yfmt:", y, n, self.Yfrac
 
-    return "Y" + self._fmt(n, self.Yfrac, y)
+    if self.invertY:
+      return "Y" + self._fmt(n, self.Yfrac, -float(y) )
+    else:
+      return "Y" + self._fmt(n, self.Yfrac, y)
 
 
 

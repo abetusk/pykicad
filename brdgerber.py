@@ -55,13 +55,17 @@ class brdgerber(brdjson.brdjson):
     self.apertureTrack = {}
 
     self.aperture = {}
+    self.invertY = False
+    #self.invertY = True
 
     self.grb = pygerber.pygerber()
+    self.grb.invertY = self.invertY
 
     self.islands = []
     self.island_layer = []
 
     self.layer = 0
+
 
     self.font_file = "./aux/hershey_ascii.json"
     f = open( self.font_file, "r")
@@ -78,11 +82,6 @@ class brdgerber(brdjson.brdjson):
 
   def toUnit(self, v):
     return float(v) / 10000.0
-
-  def genId(self):
-    i  = self._id
-    self._id+=1
-    return i
 
   def genApertureName(self):
     an = self._apertureName
@@ -200,28 +199,44 @@ class brdgerber(brdjson.brdjson):
     for v in self.json_obj["element"]:
 
       if (v["type"] == "track") or (v["type"] == "drawsegment"):
-        v["id"] = self.genId()
         key = "circle:" + "{0:011.5f}".format( self.toUnit(v["width"]) )
+
+        v["y0"] = -float(v["y0"])
+        v["y1"] = -float(v["y1"])
 
         if key in aperture_set:
           ap_name = aperture_set[key]["aperture_name"]
         else:
-          aperture_set[ key ] = { "type" : "circle", "d" : self.toUnit(v["width"] ), "aperture_name" : self.genApertureName() }
+          aperture_set[ key ] = { \
+              "type" : "circle",  \
+              "d" : self.toUnit(v["width"] ),  \
+              "aperture_name" : self.genApertureName() \
+              }
 
         v["aperture_name"] = ap_name
         v["aperture_key"] = key
 
       elif v["type"] == "text":
+
+        v["y"] = -float(v["y"])
         pass
 
-#      elif v["type"] == "czone":
-#        self._find_czone_islands( self.islands, v)
-#        pass
+      elif v["type"] == "czone":
+        #self._find_czone_islands( self.islands, v)
+
+        poly = v["polyscorners"]
+        for pc in poly:
+          pc["y0"] = -float(pc["y0"])
 
 
       elif v["type"] == "module":
 
+        v["y"] = -float(v["y"])
+
         for text in v["text"]:
+
+          text["y"] = -float(text["y"])
+
           width = self.toUnit( text["penwidth"] )
           key = "circle:" + "{0:011.5f}".format(width)
           if key not in aperture_set:
@@ -234,6 +249,14 @@ class brdgerber(brdjson.brdjson):
 
         for art in v["art"]:
           shape = art["shape"]
+
+          if (shape == "segment"):
+            art["starty"] = -float(art["starty"])
+            art["endy"] = -float(art["endy"])
+
+          if (shape == "circle") or (shape == "arc") or (shape == "polygon"):
+            art["y"] = -float(art["y"])
+
           if (shape == "segment") or (shape == "circle") or (shape == "arc") or (shape == "polygon"):
             d = self.toUnit( art["line_width"] )
             key = "circle:" + "{0:011.5f}".format(d) 
@@ -245,7 +268,10 @@ class brdgerber(brdjson.brdjson):
             art["aperture_key"] = key
 
         for pad in v["pad"]:
-          pad["id"] = self.genId()
+
+          pad["posy"] = -float(pad["posy"])
+          pad["drill_y"] = -float(pad["drill_y"])
+          pad["deltay"] = -float(pad["deltay"])
 
 
           if   pad["shape"] == "rectangle":
@@ -874,8 +900,8 @@ if __name__ == "__main__":
   b.layer = layer
 
   b.parse_brd(infile)
+
   b.dump_gerber()
 
-  #b.dump_json()
 
 
