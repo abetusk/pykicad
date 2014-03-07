@@ -135,9 +135,11 @@ class brdgerber(brdjson.brdjson):
 
     # reject duplicate points
     if len(island) == 2:
-      print "#ERROR, got length 2 for subregion"
-      sys.exit(0)
-    if len(island) > 1:
+      #print "#ERROR, got length 2 for subregion"
+      #print island
+      #sys.exit(0)
+      pass
+    elif len(island) > 1:
       islands.append( { "island":island, "layer": layer } )
 
 
@@ -146,9 +148,26 @@ class brdgerber(brdjson.brdjson):
     pos_dict = {}
 
     scalar = 10000.0
+    #scalar = 10000000.0
     pos = 0
 
-    pnts = czone["polyscorners"]
+    orig_pnts = czone["polyscorners"]
+
+    prev_pnt = { "x": 0, "y": 0 }
+    pnts = []
+    for i, pnt in enumerate(orig_pnts):
+      if i==0:
+        pnts.append(pnt)
+        continue
+      if ( (int(prev_pnt["x"]) == int(pnt["x0"])) and
+           (int(prev_pnt["y"]) == int(pnt["y0"])) ):
+        continue
+      prev_pnt["x"] = int(pnt["x0"])
+      prev_pnt["y"] = int(pnt["y0"])
+
+      pnts.append( pnt )
+
+
     for pnt in pnts:
       key_x = int( scalar * float(pnt["x0"]) + 0.5 )
       key_y = int( scalar * float(pnt["y0"]) + 0.5 )
@@ -167,6 +186,9 @@ class brdgerber(brdjson.brdjson):
         pos_dict[key] = pos
 
       pos += 1
+
+    for i, p in enumerate(pnts):
+      print "[" + str(i) + "]", p
 
     self._find_czone_islands_r( islands, pnts, 0, len(pnts)-1, czone["layer"] )
 
@@ -192,10 +214,9 @@ class brdgerber(brdjson.brdjson):
       elif v["type"] == "text":
         pass
 
-      elif v["type"] == "czone":
-        #self.islands = []
-        #self.preprocess_czone(self, v)
-        self._find_czone_islands( self.islands, v)
+#      elif v["type"] == "czone":
+#        self._find_czone_islands( self.islands, v)
+#        pass
 
 
       elif v["type"] == "module":
@@ -214,7 +235,6 @@ class brdgerber(brdjson.brdjson):
         for art in v["art"]:
           shape = art["shape"]
           if (shape == "segment") or (shape == "circle") or (shape == "arc") or (shape == "polygon"):
-          #if art["shape"] == "segment": 
             d = self.toUnit( art["line_width"] )
             key = "circle:" + "{0:011.5f}".format(d) 
             if key not in aperture_set:
@@ -722,25 +742,43 @@ class brdgerber(brdjson.brdjson):
         elif shape == "arc":        self.drawsegment_arc(v)
       #elif ele_type == "czone": self.czone(v)
 
-    # print pours
-    #
-    for ele in self.islands:
-      first = True
-      island = ele["island"]
-      layer = int(ele["layer"])
+      elif ele_type == "czone":
 
-      if int(self.layer) != int(layer): continue
+        if self.layer != int(v["layer"]): continue
 
-      for pnt in island:
-        if first:
-          self.grb.regionStart()
-          self.grb.moveTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
-          first = False
-        else:
-          self.grb.lineTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
-      if not first:
-        self.grb.lineTo( self.toUnit(island[0]["x"]), self.toUnit(island[0]["y"]) )
-        self.grb.regionEnd()
+        if len(v["polyscorners"]) < 3: continue
+
+        pnts = v["polyscorners"]
+        for i,p in enumerate(pnts):
+          if i==0:
+            self.grb.regionStart()
+            self.grb.moveTo( self.toUnit(p["x0"]), self.toUnit(p["y0"]) )
+            continue
+          self.grb.lineTo( self.toUnit(p["x0"]), self.toUnit(p["y0"]) )
+        self.grb.lineTo( self.toUnit(pnts[0]["x0"]), self.toUnit(pnts[0]["y0"]) )
+        self.grb.regionEnd();
+
+
+
+#    # print pours
+#    #
+#    for ele in self.islands:
+#      first = True
+#      island = ele["island"]
+#      layer = int(ele["layer"])
+#
+#      if int(self.layer) != int(layer): continue
+#
+#      for pnt in island:
+#        if first:
+#          self.grb.regionStart()
+#          self.grb.moveTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
+#          first = False
+#        else:
+#          self.grb.lineTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
+#      if not first:
+#        self.grb.lineTo( self.toUnit(island[0]["x"]), self.toUnit(island[0]["y"]) )
+#        self.grb.regionEnd()
 
 
   def dump_gerber(self):
