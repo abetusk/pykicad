@@ -485,10 +485,56 @@ class brdgerber(brdjson.brdjson):
       print "# WARNING: no aperture for segment: ", segment
 
   def drawsegment_circle(self, segment):
-    pass
+    x = self.toUnit( segment["x"] )
+    y = self.toUnit( segment["y"] )
+    r = self.toUnit( segment["r"] )
+
+    # negatved because of inverted y
+    #
+    sa = -float( segment["start_angle"] )
+    a = -float( segment["angle"] )
+    ccw = segment["counterclockwise_flag"]
+    x0 = x + r*math.cos(sa)
+    y0 = y + r*math.sin(sa)
+
+    n = 32
+
+    s = 1.0
+    if ccw: s = -1.0
+
+    if "aperture_key" in segment:
+      key = segment["aperture_key"]
+      ap = self.aperture[key]
+      self.grb.apertureSet( ap["aperture_name"] )
+      self.grb.moveTo( x0, y0 )
+
+      # It's just easier to linearize
+      #
+      for i in range(n):
+        ang = sa + (s*a*float(i)/float(n))
+        self.grb.lineTo( x + r * math.cos(ang) , y + r * math.sin(ang) )
+
 
   def drawsegment_arc(self, segment):
-    pass
+    x = self.toUnit( segment["x"] )
+    y = self.toUnit( segment["y"] )
+    r = self.toUnit( segment["r"] )
+
+    n = 128
+
+    if "aperture_key" in segment:
+      key = segment["aperture_key"]
+      ap = self.aperture[key]
+      self.grb.apertureSet( ap["aperture_name"] )
+
+      self.grb.moveTo( x + r, y )
+
+      # It's just easier to linearize
+      #
+      for i in range(n):
+        ang = (2.0*math.pi*float(i+1)/float(n))
+        self.grb.lineTo( x + r * math.cos(ang) , y + r * math.sin(ang) )
+
 
   def czone(self, czone):
     first = True
@@ -580,8 +626,42 @@ class brdgerber(brdjson.brdjson):
       print "# WARNING: no aperture for art_circle: ", art
 
 
+  # UNTESTED
+  #
   def art_arc(self, mod, art):
-    pass
+    mod_x = self.toUnit( mod["x"] )
+    mod_y = self.toUnit( mod["y"] )
+    mod_a = float( mod["angle"] )
+
+    cx = self.toUnit( art["x"] )
+    cy = self.toUnit( art["y"] )
+    r = self.toUnit( art["r"] )
+
+    sa = float( art["start_angle"] )
+    a = float( art["angle"] )
+
+    u = self._rot( mod_a, [ cx, cy ] )
+    du = self._rot( sa, [ 0, r ] )
+    dr = self._rot( sa + a, [ 0, r ] )
+
+    x0 = u[0,0] + mod_x + du[0,0]
+    y0 = u[0,1] + mod_y + du[0,1]
+
+    x1 = u[0,0] + mod_x + dr[0,0]
+    y1 = u[0,1] + mod_y + dr[0,1]
+
+
+    if "aperture_key" in art:
+      key = art["aperture_key"]
+      ap = self.aperture[key]
+
+      self.grb.apertureSet( ap["aperture_name"] )
+      self.grb.moveTo( x0, y0 )
+      self.grb.arcTo( x1, y1 )
+
+    else:
+      print "# WARNING: no aperture for art_circle: ", art
+
 
   def art_polygon(self, mod, art):
     pass
@@ -661,7 +741,13 @@ class brdgerber(brdjson.brdjson):
 
     x = float(text_obj["x"])
     y = float(text_obj["y"])
-    ang = float(text_obj["angle"])
+
+    # Since we're inverting the y axis, we need to also
+    # invert the angle here
+    #
+    #ang = float(text_obj["angle"])
+    ang = -float(text_obj["angle"])
+
 
     width = float(text_obj["penwidth"])
     text_code = text_obj["flag"]
