@@ -201,8 +201,23 @@ class brdgerber(brdjson.brdjson):
       if (v["type"] == "track") or (v["type"] == "drawsegment"):
         key = "circle:" + "{0:011.5f}".format( self.toUnit(v["width"]) )
 
-        v["y0"] = -float(v["y0"])
-        v["y1"] = -float(v["y1"])
+        if v["type"] == "drawsegment":
+          shape = v["shape"]
+          if shape == "line":
+            v["y0"] = -float(v["y0"])
+            v["y1"] = -float(v["y1"])
+          elif shape == "circle" :
+            v["y"] = -float(v["y"])
+          elif shape == "arc":
+            v["y"] = -float(v["y"])
+            v["start_angle"] = -float(v["start_angle"])
+            v["angle"] = -float(v["angle"])
+
+        else:
+          v["y0"] = -float(v["y0"])
+          v["y1"] = -float(v["y1"])
+
+
 
         if key in aperture_set:
           ap_name = aperture_set[key]["aperture_name"]
@@ -217,6 +232,23 @@ class brdgerber(brdjson.brdjson):
         v["aperture_key"] = key
 
       elif v["type"] == "text":
+
+        key = "circle:" + "{0:011.5f}".format( self.toUnit(v["width"]) )
+
+        v["angle"] = -float(v["angle"])
+
+        if key in aperture_set:
+          ap_name = aperture_set[key]["aperture_name"]
+        else:
+          aperture_set[ key ] = { \
+              "type" : "circle",  \
+              "d" : self.toUnit(v["width"] ),  \
+              "aperture_name" : self.genApertureName() \
+              }
+
+        v["aperture_name"] = ap_name
+        v["aperture_key"] = key
+
 
         v["y"] = -float(v["y"])
         pass
@@ -489,29 +521,18 @@ class brdgerber(brdjson.brdjson):
     y = self.toUnit( segment["y"] )
     r = self.toUnit( segment["r"] )
 
-    # negatved because of inverted y
-    #
-    sa = -float( segment["start_angle"] )
-    a = -float( segment["angle"] )
-    ccw = segment["counterclockwise_flag"]
-    x0 = x + r*math.cos(sa)
-    y0 = y + r*math.sin(sa)
-
     n = 32
-
-    s = 1.0
-    if ccw: s = -1.0
 
     if "aperture_key" in segment:
       key = segment["aperture_key"]
       ap = self.aperture[key]
       self.grb.apertureSet( ap["aperture_name"] )
-      self.grb.moveTo( x0, y0 )
+      self.grb.moveTo( x + r, y )
 
       # It's just easier to linearize
       #
-      for i in range(n):
-        ang = sa + (s*a*float(i)/float(n))
+      for i in range(n+1):
+        ang = (2.0 * math.pi * float(i)/float(n))
         self.grb.lineTo( x + r * math.cos(ang) , y + r * math.sin(ang) )
 
 
@@ -520,6 +541,14 @@ class brdgerber(brdjson.brdjson):
     y = self.toUnit( segment["y"] )
     r = self.toUnit( segment["r"] )
 
+    sa = float( segment["start_angle"] )
+    a = float( segment["angle"] )
+
+    ccw = segment["counterclockwise_flag"]
+
+    s = 1.0
+    if ccw: s = -1.0
+
     n = 128
 
     if "aperture_key" in segment:
@@ -527,12 +556,13 @@ class brdgerber(brdjson.brdjson):
       ap = self.aperture[key]
       self.grb.apertureSet( ap["aperture_name"] )
 
-      self.grb.moveTo( x + r, y )
+      self.grb.moveTo( x + r*math.cos(sa), y + r*math.sin(sa)  )
+
 
       # It's just easier to linearize
       #
-      for i in range(n):
-        ang = (2.0*math.pi*float(i+1)/float(n))
+      for i in range(n+1):
+        ang = sa + (s*a*float(i)/float(n))
         self.grb.lineTo( x + r * math.cos(ang) , y + r * math.sin(ang) )
 
 
@@ -667,28 +697,10 @@ class brdgerber(brdjson.brdjson):
     pass
 
 
-#  def _draw_hershey_char( self, ch, x, y, rad_angle, line_width, width, height ):
-#    c = ord(ch)
-#
-#    font = self.hershey_font_json[c]
-#
-#    for pnts in font["art"]:
-#      first = True
-#      for pnt in pnts:
-#        f_x = pnt["x"]
-#        f_y = pnt["y"]
-#
-#        if first:
-#          key = 
-#          self.grbl.apertureSet( ap["aperture_name"] )
-#          self.grb.moveTo(f_x, f_y)
-#        else:
-#          self.grb.lineTo(f_x, f_y)
-#
-#        first = False
-
-
+  # first apply the rotation in ang radians, then apply the trnslation [x,y]
+  #
   def _draw_hershey_char( self, ap, font_entry, ang, x, y, sizex, sizey, flip_flag = False ):
+
     for pnts in font_entry["art"]:
       first = True
       for pnt in pnts:
@@ -707,13 +719,9 @@ class brdgerber(brdjson.brdjson):
 
         u = self._rot( ang, [a,b] )
 
-        #a += x
-        #b += y
         u[0,0] += x
         u[0,1] += y
 
-        #a = self.toUnit(a)
-        #b = self.toUnit(b)
         a = self.toUnit( u[0,0] )
         b = self.toUnit( u[0,1] )
         
@@ -742,12 +750,7 @@ class brdgerber(brdjson.brdjson):
     x = float(text_obj["x"])
     y = float(text_obj["y"])
 
-    # Since we're inverting the y axis, we need to also
-    # invert the angle here
-    #
-    #ang = float(text_obj["angle"])
-    ang = -float(text_obj["angle"])
-
+    ang = float(text_obj["angle"])
 
     width = float(text_obj["penwidth"])
     text_code = text_obj["flag"]
@@ -776,9 +779,7 @@ class brdgerber(brdjson.brdjson):
     if flip_flag:
       start_x = x + text_width/2
 
-    #start_y = y - text_height
-    start_y = y
-
+    start_y = y - text_height/2
     su = self._rot( ang , [ start_x, start_y ] )
 
     cur_u = [ su[0,0], su[0,1] ]
@@ -790,6 +791,82 @@ class brdgerber(brdjson.brdjson):
       self._draw_hershey_char( ap, font, ang, mod_x + cur_u[0], mod_y + cur_u[1], sizex, sizey, flip_flag )
       cur_u[0] += dv[0,0]
       cur_u[1] += dv[0,1]
+
+
+  def text_element(self, text_obj):
+
+    #flip_flag = True
+    flip_flag = False
+
+    visible_flag = text_obj["visible"]
+    if not visible_flag: return
+
+    x = float(text_obj["x"])
+    y = float(text_obj["y"])
+
+    ang = float(text_obj["angle"])
+
+    width = float(text_obj["width"])
+    #text_code = text_obj["flag"]
+    #texts = text_obj["text"]
+
+    key = text_obj["aperture_key"]
+    ap = self.aperture[key]
+    aperture_name = ap["aperture_name"]
+
+    sizex = float(text_obj["sizex"])
+    sizey = float(text_obj["sizey"])
+
+    s = text_obj["text"]
+    texts = s.split( "\n" )
+
+    dh = -int(float(sizey)/0.6)
+    curh = 0
+
+    for text in texts:
+
+      text_width = len(text) * sizex
+      text_height = sizey
+
+      dx = sizex
+      dy = 0
+
+      tv = self._rot( ang, [ 0, curh ])
+      h_offset = [ tv[0,0], tv[0,1] ]
+      curh += dh
+
+      if flip_flag:
+        dx *= -1
+
+      dv = self._rot( ang, [ dx, dy ] )
+
+
+      start_x = - text_width/2
+      if flip_flag:
+        start_x = + text_width/2
+
+      start_y = - text_height/2
+      su = self._rot( ang , [ start_x, start_y ] )
+
+      cur_u = [ su[0,0], su[0,1] ]
+
+      for ch in text:
+        c = ord(ch) 
+        c_str = str(c)
+
+        if c_str not in self.hershey_font_json:
+          c_str = str(ord('.'))
+
+        font = self.hershey_font_json[c_str]
+        self._draw_hershey_char( ap, font, ang, \
+            x + cur_u[0] + h_offset[0], \
+            y + cur_u[1] + h_offset[1], \
+            sizex, sizey, flip_flag )
+        cur_u[0] += dv[0,0]
+        cur_u[1] += dv[0,1]
+
+
+
 
 
   def second_pass(self):
@@ -825,6 +902,13 @@ class brdgerber(brdjson.brdjson):
         for text in v["text"]:
           if int(text["layer"]) != self.layer: continue
           self.text_module(v, text)
+
+      elif ele_type == "text":
+
+        self.text_element(v)
+
+        pass
+
 
       elif ele_type == "track":
 
