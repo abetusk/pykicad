@@ -79,6 +79,16 @@ class brdgerber(brdjson.brdjson):
     self.hershey_scale_factor = float( self.hershey_font_json["scale_factor"] )
 
 
+  def _font_string_width(self, text, sizex):
+    w = 0
+    sf = float(self.hershey_font_json["scale_factor"])
+    for i in range(len(text)):
+      ch_ord = str(ord(text[i]))
+      if ch_ord not in self.hershey_font_json : continue
+      f = self.hershey_font_json[ch_ord]
+      w += sf * (float(f["xsto"]) - float(f["xsta"])) * float(sizex)
+    return w
+
 
   def toUnit(self, v):
     return float(v) / 10000.0
@@ -701,6 +711,12 @@ class brdgerber(brdjson.brdjson):
   #
   def _draw_hershey_char( self, ap, font_entry, ang, x, y, sizex, sizey, flip_flag = False ):
 
+    sf = float( self.hershey_font_json["scale_factor"] )
+    xsto = float(font_entry["xsto"])
+    xsta = float(font_entry["xsta"])
+
+    dx = sf * (xsto - xsta) * float(sizex)
+
     for pnts in font_entry["art"]:
       first = True
       for pnt in pnts:
@@ -734,6 +750,41 @@ class brdgerber(brdjson.brdjson):
 
         first = False
 
+    return dx
+
+  def _feq(self, a, b):
+    return abs(float(a)-float(b)) < 0.001
+
+  def _deg_mod(self, ang):
+    q = int( float(ang) / 360 )
+    deg = float(ang) - float(q) * 360.0
+
+    if (deg >= 180.0 ): return deg - 360
+    if (deg < -180.0 ): return deg + 360
+    return deg
+
+  def _find_footprint_text_angle( self, loc_deg_ang, glob_deg_ang):
+    loc_deg_ang = self._deg_mod( loc_deg_ang )
+    glob_deg_ang = self._deg_mod( glob_deg_ang )
+
+    if (self._feq(loc_deg_ang, 90) or 
+        self._feq(loc_deg_ang, -90)):
+      loc_deg_ang = -90.0
+    elif (self._feq(loc_deg_ang, 180) or
+          self._feq(loc_deg_ang, -180)):
+      loc_deg_ang = 0.0
+    elif loc_deg_ang > 90:
+      loc_deg_ang -= 180
+    elif loc_deg_ang < -90:
+      loc_deg_ang += 180
+
+    loc_deg_ang -= glob_deg_ang
+
+    if loc_deg_ang >  180: loc_deg_ang -= 360
+    if loc_deg_ang < -180: loc_deg_ang += 360
+
+    return loc_deg_ang
+
 
   def text_module(self, mod, text_obj):
 
@@ -763,7 +814,7 @@ class brdgerber(brdjson.brdjson):
     sizex = float(text_obj["sizex"])
     sizey = float(text_obj["sizey"])
 
-    text_width = len(text) * sizex
+    text_width = self._font_string_width( text, sizex )
     text_height = sizey
 
     dx = sizex
@@ -775,20 +826,31 @@ class brdgerber(brdjson.brdjson):
     dv = self._rot( ang, [ dx, dy ] )
 
 
-    start_x = x - text_width/2
+    deg_ang = math.degrees(ang)
+    deg_ang = -self._find_footprint_text_angle( deg_ang, 0 )
+    rad_ang = math.radians(deg_ang)
+
+    d_off = [ - text_width/2, - text_height/2 ]
     if flip_flag:
-      start_x = x + text_width/2
+      d_off[0] *= -1.0
+    td_off = self._rot( rad_ang, d_off )
 
-    start_y = y - text_height/2
-    su = self._rot( ang , [ start_x, start_y ] )
-
-    cur_u = [ su[0,0], su[0,1] ]
+    ds = [ x, y ]
+    tds = self._rot( ang, ds )
+    cur_u = [ tds[0,0] + td_off[0,0], tds[0,1] + td_off[0,1] ]
 
     for ch in text:
       c = ord(ch) 
       c_str = str(c)
       font = self.hershey_font_json[c_str]
-      self._draw_hershey_char( ap, font, ang, mod_x + cur_u[0], mod_y + cur_u[1], sizex, sizey, flip_flag )
+
+      dx = self._draw_hershey_char( ap, font, rad_ang, mod_x + cur_u[0], mod_y + cur_u[1], sizex, sizey, flip_flag )
+
+      if flip_flag:
+        dx *= -1
+
+      dv = self._rot( rad_ang, [ dx, 0 ] )
+
       cur_u[0] += dv[0,0]
       cur_u[1] += dv[0,1]
 
@@ -857,15 +919,18 @@ class brdgerber(brdjson.brdjson):
         if c_str not in self.hershey_font_json:
           c_str = str(ord('.'))
 
+
         font = self.hershey_font_json[c_str]
-        self._draw_hershey_char( ap, font, ang, \
+        dx = self._draw_hershey_char( ap, font, ang, \
             x + cur_u[0] + h_offset[0], \
             y + cur_u[1] + h_offset[1], \
             sizex, sizey, flip_flag )
+
+        if flip_flag: dx *= -1
+        dv = self._rot( ang, [ dx, 0 ] )
+
         cur_u[0] += dv[0,0]
         cur_u[1] += dv[0,1]
-
-
 
 
 
