@@ -124,7 +124,7 @@ class brdgerber(brdjson.brdjson):
 
 
 
-  def _find_czone_islands_r( self, islands, pnts, start_pos, end_pos , layer ):
+  def _find_czone_islands_r( self, islands, pnts, start_pos, end_pos , layer, width, ap_key ):
 
     island = []
 
@@ -134,7 +134,7 @@ class brdgerber(brdjson.brdjson):
       pnt = pnts[cur_pos]
 
       if pnt["skip_pos"] >= 0:
-        self._find_czone_islands_r( islands, pnts, cur_pos, pnt["skip_pos"], layer )
+        self._find_czone_islands_r( islands, pnts, cur_pos, pnt["skip_pos"], layer, width, ap_key )
         cur_pos = pnt["skip_pos"]
       else:
         island.append( { "x" : pnt["x0"], "y" : pnt["y0"] } )
@@ -149,10 +149,10 @@ class brdgerber(brdjson.brdjson):
       #sys.exit(0)
       pass
     elif len(island) > 1:
-      islands.append( { "island":island, "layer": layer } )
+      islands.append( { "island":island, "layer": layer, "width": width, "aperture_key": ap_key  } )
 
 
-  def _find_czone_islands( self, islands, czone ):
+  def _find_czone_islands( self, islands, czone, ap_key ):
     cur_list = []
     pos_dict = {}
 
@@ -196,10 +196,10 @@ class brdgerber(brdjson.brdjson):
 
       pos += 1
 
-    for i, p in enumerate(pnts):
-      print "[" + str(i) + "]", p
+    #for i, p in enumerate(pnts):
+    #  print "[" + str(i) + "]", p
 
-    self._find_czone_islands_r( islands, pnts, 0, len(pnts)-1, czone["layer"] )
+    self._find_czone_islands_r( islands, pnts, 0, len(pnts)-1, czone["layer"], czone["min_thickness"], ap_key )
 
 
   def first_pass(self):
@@ -264,11 +264,29 @@ class brdgerber(brdjson.brdjson):
         pass
 
       elif v["type"] == "czone":
-        #self._find_czone_islands( self.islands, v)
+
+        key = "circle:" +  "{0:011.5f}".format( self.toUnit(v["min_thickness"]) )
+
+        if key in aperture_set:
+          ap_name = aperture_set[key]["aperture_name"]
+        else:
+          aperture_set[ key ] = { \
+            "type" : "circle",  \
+            "d" : self.toUnit(v["width"] ),  \
+            "aperture_name" : self.genApertureName() \
+          }
+
+        v["aperture_name"] = ap_name
+        v["aperture_key"] = key
+
 
         poly = v["polyscorners"]
         for pc in poly:
           pc["y0"] = -float(pc["y0"])
+
+
+
+        self._find_czone_islands( self.islands, v, key)
 
 
       elif v["type"] == "module":
@@ -786,10 +804,13 @@ class brdgerber(brdjson.brdjson):
     return loc_deg_ang
 
 
-  def text_module(self, mod, text_obj):
+  def text_module(self, mod, text_obj, flip_flag = False):
 
     #flip_flag = True
-    flip_flag = False
+    #flip_flag = False
+    if "flag" in text_obj:
+      if re.search( 'M', text_obj["flag"]):
+        flip_flag = True
 
     visible_flag = text_obj["visible"]
     if not visible_flag: return
@@ -855,10 +876,13 @@ class brdgerber(brdjson.brdjson):
       cur_u[1] += dv[0,1]
 
 
-  def text_element(self, text_obj):
+  def text_element(self, text_obj, flip_flag = False):
 
     #flip_flag = True
-    flip_flag = False
+    #flip_flag = False
+    if "mirror_code" in text_obj:
+      if int(text_obj["mirror_code"] == 0):
+        flip_flag = True
 
     visible_flag = text_obj["visible"]
     if not visible_flag: return
@@ -1040,6 +1064,27 @@ class brdgerber(brdjson.brdjson):
 #      if not first:
 #        self.grb.lineTo( self.toUnit(island[0]["x"]), self.toUnit(island[0]["y"]) )
 #        self.grb.regionEnd()
+
+    # print pour outlines
+    #
+    for ele in self.islands:
+      island = ele["island"]
+      width = ele["width"]
+      key = ele["aperture_key"]
+
+      layer = int(ele["layer"])
+
+      if int(self.layer) != int(layer): continue
+
+      ap = self.aperture[key]
+      self.grb.apertureSet( ap["aperture_name"] )
+
+      if len(island) < 3: continue
+
+      self.grb.moveTo( self.toUnit(island[0]["x"]), self.toUnit(island[0]["y"]) )
+      for pnt in island:
+        self.grb.lineTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
+      self.grb.lineTo( self.toUnit(island[0]["x"]), self.toUnit(island[0]["y"]) )
 
 
   def dump_gerber(self):
