@@ -549,7 +549,7 @@ class brdgerber(brdjson.brdjson):
     y = self.toUnit( segment["y"] )
     r = self.toUnit( segment["r"] )
 
-    n = 32
+    n = 128
 
     if "aperture_key" in segment:
       key = segment["aperture_key"]
