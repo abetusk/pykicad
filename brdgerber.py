@@ -994,6 +994,8 @@ class brdgerber(brdjson.brdjson):
 
       elif ele_type == "text":
 
+        if int(v["layer"]) != self.layer: continue
+
         self.text_element(v)
 
         pass
