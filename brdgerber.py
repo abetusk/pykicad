@@ -846,9 +846,8 @@ class brdgerber(brdjson.brdjson):
 
     dv = self._rot( ang, [ dx, dy ] )
 
-
     deg_ang = math.degrees(ang)
-    deg_ang = -self._find_footprint_text_angle( deg_ang, 0 )
+    deg_ang = -self._find_footprint_text_angle( -deg_ang, 0 )
     rad_ang = math.radians(deg_ang)
 
     d_off = [ - text_width/2, - text_height/2 ]
