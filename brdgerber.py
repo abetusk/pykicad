@@ -880,7 +880,7 @@ class brdgerber(brdjson.brdjson):
     #flip_flag = True
     #flip_flag = False
     if "mirror_code" in text_obj:
-      if int(text_obj["mirror_code"] == 0):
+      if int(text_obj["mirror_code"]) == 0:
         flip_flag = True
 
     visible_flag = text_obj["visible"]
@@ -910,7 +910,8 @@ class brdgerber(brdjson.brdjson):
 
     for text in texts:
 
-      text_width = len(text) * sizex
+      #text_width = len(text) * sizex
+      text_width = self._font_string_width( text, sizex )
       text_height = sizey
 
       dx = sizex
