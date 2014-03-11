@@ -47,7 +47,7 @@ import json
 
 class brdgerber(brdjson.brdjson):
 
-  def __init__(self):
+  def __init__(self, fontFile = None):
     brdjson.brdjson.__init__(self)
     self._apertureName = 10
     self._id = 1
@@ -68,6 +68,9 @@ class brdgerber(brdjson.brdjson):
 
 
     self.font_file = "./aux/hershey_ascii.json"
+    if fontFile is not None:
+      self.font_file = fontFile
+
     f = open( self.font_file, "r")
     s = ""
     for l in f:
@@ -272,7 +275,7 @@ class brdgerber(brdjson.brdjson):
         else:
           aperture_set[ key ] = { \
             "type" : "circle",  \
-            "d" : self.toUnit(v["width"] ),  \
+            "d" : self.toUnit(v["min_thickness"] ),  \
             "aperture_name" : self.genApertureName() \
           }
 
@@ -497,8 +500,8 @@ class brdgerber(brdjson.brdjson):
       ap = self.aperture[key]
 
       self.grb.apertureSet( ap["aperture_name"] )
-      self.moveTo( u[0,0], u[0,1] )
-      self.lineTo( v[0,0], v[0,1] )
+      self.grb.moveTo( u[0,0], u[0,1] )
+      self.grb.lineTo( v[0,0], v[0,1] )
     else:
       print "# WARNING, no aperture for pad_oblong:", pad
 
@@ -698,6 +701,14 @@ class brdgerber(brdjson.brdjson):
     sa = float( art["start_angle"] )
     a = float( art["angle"] )
 
+    ccw = True
+    if "counterclockwise_flag" in art:
+      ccw = art["counterclockwise_flag"]
+
+    s = 1.0
+    if ccw: s = -1.0
+    
+
     u = self._rot( mod_a, [ cx, cy ] )
     du = self._rot( sa, [ 0, r ] )
     dr = self._rot( sa + a, [ 0, r ] )
@@ -715,7 +726,13 @@ class brdgerber(brdjson.brdjson):
 
       self.grb.apertureSet( ap["aperture_name"] )
       self.grb.moveTo( x0, y0 )
-      self.grb.arcTo( x1, y1 )
+      #self.grb.arcTo( x1, y1 )
+
+      n = 64
+      for i in range(n+1):
+        ang = sa + (s*a*float(i)/float(n))
+        self.grb.lineTo( x0 + r * math.cos(ang), y0 + r * math.sin(ang) )
+
 
     else:
       print "# WARNING: no aperture for art_circle: ", art
@@ -1166,18 +1183,21 @@ if __name__ == "__main__":
 
   infile = None
   layer = 0
+  font_file = None
 
   if len(sys.argv) >= 2:
     infile = sys.argv[1]
     if len(sys.argv) >= 3:
       layer = int(sys.argv[2])
+      if len(sys.argv) >= 4:
+        font_file = sys.argv[3]
 
   if infile is None:
     print "provide infile"
     sys.exit(0)
 
 
-  b = brdgerber()
+  b = brdgerber(font_file)
 
   b.layer = layer
 

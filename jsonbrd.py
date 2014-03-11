@@ -47,8 +47,18 @@ def uc( src ):
 
   if   (SRC_UNIT == "mm") and (DST_UNIT == "deci-thou"):
     f = 10000.0/25.4
+  elif (SRC_UNIT == "mm") and (DST_UNIT == "deci-mils"):
+    f = 10000.0/25.4
+  elif (SRC_UNIT == "mm") and (DST_UNIT == "deci-mil"):
+    f = 10000.0/25.4
+
   elif (SRC_UNIT == "deci-thou") and (DST_UNIT == "mm"):
     f = 25.4/10000.0
+  elif (SRC_UNIT == "deci-mils") and (DST_UNIT == "mm"):
+    f = 25.4/10000.0
+  elif (SRC_UNIT == "deci-mil")  and (DST_UNIT == "mm"):
+    f = 25.4/10000.0
+
 
   return f*s
 
@@ -77,7 +87,9 @@ if __name__ == "__main__":
 
   json_data = json.loads(s)
 
-  SRC_UNIT = json_data["units"]
+  SRC_UNIT = "mm"
+  if "units" in json_data:
+    SRC_UNIT = json_data["units"]
   DST_UNIT = "mm"
 
   dt = datetime.datetime.now()
@@ -339,7 +351,7 @@ if __name__ == "__main__":
 
     elif ele_type == "track":
       s = "Po"
-      s += " " + ele["shape_code"]
+      s += " " + str(ele["shape_code"])
       s += " " + str(uc(ele["x0"]))
       s += " " + str(uc(ele["y0"]))
       s += " " + str(uc(ele["x1"]))

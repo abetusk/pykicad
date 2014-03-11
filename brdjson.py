@@ -88,6 +88,11 @@ class brdjson(brd.brd):
   def cb_track(self, arg):
     pass
 
+  def cb_general_units(self, arg):
+    units = arg[0]
+    self.json_obj["units"] = str(units)
+
+
   def cb_track_po(self, arg):
     shape_code,x0,y0,x1,y1,width,extra = arg
     self.cur_track["shape_code"] = shape_code

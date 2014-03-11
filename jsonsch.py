@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
 
     elif ele_type == "label":
-      print "Text Label", ele["x"], ele["y"], ele["orientation"], ele["dimension"], ele["shape"], "0"
+      print "Text Label", ele["x"], ele["y"], ele["orientation"], ele["dimension"], "~ 0"
       print ele["text"]
     elif ele_type == "labelglobal":
       print "Text GLabel", ele["x"], ele["y"], ele["orientation"], ele["dimension"], ele["shape"], "~ 0"
