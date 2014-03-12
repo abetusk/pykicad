@@ -17,6 +17,7 @@
 Loads KiCAD brd file (pcb(new?) file), parses it with brd.py, writes to gerber format.
 """
 
+VERSION="( brdgerber.py v0.1 2014-03-12 )"
 
 # TODO: 
 #  - contours and regions (somewhat done, needs to be more inteligent about how it splits
@@ -34,6 +35,9 @@ import math
 import numpy
 import cgi
 import urllib
+
+import datetime
+import time
 
 import json
 
@@ -319,6 +323,10 @@ class brdgerber(brdjson.brdjson):
 
           if (shape == "circle") or (shape == "arc") or (shape == "polygon"):
             art["y"] = -float(art["y"])
+
+            if shape == "arc":
+              art["start_angle"] = -float(art["start_angle"])
+              art["angle"] = -float(art["angle"])
 
           if (shape == "segment") or (shape == "circle") or (shape == "arc") or (shape == "polygon"):
             d = self.toUnit( art["line_width"] )
@@ -682,12 +690,19 @@ class brdgerber(brdjson.brdjson):
 
       self.grb.apertureSet( ap["aperture_name"] )
       self.grb.moveTo( x + r, y )
-      self.grb.arcTo(x + r, y, -r, 0  )
+
+      n = 256
+      for i in range(n+1):
+        ang = 2.0 * math.pi * float(i)/float(n)
+        self.grb.lineTo( x + r * math.cos(ang), y + r * math.sin(ang) )
+
+      #self.grb.arcTo(x + r, y, -r, 0  )
     else:
       print "# WARNING: no aperture for art_circle: ", art
 
 
-  # UNTESTED
+  # We should come back and review all of our angle assumptions
+  # are correct.
   #
   def art_arc(self, mod, art):
     mod_x = self.toUnit( mod["x"] )
@@ -701,37 +716,33 @@ class brdgerber(brdjson.brdjson):
     sa = float( art["start_angle"] )
     a = float( art["angle"] )
 
-    ccw = True
-    if "counterclockwise_flag" in art:
-      ccw = art["counterclockwise_flag"]
+    if a > 2.0 * math.pi:
+      a -= 2.0 * math.pi
+    elif a <= -2.0 * math.pi:
+      a += 2.0 * math.pi
 
+    sa = -sa - mod_a
     s = 1.0
-    if ccw: s = -1.0
-    
 
     u = self._rot( mod_a, [ cx, cy ] )
-    du = self._rot( sa, [ 0, r ] )
-    dr = self._rot( sa + a, [ 0, r ] )
 
-    x0 = u[0,0] + mod_x + du[0,0]
-    y0 = u[0,1] + mod_y + du[0,1]
-
-    x1 = u[0,0] + mod_x + dr[0,0]
-    y1 = u[0,1] + mod_y + dr[0,1]
-
+    x0 = u[0,0] + mod_x
+    y0 = u[0,1] + mod_y
 
     if "aperture_key" in art:
       key = art["aperture_key"]
       ap = self.aperture[key]
 
       self.grb.apertureSet( ap["aperture_name"] )
-      self.grb.moveTo( x0, y0 )
-      #self.grb.arcTo( x1, y1 )
 
       n = 64
       for i in range(n+1):
         ang = sa + (s*a*float(i)/float(n))
-        self.grb.lineTo( x0 + r * math.cos(ang), y0 + r * math.sin(ang) )
+
+        if i==0:
+          self.grb.moveTo( x0 + r * math.cos(ang), y0 + r * math.sin(ang) )
+        else:
+          self.grb.lineTo( x0 + r * math.cos(ang), y0 + r * math.sin(ang) )
 
 
     else:
@@ -1115,8 +1126,16 @@ class brdgerber(brdjson.brdjson):
     self.grb.mode("IN")
     self.grb.formatSpecification( 'L', 'A', 3, 4, 3, 4 )
 
+
+    self.grb.addCommand( "G01*" )  # linear interpolation
+    self.grb.addCommand( "G70*" )  # deprecated set inches
+    self.grb.addCommand( "G90*" )  # deprecated set aboslute
+
+    self.grb.comment("APERTURE LIST")
+
     # define apertures
     #
+    dummy_aperture_name = None
     for key in self.aperture:
       ap = self.aperture[key]
       typ = ap["type"] 
@@ -1124,6 +1143,12 @@ class brdgerber(brdjson.brdjson):
       if typ == "rect":     self.grb.defineApertureRectangle( nam, ap["x"], ap["y"] )
       elif typ == "circle": self.grb.defineApertureCircle( nam, ap["d"] )
 
+      if dummy_aperture_name is None:
+        dummy_aperture_name = nam
+
+    self.grb.comment("APERTURE END LIST")
+
+    self.grb.addCommand( "G54D" + dummy_aperture_name + "*" )  # deprecated set aperture
 
     # second pass to push to render
     #
@@ -1179,6 +1204,19 @@ class brdgerber(brdjson.brdjson):
 
     #self.dump_json()
 
+####
+# Code taken from question by Daniel Goldberg :
+# http://stackoverflow.com/questions/354038/how-do-i-check-if-a-string-is-a-number-in-python 
+#
+def is_num(s):
+  try:
+    float(s)
+    return True
+  except ValueError:
+    return False
+#
+###
+
 if __name__ == "__main__":
 
   infile = None
@@ -1200,6 +1238,11 @@ if __name__ == "__main__":
   b = brdgerber(font_file)
 
   b.layer = layer
+
+  str_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+  str_date += " " + time.strftime("%Z")
+  b.grb.comment("( created by brdgerber.py " + VERSION + " ) date " + str_date )
+  b.grb.comment("Gerber Fmt 3.4, Leading zero omitted, Abs format")
 
   b.parse_brd(infile)
 

@@ -359,7 +359,7 @@ class brdjson(brd.brd):
     cy = self.decithou( float(centery) )
     sx = self.decithou( float(startx) )
     sy = self.decithou( float(starty) )
-    dx = (cx - sx)
+    dx = (sx - cx)
     dy = (cy - sy)
     dx2 = dx*dx
     dy2 = dy*dy
@@ -371,7 +371,6 @@ class brdjson(brd.brd):
     art_field["angle"] = ang
 
     art_field["start_angle"] = math.atan2(dy, dx)
-    #art_field["line_width"] = stroke_width
     art_field["line_width"] = self.decithou( float(stroke_width) )
     art_field["layer"] = layer
 

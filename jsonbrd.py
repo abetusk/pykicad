@@ -317,13 +317,18 @@ if __name__ == "__main__":
         a = float(ele["angle"])
 
         deg_a = math.degrees(a)
-        s = 1.0
+
+        # Come back to this later, not sure why this works
+        #
+        s = -1.0
         if ele["counterclockwise_flag"]:
-          s = -1.0
+          s = 1.0
+
         x1 = x + r*math.cos(s*sa)
         y1 = y + r*math.sin(s*sa)
+
         print "Po", ele["shape_code"], uc(ele["x"]), uc(ele["y"]), x1, y1, uc(ele["width"])
-        print "De", ele["layer"], 0, int(deg_a*10.0), 0, 0
+        print "De", ele["layer"], 0, int(s*deg_a*10.0), 0, 0
 
       elif seg_shape == "circle":
         x = uc(ele["x"])

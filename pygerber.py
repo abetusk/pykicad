@@ -240,7 +240,7 @@ class pygerber(object):
 
 
   def comment(self, comment):
-    self._command.append("G04 " + comment)
+    self._command.append("G04 " + comment + "*" )
 
 #  def coordinateFormat(self, lead_x, deci_x, lead_y, deci_y ):
 #    self._command.append( "%FSLAX" + str(lead_x) + str(deci_x) + "Y" + str(lead_y) + str(deci_y) + "*%" )
@@ -301,6 +301,11 @@ class pygerber(object):
   def quickSetup(self):
     self.formatSpecification( 'L', 'A', 2, 4, 2, 4)
     self.mode("IN")
+
+  # if you just need to bypass the helper functions
+  #
+  def addCommand(self, cmd):
+    self._command.append( cmd )
 
   def end(self):
     self._command.append( "M02*" )
