@@ -278,24 +278,25 @@ if __name__ == "__main__":
 
           print "DC", x, y, x+r, y, w, layer
 
-      pad = ele["pad"]
-      for p in pad:
-        x = uc(p["posx"])
-        y = uc(p["posy"])
+      if "pad" in ele:
+        pad = ele["pad"]
+        for p in pad:
+          x = uc(p["posx"])
+          y = uc(p["posy"])
 
-        #pad_type = "SMD"
-        pad_type = "STD"
-        if "type" in pad:
-          pad_type = pad["type"]
+          #pad_type = "SMD"
+          pad_type = "STD"
+          if "type" in pad:
+            pad_type = pad["type"]
 
-        print "$PAD"
-        print "Sh", "\"" + str(p["name"]) + "\"", p["shape_code"], uc(p["sizex"]), uc(p["sizey"]), \
-            uc(p["deltax"]), uc(p["deltay"]), p["orientation"]
-        print "Dr", uc(p["drill_diam"]), uc(p["drill_x"]), uc(p["drill_y"])
-        print "At", pad_type, "N", p["layer_mask"]
-        print "Ne", p["net_number"], "\"" + str(p["net_name"]) + "\""
-        print "Po", uc(p["posx"]), uc(p["posy"])
-        print "$EndPAD"
+          print "$PAD"
+          print "Sh", "\"" + str(p["name"]) + "\"", p["shape_code"], uc(p["sizex"]), uc(p["sizey"]), \
+              uc(p["deltax"]), uc(p["deltay"]), p["orientation"]
+          print "Dr", uc(p["drill_diam"]), uc(p["drill_x"]), uc(p["drill_y"])
+          print "At", pad_type, "N", p["layer_mask"]
+          print "Ne", p["net_number"], "\"" + str(p["net_name"]) + "\""
+          print "Po", uc(p["posx"]), uc(p["posy"])
+          print "$EndPAD"
 
 
       print "$EndMODULE"
