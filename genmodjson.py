@@ -6,7 +6,10 @@ from subprocess import check_call
 import sys
 import urllib
 
-for mod_fn in os.listdir("modules"):
+moddir = "modules"
+#moddir = "thirdparty"
+
+for mod_fn in os.listdir( moddir ):
   
   if re.search('\.mod$', mod_fn):
     print "converting:", mod_fn
@@ -14,5 +17,5 @@ for mod_fn in os.listdir("modules"):
     base = re.sub('\.mod', '', mod_fn)
     odn = urllib.quote( 'pcb/json/' + base + '/' )
     check_call( [ 'mkdir', '-p', odn ] )
-    check_call( ['./modjson.py', 'modules/' + mod_fn, odn] )
+    check_call( ['./modjson.py', moddir + '/' + mod_fn, odn] )
 
