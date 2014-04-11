@@ -30,6 +30,79 @@ SRC_UNIT = "deci-thou"
 DST_UNIT = "mm"
 
 
+#ZZ = 1
+
+def lerpx( p0, p1, x ):
+  dx = p1["x"] - p0["x"]
+  dy = p1["y"] - p0["y"]
+
+  if abs(dx) < 0.00001:
+    return p0["x"] + dx/2, p1["y"] + dy/2
+
+  t = (x - p0["x"]) / dx
+  return { "x" : p0["x"] + t*dx, "y" : p0["y"] + t*dy }
+
+
+
+def make_kicad_zone_r( respnt, islands, maxmin, pos, d = 1 ):
+  #global ZZ
+
+  hole = []
+
+  start_ind = maxsorted[pos]["maxpos"]
+  boundary = islands[ maxsorted[pos]["island"] ]["island"]
+  n = len( boundary )
+  i = start_ind + (n + d)
+  i = i % n
+
+  #print "hole:", boundary[start_ind]["x"], boundary[start_ind]["y"], ZZ
+  #ZZ += 1
+  respnt.append( [ boundary[start_ind]["x"], boundary[start_ind]["y"] ] )
+
+  maxmin[pos]["visited"] = True
+  cur_pos = pos
+
+  while i != start_ind:
+    x = boundary[i]["x"]
+    y = boundary[i]["y"]
+
+    while ( (cur_pos < len(maxsorted)) and
+            maxsorted[cur_pos]["visited"] ):
+      cur_pos += 1
+
+    if cur_pos < len(maxsorted):
+      next_x = maxsorted[cur_pos]["maxp"][0]
+      next_y = maxsorted[cur_pos]["maxp"][1]
+
+      if next_x > x:
+
+        iprev = (i - d + n) % n
+
+        ipnt = lerpx( boundary[iprev], boundary[i], next_x )
+
+        #print "hole:", ipnt["x"], ipnt["y"]
+        #make_kicad_zone_r( islands, maxsorted, cur_pos )
+        #print "hole:", ipnt["x"], ipnt["y"]
+
+        respnt.append( [ ipnt["x"], ipnt["y"] ] )
+        make_kicad_zone_r( respnt, islands, maxsorted, cur_pos, d )
+        respnt.append( [ ipnt["x"], ipnt["y"] ] )
+
+        continue
+
+    #hole.append( [ x, y ] )
+    #print "# hole:", x, y, "cur_pos:", cur_pos, "i:", i, "n:", n, "d:", d, "start_ind:", start_ind
+    #print "hole:", x, y, ZZ
+    #ZZ += 1
+    respnt.append( [ x, y ] )
+
+    i = ( i + n + d ) % n
+
+  #print "\n"
+  #for h in hole:
+  #  print h
+
+
 class jsonbrd:
   def __init__(self):
     pass
@@ -61,6 +134,89 @@ def uc( src ):
 
 
   return f*s
+
+
+
+
+def _find_czone_islands_r( islands, pnts, start_pos, end_pos , layer, width ):
+
+  island = []
+
+  cur_pos = start_pos + 1
+  while cur_pos <= end_pos:
+
+    pnt = pnts[cur_pos]
+
+    if pnt["skip_pos"] >= 0:
+      _find_czone_islands_r( islands, pnts, cur_pos, pnt["skip_pos"], layer, width )
+      cur_pos = pnt["skip_pos"]
+    else:
+      island.append( { "x" : pnt["x0"], "y" : pnt["y0"] } )
+
+    cur_pos += 1
+
+
+  # reject duplicate points
+  if len(island) == 2:
+    #print "#ERROR, got length 2 for subregion"
+    #print island
+    #sys.exit(0)
+    pass
+  elif len(island) > 1:
+    islands.append( { "island":island, "layer": layer, "width": width } )
+
+
+
+
+def _find_czone_islands( islands, czone ):
+  cur_list = []
+  pos_dict = {}
+
+  scalar = 10000.0
+  pos = 0
+
+  orig_pnts = czone["polyscorners"]
+
+  # Remove duplicates
+  #
+  prev_pnt = { "x": 0, "y": 0 }
+  pnts = []
+  for i, pnt in enumerate(orig_pnts):
+    if i==0:
+      pnts.append(pnt)
+      continue
+    if ( (int(prev_pnt["x"]) == int(pnt["x0"])) and
+         (int(prev_pnt["y"]) == int(pnt["y0"])) ):
+      continue
+    prev_pnt["x"] = int(pnt["x0"])
+    prev_pnt["y"] = int(pnt["y0"])
+
+    pnts.append( pnt )
+
+
+  # Initialize pos jump map
+  #
+  for pnt in pnts:
+    key_x = int( scalar * float(pnt["x0"]) + 0.5 )
+    key_y = int( scalar * float(pnt["y0"]) + 0.5 )
+
+    x = float(pnt["x0"])
+    y = float(pnt["y0"])
+
+    key = str(key_x) + ":" + str(key_y)
+    cur_list.append( { "x" : x, "y" : y } )
+
+    pnt["skip_pos"] = -1
+
+    if key in pos_dict:
+      pnts[ pos_dict[key] ]["skip_pos"]  = pos
+    else:
+      pos_dict[key] = pos
+
+    pos += 1
+
+  _find_czone_islands_r( islands, pnts, 0, len(pnts)-1, czone["layer"], czone["min_thickness"] )
+
 
 if __name__ == "__main__":
 
@@ -236,8 +392,10 @@ if __name__ == "__main__":
           visible = "V"
         layer = t["layer"]
         misc = t["misc"]
+        ele_text = t["text"]
 
-        print "T" + str(num), x, y, sizex, sizey, rot, w, flag, visible, layer, misc
+        #print "T" + str(num), x, y, sizex, sizey, rot, w, flag, visible, layer, misc
+        print "T" + str(num), x, y, sizex, sizey, rot, w, flag, visible, layer, " N", "\"" + ele_text + "\""
 
       art = ele["art"]
       for a in art:
@@ -367,7 +525,8 @@ if __name__ == "__main__":
       tracks.append( s )
 
       s = "De " + str(ele["layer"])
-      if  ele["type"] == "via": s += " 1"
+      #if  ele["type"] == "via": s += " 1"
+      if  ele["shape"] == "through": s += " 1"
       else: s += " 0"
       s += " " + str(ele["netcode"])
       s += " " + str(ele["timestamp"])
@@ -384,10 +543,104 @@ if __name__ == "__main__":
   print "$ZONE"
   print "$EndZONE"
 
+
+
   for ele in eles:
     ele_type = ele["type"]
 
     if ele_type == "czone":
+
+      # last island is outer boundary
+      #
+      islands = []
+      _find_czone_islands( islands, ele )
+
+      #### EXPERIMENTAL
+      ####
+
+      respnt = []
+
+      islandMaxMin = []
+      for isl_ind, island in enumerate(islands):
+        maxmin = { "minp" : [0,0], "maxp" : [0,0], "minpos" : -1, "maxpos": -1, "island" : -1, "visited" : False }
+
+        for i, p in enumerate(island["island"]):
+          if (i==0) or (p["x"] < maxmin["minp"][0]):
+            maxmin["minp"] = [ p["x"], p["y"] ]
+            maxmin["minpos"] = i
+            maxmin["island"] = isl_ind
+          if (i==0) or (p["x"] > maxmin["maxp"][0]):
+            maxmin["maxp"] = [ p["x"], p["y"] ]
+            maxmin["maxpos"] = i
+            maxmin["island"] = isl_ind
+        islandMaxMin.append( maxmin )
+
+
+      maxsorted = sorted( islandMaxMin, key = lambda s: s["maxp"][0], reverse=True )
+      #for p in maxsorted:
+      #  print p
+
+      start_ind = maxsorted[0]["maxpos"]
+      island_ob = islands[ maxsorted[0]["island"] ]["island"]
+      n = len( island_ob )
+      i=start_ind + 1
+      i = i % n
+
+      maxsorted[0]["visited"] = True
+
+      cur_pos = 0
+
+      #print "ob:", island_ob[start_ind]["x"], island_ob[start_ind]["y"]
+      respnt.append( [ island_ob[start_ind]["x"], island_ob[start_ind]["y"] ] )
+
+      while i != start_ind:
+        x = island_ob[i]["x"]
+        y = island_ob[i]["y"]
+
+        while ( (cur_pos < len(maxsorted)) and
+                maxsorted[cur_pos]["visited"] ):
+          cur_pos += 1
+
+        if cur_pos < len(maxsorted):
+          next_x = maxsorted[cur_pos]["maxp"][0]
+          next_y = maxsorted[cur_pos]["maxp"][1]
+
+          if next_x > x:
+
+            iprev = (i - 1 + n) % n
+            ipnt = lerpx( island_ob[iprev], island_ob[i], next_x )
+
+            #print "ob:", ipnt["x"], ipnt["y"]
+            respnt.append( [ ipnt["x"], ipnt["y"] ] )
+
+            make_kicad_zone_r( respnt, islands, maxsorted, cur_pos, 1 )
+
+            #print "ob:", ipnt["x"], ipnt["y"]
+            respnt.append( [ ipnt["x"], ipnt["y"] ] )
+            continue
+
+        #print "ob:", x, y, ZZ
+        #ZZ += 1
+        #print "cur_pos:", cur_pos
+        respnt.append( [ x, y ] )
+
+        i = (i + 1) % n
+        pass
+
+      #for mxmn in islandMaxMin:
+      #  print mxmn
+
+      ####
+      #### EXPERIMENTAL
+
+#      for island in islands:
+#        for p in island["island"]:
+#          print p
+#        print "\n"
+
+#      for p in respnt:
+#        print p[0], p[1], 0, 0
+
       print "$CZONE_OUTLINE"
 
       nc = int( ele["netcode"] )
@@ -405,11 +658,18 @@ if __name__ == "__main__":
         print "ZCorner", uc(z["x"]), uc(z["y"]), k
 
       print "$POLYSCORNERS"
-      for i, pc in enumerate(ele["polyscorners"]):
-        if i == (len(ele["polyscorners"]) - 1):
-          print uc(pc["x0"]), uc(pc["y0"]), 1, 0
+
+#      for i, pc in enumerate(ele["polyscorners"]):
+#        if i == (len(ele["polyscorners"]) - 1):
+#          print uc(pc["x0"]), uc(pc["y0"]), 1, 0
+#        else:
+#          print uc(pc["x0"]), uc(pc["y0"]), uc(pc["x1"]), uc(pc["y1"])
+
+      for i, p in enumerate(respnt):
+        if i == (len(respnt)-1):
+          print p[0], p[1], 0, 1
         else:
-          print uc(pc["x0"]), uc(pc["y0"]), uc(pc["x1"]), uc(pc["y1"])
+          print p[0], p[1], 0, 0
 
 
       print "$EndPOLYSCORNERS"
