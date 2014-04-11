@@ -70,6 +70,23 @@ class brdgerber(brdjson.brdjson):
 
     self.layer = 0
 
+    self.netClass = {}
+
+    netclass = { 
+        "name" : "Default", 
+        "description" : "This is the default net class.",
+        "clearance" : 0.254,
+        "track_width" : "254",
+        "via_diameter" : 0.889,
+        "via_drill_diameter" : 0.635,
+        "uvia_diameter" : 0.508,
+        "uvia_drill_diameter" : 0.127,
+        "net" : [ "", "N-00001" ]
+        }
+    self.netClass[ netclass["name"] ] = netclass
+          
+    self.netcodeMap = { "0" : "Default" }
+
 
     self.font_file = "./aux/hershey_ascii.json"
     if fontFile is not None:
@@ -1116,12 +1133,96 @@ class brdgerber(brdjson.brdjson):
         self.grb.lineTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
       self.grb.lineTo( self.toUnit(island[0]["x"]), self.toUnit(island[0]["y"]) )
 
+  def generate_excellon_drill_file(self):
+
+    str_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    drillDiam = {}
+    drillDiamCode = 1
+    drillDiamList = {}
+
+    for v in self.json_obj["element"]:
+      ele_type = v["type"]
+      if ele_type == "module":
+
+        for pad in v["pad"]:
+          #drill_diam = pad["drill_diam"]
+          drill_diam = "{0:011.5f}".format( self.toUnit(pad["drill_diam"]) )
+          if drill_diam == 0: continue
+
+          x = "{0:011.5f}".format( self.toUnit(pad["posx"]) + self.toUnit(pad["drill_x"]) )
+          y = "{0:011.5f}".format( self.toUnit(pad["posy"]) + self.toUnit(pad["drill_y"]) )
+
+          if drill_diam in drillDiam:
+            drillDiam[drill_diam]["pos"].append( [ x, y ] )
+          else:
+            drillDiam[drill_diam] = { "code" : drillDiamCode , "pos" : [ [ x, y ] ] }
+            drillDiamCode += 1
+
+
+
+
+      elif ele_type == "track":
+        shape = v["shape"]
+        if shape != "through": continue
+
+        netclass = self.netClass["Default"]
+        netcode = int(v["netcode"])
+        if netcode in self.netcodeMap:
+          netclassName = self.netcodeMap[netcode]
+          if netclassName in self.netClass:
+            netclass = self.netClass[netclassName]
+
+        #drill_diam = netclass["via_drill_diameter"]
+        drill_diam = "{0:011.5f}".format( self.toUnit( netclass["via_drill_diameter"] ) )
+        x = "{0:011.5f}".format( self.toUnit( v["x0"] ) )
+        y = "{0:011.5f}".format( self.toUnit( v["y0"] ) )
+
+        if drill_diam in drillDiam:
+          #drillDiam[drill_diam]["pos"].append( [ self.toUnit(v["x0"]), self.toUnit(v["y0"]) ] )
+          drillDiam[drill_diam]["pos"].append( [ x, y ] )
+        else:
+          #drillDiam[drill_diam] = { "code" : drillDiamCode , "pos" : [ [ self.toUnit(v["x0"]), self.toUnit(v["y0"]) ] ] }
+          drillDiam[drill_diam] = { "code" : drillDiamCode , "pos" : [ [ x, y ] ] }
+          drillDiamCode += 1
+
+
+    print "M48"
+    print ";DRILL file {brdgerber.py (" + str_date + ") date " + str_date + "}"
+    print ";FORMAT={-:-/ absolute / inch / decimal}"
+    print "FMAT,2"
+    print "INCH,TZ"
+
+    for d in drillDiam:
+      #print "T" + str(drillDiam[d]["code"]) + "C" + str(self.toUnit(d))
+      print "T" + str(drillDiam[d]["code"]) + "C" + str(d)
+    #print "T1C0.025"
+    print "%"
+    print "G90"
+    print "G05"
+    print "M72"
+
+    for d in drillDiam:
+      print "T" + str(drillDiam[d]["code"])
+      for p in drillDiam[d]["pos"]:
+        print "X" + str( p[0] ) + "Y" + str( p[1] )
+      print "T0"
+
+    #print "X3.6024y-1.8819"
+    #print "T0"
+
+    print "M30"
+
 
   def dump_gerber(self):
 
     # first pass to get apertures that are used
     #
     self.first_pass()
+
+    if self.layer == -1:
+      self.generate_excellon_drill_file()
+      return
 
     self.grb.mode("IN")
     self.grb.formatSpecification( 'L', 'A', 3, 4, 3, 4 )
