@@ -1249,7 +1249,8 @@ class brdgerber(brdjson.brdjson):
 
     self.grb.comment("APERTURE END LIST")
 
-    self.grb.addCommand( "G54D" + dummy_aperture_name + "*" )  # deprecated set aperture
+    if dummy_aperture_name:
+      self.grb.addCommand( "G54D" + dummy_aperture_name + "*" )  # deprecated set aperture
 
     # second pass to push to render
     #
