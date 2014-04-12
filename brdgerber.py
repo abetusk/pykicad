@@ -251,16 +251,13 @@ class brdgerber(brdjson.brdjson):
           v["y0"] = -float(v["y0"])
           v["y1"] = -float(v["y1"])
 
-
-
-        if key in aperture_set:
-          ap_name = aperture_set[key]["aperture_name"]
-        else:
+        if key not in aperture_set:
           aperture_set[ key ] = { \
               "type" : "circle",  \
               "d" : self.toUnit(v["width"] ),  \
               "aperture_name" : self.genApertureName() \
               }
+        ap_name = aperture_set[key]["aperture_name"]
 
         v["aperture_name"] = ap_name
         v["aperture_key"] = key
@@ -271,14 +268,13 @@ class brdgerber(brdjson.brdjson):
 
         v["angle"] = -float(v["angle"])
 
-        if key in aperture_set:
-          ap_name = aperture_set[key]["aperture_name"]
-        else:
+        if key not in aperture_set:
           aperture_set[ key ] = { \
               "type" : "circle",  \
               "d" : self.toUnit(v["width"] ),  \
               "aperture_name" : self.genApertureName() \
               }
+        ap_name = aperture_set[key]["aperture_name"]
 
         v["aperture_name"] = ap_name
         v["aperture_key"] = key
@@ -291,14 +287,13 @@ class brdgerber(brdjson.brdjson):
 
         key = "circle:" +  "{0:011.5f}".format( self.toUnit(v["min_thickness"]) )
 
-        if key in aperture_set:
-          ap_name = aperture_set[key]["aperture_name"]
-        else:
+        if key not in aperture_set:
           aperture_set[ key ] = { \
             "type" : "circle",  \
             "d" : self.toUnit(v["min_thickness"] ),  \
             "aperture_name" : self.genApertureName() \
           }
+        ap_name = aperture_set[key]["aperture_name"]
 
         v["aperture_name"] = ap_name
         v["aperture_key"] = key
