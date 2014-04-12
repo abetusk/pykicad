@@ -515,16 +515,20 @@ class brdgerber(brdjson.brdjson):
 
     da = a - mod_a
 
-    u = self._rot( a, [ x, y ] )
-    v = self._rot( a, [ x, y ] )
+    ps = self._rot( da, [ -dx/2, -dy/2 ] )
+    pe = self._rot( da, [  dx/2,  dy/2 ] )
+
+    u = self._rot( mod_a, [ x + ps[0,0], y + ps[0,1] ] )
+    v = self._rot( mod_a, [ x + pe[0,0], y + pe[0,1] ] )
 
     if "aperture_key" in pad:
       key = pad["aperture_key"]
       ap = self.aperture[key]
 
       self.grb.apertureSet( ap["aperture_name"] )
-      self.grb.moveTo( u[0,0], u[0,1] )
-      self.grb.lineTo( v[0,0], v[0,1] )
+      self.grb.moveTo( u[0,0] + mod_x, u[0,1] + mod_y )
+      self.grb.lineTo( v[0,0] + mod_x, v[0,1] + mod_y )
+
     else:
       print "# WARNING, no aperture for pad_oblong:", pad
 
