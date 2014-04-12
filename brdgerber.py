@@ -1158,7 +1158,7 @@ class brdgerber(brdjson.brdjson):
             drill_shape = pad["drill_shape"]
 
           drill_diam = "{0:011.5f}".format( self.toUnit(pad["drill_diam"]) )
-          if drill_diam == 0: continue
+          if re.match( '^0*\.0*$', drill_diam): continue
 
           px = self.toUnit( pad["posx"] )
           py = self.toUnit( pad["posy"] )
