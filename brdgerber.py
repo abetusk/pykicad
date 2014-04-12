@@ -895,14 +895,6 @@ class brdgerber(brdjson.brdjson):
     text_width = self._font_string_width( text, sizex )
     text_height = sizey
 
-    dx = sizex
-    dy = 0
-
-    if flip_flag:
-      dx *= -1
-
-    dv = self._rot( ang, [ dx, dy ] )
-
     deg_ang = math.degrees(ang)
     deg_ang = -self._find_footprint_text_angle( -deg_ang, 0 )
     rad_ang = math.radians(deg_ang)
