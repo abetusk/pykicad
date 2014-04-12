@@ -27,6 +27,14 @@ VERSION="( brdgerber.py v0.1 2014-03-12 )"
 #  - text
 #  - trapeze (if ever)
 
+## The 'first_pass' function collects aperture names
+## The 'second_pass' goes through and does the rendering using the apertures calculated
+##   from the first pass.
+##
+## Calculation of the excellon drill is done in a separate function.
+##
+##
+
 import re
 import sys
 import os
@@ -740,7 +748,8 @@ class brdgerber(brdjson.brdjson):
     elif a <= -2.0 * math.pi:
       a += 2.0 * math.pi
 
-    sa = -sa - mod_a
+    #sa = -sa - mod_a
+    da = mod_a - sa 
     s = 1.0
 
     u = self._rot( mod_a, [ cx, cy ] )
@@ -756,7 +765,8 @@ class brdgerber(brdjson.brdjson):
 
       n = 64
       for i in range(n+1):
-        ang = sa + (s*a*float(i)/float(n))
+        #ang = sa + (s*a*float(i)/float(n))
+        ang = da + (s*a*float(i)/float(n))
 
         if i==0:
           self.grb.moveTo( x0 + r * math.cos(ang), y0 + r * math.sin(ang) )
