@@ -75,12 +75,15 @@ class brdgerber(brdjson.brdjson):
     netclass = { 
         "name" : "Default", 
         "description" : "This is the default net class.",
-        "clearance" : 0.254,
-        "track_width" : "254",
-        "via_diameter" : 0.889,
-        "via_drill_diameter" : 0.635,
-        "uvia_diameter" : 0.508,
-        "uvia_drill_diameter" : 0.127,
+
+
+        "clearance" : 100,
+        "track_width" : 100,
+        "via_diameter" : 472,
+        "via_drill_diameter" : 250,
+        "uvia_diameter" : 200,
+        "uvia_drill_diameter" : 50,
+
         "net" : [ "", "N-00001" ]
         }
     self.netClass[ netclass["name"] ] = netclass
@@ -1140,12 +1143,32 @@ class brdgerber(brdjson.brdjson):
       ele_type = v["type"]
       if ele_type == "module":
 
+        mod_a = float(v["angle"])
+        mod_x = self.toUnit( v["x"] )
+        mod_y = self.toUnit( v["y"] )
+
         for pad in v["pad"]:
+
+          drill_shape = "circle"
+          if "drill_shape" in pad:
+            drill_shape = pad["drill_shape"]
+
           drill_diam = "{0:011.5f}".format( self.toUnit(pad["drill_diam"]) )
           if drill_diam == 0: continue
 
-          x = "{0:011.5f}".format( self.toUnit(pad["posx"]) + self.toUnit(pad["drill_x"]) )
-          y = "{0:011.5f}".format( self.toUnit(pad["posy"]) + self.toUnit(pad["drill_y"]) )
+          px = self.toUnit( pad["posx"] )
+          py = self.toUnit( pad["posy"] )
+
+          drx = self.toUnit( pad["drill_x"] )
+          dry = self.toUnit( pad["drill_y"] )
+
+          u = self._rot( mod_a, [ px + drx, py + dry] )
+          tx = u[0,0] + mod_x
+          ty = u[0,1] + mod_y
+
+          x = "{0:011.5f}".format( tx )
+          y = "{0:011.5f}".format( ty )
+
 
           if drill_diam in drillDiam:
             drillDiam[drill_diam]["pos"].append( [ x, y ] )
