@@ -178,7 +178,22 @@ if __name__ == "__main__":
     print "St ~"
     print "$EndEQUIPOT"
 
-  if len(eqpot) > 0:
+  if "net_class" in json_data: 
+    for netclassName in json_data["net_class"]:
+      netclass = json_data["net_class"][netclassName]
+      print "$NCLASS"
+      print "Name \"" + str(netclass["name"]) + "\""
+      print "Desc \"" + str(netclass["description"]) + "\""
+      print "Clearance", str(uc(netclass["clearance"])) 
+      print "TrackWidth", str(uc(netclass["track_width"]))
+      print "ViaDia", str(uc(netclass["via_diameter"]))
+      print "ViaDrill", str(uc(netclass["via_drill_diameter"]))
+      print "uViaDia", str(uc(netclass["uvia_diameter"]))
+      print "uViaDrill", str(uc(netclass["uvia_drill_diameter"]))
+      for netname in netclass["net"]:
+        print "AddNet \"" + str(netname) + "\""
+      print "$EndNCLASS"
+  elif len(eqpot) > 0:
     print "$NCLASS"
     print "Name \"Default\""
     print "Desc \"This is the default net class.\""

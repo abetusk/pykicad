@@ -1141,7 +1141,6 @@ class brdgerber(brdjson.brdjson):
       if ele_type == "module":
 
         for pad in v["pad"]:
-          #drill_diam = pad["drill_diam"]
           drill_diam = "{0:011.5f}".format( self.toUnit(pad["drill_diam"]) )
           if drill_diam == 0: continue
 
@@ -1168,16 +1167,13 @@ class brdgerber(brdjson.brdjson):
           if netclassName in self.netClass:
             netclass = self.netClass[netclassName]
 
-        #drill_diam = netclass["via_drill_diameter"]
         drill_diam = "{0:011.5f}".format( self.toUnit( netclass["via_drill_diameter"] ) )
         x = "{0:011.5f}".format( self.toUnit( v["x0"] ) )
         y = "{0:011.5f}".format( self.toUnit( v["y0"] ) )
 
         if drill_diam in drillDiam:
-          #drillDiam[drill_diam]["pos"].append( [ self.toUnit(v["x0"]), self.toUnit(v["y0"]) ] )
           drillDiam[drill_diam]["pos"].append( [ x, y ] )
         else:
-          #drillDiam[drill_diam] = { "code" : drillDiamCode , "pos" : [ [ self.toUnit(v["x0"]), self.toUnit(v["y0"]) ] ] }
           drillDiam[drill_diam] = { "code" : drillDiamCode , "pos" : [ [ x, y ] ] }
           drillDiamCode += 1
 
@@ -1189,9 +1185,7 @@ class brdgerber(brdjson.brdjson):
     print "INCH,TZ"
 
     for d in drillDiam:
-      #print "T" + str(drillDiam[d]["code"]) + "C" + str(self.toUnit(d))
       print "T" + str(drillDiam[d]["code"]) + "C" + str(d)
-    #print "T1C0.025"
     print "%"
     print "G90"
     print "G05"
