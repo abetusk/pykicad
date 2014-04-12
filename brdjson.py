@@ -429,7 +429,7 @@ class brdjson(brd.brd):
     self.cur_pad["sizey"] = self.decithou( float(sizey) )
     self.cur_pad["deltax"] = self.decithou( float(deltax) )
     self.cur_pad["deltay"] = self.decithou( float(deltay) )
-    self.cur_pad["orientation"] = int(orientation)
+    self.cur_pad["orientation"] = int(float(orientation))
 
     rad_ang = math.radians( float(orientation)/10.0 )
 
