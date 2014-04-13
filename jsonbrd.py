@@ -211,6 +211,8 @@ if __name__ == "__main__":
 
   tracks = []
 
+  sch_to_brd_net_map = json_data["sch_to_brd_net_map"]
+  brd_to_sch_net_map = json_data["brd_to_sch_net_map"]
 
   eles = json_data["element"]
   for ele in eles:
@@ -408,7 +410,11 @@ if __name__ == "__main__":
     if ele_type == "czone":
       print "$CZONE_OUTLINE"
 
-      nc = int( ele["netcode"] )
+      sch_nc = int( ele["netcode"] )
+      nc = 0
+      if len(sch_to_brd_net_map[str(sch_nc)]) > 0:
+        nc = sch_to_brd_net_map[str(sch_nc)][0]
+
       print "ZInfo", ele["timestamp"], ele["netcode"], "\"" + eqpot[ nc ]["net_name"] + "\""
       print "ZLayer", ele["layer"]
       print "ZAux", len( ele["zcorner"] ), ele["hatching_option"]
