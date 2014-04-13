@@ -878,7 +878,6 @@ class brdgerber(brdjson.brdjson):
 
     x = float(text_obj["x"])
     y = float(text_obj["y"])
-
     ang = float(text_obj["angle"])
 
     width = float(text_obj["penwidth"])
@@ -899,13 +898,16 @@ class brdgerber(brdjson.brdjson):
     deg_ang = -self._find_footprint_text_angle( -deg_ang, 0 )
     rad_ang = math.radians(deg_ang)
 
-    d_off = [ - text_width/2, - text_height/2 ]
+    da = mod_a - ang
+
+    d_off = [ -text_width/2, -text_height/2 ]
     if flip_flag:
       d_off[0] *= -1.0
     td_off = self._rot( rad_ang, d_off )
 
     ds = [ x, y ]
-    tds = self._rot( ang, ds )
+    tds = self._rot( ang + da, ds )
+
     cur_u = [ tds[0,0] + td_off[0,0], tds[0,1] + td_off[0,1] ]
 
     for ch in text:
