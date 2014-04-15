@@ -77,8 +77,9 @@ class brdgerber(brdjson.brdjson):
     self.island_layer = []
 
     self.layer = 0
-
     self.solderMaskClearance = 100
+    self.isSolderMaskLayer = False
+    self.isSilkScreenLayer = False
 
     self.netClass = {}
 
@@ -1038,11 +1039,12 @@ class brdgerber(brdjson.brdjson):
           pad_layer_mask = int(pad["layer_mask"], 16)
           if not (pad_layer_mask & (1<<self.layer)): continue
 
-          shape = pad["shape"]
-          if   shape == "circle":     self.pad_circle(v, pad )
-          elif shape == "rectangle":  self.pad_rectangle(v, pad )
-          elif shape == "oblong":     self.pad_oblong(v, pad )
-          elif shape == "trapeze":    self.pad_trapeze(v, pad )
+          if not self.isSilkScreenLayer:
+            shape = pad["shape"]
+            if   shape == "circle":     self.pad_circle(v, pad )
+            elif shape == "rectangle":  self.pad_rectangle(v, pad )
+            elif shape == "oblong":     self.pad_oblong(v, pad )
+            elif shape == "trapeze":    self.pad_trapeze(v, pad )
 
         if self.isSolderMaskLayer:
           continue
@@ -1257,6 +1259,10 @@ class brdgerber(brdjson.brdjson):
     self.isSolderMaskLayer = False
     if (int(self.layer) == 22) or (int(self.layer) == 23):
       self.isSolderMaskLayer = True
+
+    self.isSilkScreenLayer = False
+    if (int(self.layer) == 20) or (int(self.layer) == 21):
+      self.isSilkScreenLayer = True
 
 
     # first pass to get apertures that are used
