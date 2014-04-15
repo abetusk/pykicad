@@ -78,12 +78,13 @@ class brdgerber(brdjson.brdjson):
 
     self.layer = 0
 
+    self.solderMaskClearance = 100
+
     self.netClass = {}
 
     netclass = { 
         "name" : "Default", 
         "description" : "This is the default net class.",
-
 
         "clearance" : 100,
         "track_width" : 100,
@@ -240,8 +241,14 @@ class brdgerber(brdjson.brdjson):
   def first_pass(self):
 
     aperture_set = {}
+    ds = 0.0
+    if self.isSolderMaskLayer:
+      ds = self.toUnit(self.solderMaskClearance)
 
     for v in self.json_obj["element"]:
+
+      if self.isSolderMaskLayer and v["type"] != "module":
+        continue
 
       if (v["type"] == "track") or (v["type"] == "drawsegment"):
         key = "circle:" + "{0:011.5f}".format( self.toUnit(v["width"]) )
@@ -323,6 +330,77 @@ class brdgerber(brdjson.brdjson):
 
         v["y"] = -float(v["y"])
 
+        for pad in v["pad"]:
+
+          pad["posy"] = -float(pad["posy"])
+          pad["drill_y"] = -float(pad["drill_y"])
+          pad["deltay"] = -float(pad["deltay"])
+
+
+          if   pad["shape"] == "rectangle":
+
+            sx = self.toUnit( pad["sizex"] ) + 2.0*ds
+            sy = self.toUnit( pad["sizey"] ) + 2.0*ds
+            a = float( pad["angle"] )
+            deg = int( round( math.degrees(a) ) )
+
+            if (deg % 90) == 0:
+              if (deg % 180) == 0:
+                key = "rect:" + "{0:011.5f}".format(sx) + ":" + "{0:011.5f}".format(sy)
+
+                if key not in aperture_set:
+                  aperture_set[key] = { "type" : "rect", "x" : sx , "y" : sy, "aperture_name" : self.genApertureName() }
+                ap_name = aperture_set[key]["aperture_name"]
+                pad["aperture_name"] = ap_name
+                pad["aperture_key"] = key
+
+              else:
+                key = "rect:" + "{0:011.5f}".format(sy) + ":" + "{0:011.5f}".format(sx)
+
+                if key not in aperture_set:
+                  aperture_set[key] = { "type" : "rect", "x" : sy , "y" : sx, "aperture_name" : self.genApertureName() }
+
+                ap_name = aperture_set[key]["aperture_name"]
+                pad["aperture_name"] = ap_name
+                pad["aperture_key"] = key
+
+            else:
+              pass
+
+          elif pad["shape"] == "circle":
+            d = self.toUnit(pad["sizex"]) + 2.0*ds
+            key = "circle:" + "{0:011.5f}".format( d )
+
+            if key not in aperture_set:
+              aperture_set[key] = { "type" : "circle" , "d" : d, "aperture_name" : self.genApertureName() }
+
+            ap_name = aperture_set[key]["aperture_name"]
+            pad["aperture_name"] = ap_name
+            pad["aperture_key"] = key
+
+          elif pad["shape"] == "oblong":
+
+            sx = self.toUnit( pad["sizex"] ) + 2.0*ds
+            sy = self.toUnit( pad["sizey"] ) + 2.0*ds
+
+            if sx > sy: d = sy
+            else: d = sx
+
+            key = "circle:" + "{0:011.5f}".format( d  )
+
+            if key not in aperture_set:
+              aperture_set[key] = { "type" : "circle" , "d" : d, "aperture_name" : self.genApertureName() }
+
+            ap_name = aperture_set[key]["aperture_name"]
+            pad["aperture_name"] = ap_name
+            pad["aperture_key"] = key
+
+          elif pad["shape"] == "trapeze":
+            pass
+
+        if self.isSolderMaskLayer:
+          continue
+
         for text in v["text"]:
 
           text["y"] = -float(text["y"])
@@ -361,73 +439,6 @@ class brdgerber(brdjson.brdjson):
             art["aperture_name"] = ap_name
             art["aperture_key"] = key
 
-        for pad in v["pad"]:
-
-          pad["posy"] = -float(pad["posy"])
-          pad["drill_y"] = -float(pad["drill_y"])
-          pad["deltay"] = -float(pad["deltay"])
-
-
-          if   pad["shape"] == "rectangle":
-
-            sx = self.toUnit( pad["sizex"] )
-            sy = self.toUnit( pad["sizey"] )
-            a = float( pad["angle"] )
-            deg = int( round( math.degrees(a) ) )
-
-            if (deg % 90) == 0:
-              if (deg % 180) == 0:
-                key = "rect:" + "{0:011.5f}".format(sx) + ":" + "{0:011.5f}".format(sy)
-
-                if key not in aperture_set:
-                  aperture_set[key] = { "type" : "rect", "x" : sx , "y" : sy, "aperture_name" : self.genApertureName() }
-                ap_name = aperture_set[key]["aperture_name"]
-                pad["aperture_name"] = ap_name
-                pad["aperture_key"] = key
-
-              else:
-                key = "rect:" + "{0:011.5f}".format(sy) + ":" + "{0:011.5f}".format(sx)
-
-                if key not in aperture_set:
-                  aperture_set[key] = { "type" : "rect", "x" : sy , "y" : sx, "aperture_name" : self.genApertureName() }
-
-                ap_name = aperture_set[key]["aperture_name"]
-                pad["aperture_name"] = ap_name
-                pad["aperture_key"] = key
-
-            else:
-              pass
-
-          elif pad["shape"] == "circle":
-            d = self.toUnit(pad["sizex"])
-            key = "circle:" + "{0:011.5f}".format( d )
-
-            if key not in aperture_set:
-              aperture_set[key] = { "type" : "circle" , "d" : d, "aperture_name" : self.genApertureName() }
-
-            ap_name = aperture_set[key]["aperture_name"]
-            pad["aperture_name"] = ap_name
-            pad["aperture_key"] = key
-
-          elif pad["shape"] == "oblong":
-
-            sx = self.toUnit( pad["sizex"] )
-            sy = self.toUnit( pad["sizey"] )
-
-            if sx > sy: d = sy
-            else: d = sx
-
-            key = "circle:" + "{0:011.5f}".format( d )
-
-            if key not in aperture_set:
-              aperture_set[key] = { "type" : "circle" , "d" : d, "aperture_name" : self.genApertureName() }
-
-            ap_name = aperture_set[key]["aperture_name"]
-            pad["aperture_name"] = ap_name
-            pad["aperture_key"] = key
-
-          elif pad["shape"] == "trapeze":
-            pass
 
     ## end for json_obj
     self.aperture = aperture_set
@@ -1011,12 +1022,30 @@ class brdgerber(brdjson.brdjson):
 
   def second_pass(self):
 
+
     for v in self.json_obj["element"]:
 
 
       ele_type = v["type"]
 
+      if self.isSolderMaskLayer and ele_type != "module":
+        continue
+
       if ele_type == "module":
+
+        for pad in v["pad"]:
+
+          pad_layer_mask = int(pad["layer_mask"], 16)
+          if not (pad_layer_mask & (1<<self.layer)): continue
+
+          shape = pad["shape"]
+          if   shape == "circle":     self.pad_circle(v, pad )
+          elif shape == "rectangle":  self.pad_rectangle(v, pad )
+          elif shape == "oblong":     self.pad_oblong(v, pad )
+          elif shape == "trapeze":    self.pad_trapeze(v, pad )
+
+        if self.isSolderMaskLayer:
+          continue
 
         for art in v["art"]:
 
@@ -1027,17 +1056,6 @@ class brdgerber(brdjson.brdjson):
           if shape == "circle":       self.art_circle(v, art)
           if shape == "arc":          self.art_arc(v, art)
           if shape == "polygon":      self.art_polygon(v, art)
-
-        for pad in v["pad"]:
-
-          pad_layer_mask = int(pad["layer_mask"], 16)
-          if not (pad_layer_mask & (1<<self.layer)): continue
-
-          shape = pad["shape"]
-          if   shape == "circle":     self.pad_circle(v, pad)
-          elif shape == "rectangle":  self.pad_rectangle(v, pad)
-          elif shape == "oblong":     self.pad_oblong(v, pad)
-          elif shape == "trapeze":    self.pad_trapeze(v, pad)
 
         for text in v["text"]:
           if int(text["layer"]) != self.layer: continue
@@ -1236,6 +1254,11 @@ class brdgerber(brdjson.brdjson):
 
   def dump_gerber(self):
 
+    self.isSolderMaskLayer = False
+    if (int(self.layer) == 22) or (int(self.layer) == 23):
+      self.isSolderMaskLayer = True
+
+
     # first pass to get apertures that are used
     #
     self.first_pass()
@@ -1280,51 +1303,15 @@ class brdgerber(brdjson.brdjson):
     self.grb.end()
     self.grb._print()
 
-    sys.exit(0)
-
-    grb = pygerber.pygerber()
-
-    grb.mode( "IN" )
-    grb.formatSpecification( 'L', 'A', 3, 4, 3, 4 )
-
-    for width_key in self.apertureTrack:
-      ap = self.apertureTrack[ width_key ]
-      if ap["type"] == "circle":  grb.defineApertureCircle( ap["name"], ap["d"] )
-
-    prev_x = None
-    prev_y = None
-
-    cur_x = None
-    cur_y = None
-
-    cur_ap = None
-
-    for v in self.json_obj["element"]:
-      if (v["type"] == "track") or (v["type"] == "drawsegment"):
-
-        width_key = "{0:011.5f}".format( self.toUnit(v["width"]) )
-
-        ap_name = self.apertureTrack[ width_key ]["name"]
-
-        if ap_name != cur_ap:
-          cur_ap = ap_name
-          grb.apertureSet( cur_ap )
-
-        x = self.toUnit( v["x0"] )
-        y = self.toUnit( v["y0"] )
-
-        if (x != cur_x) or (y != cur_y):
-          grb.moveTo( x, y )
-
-        grb.lineTo( self.toUnit(v["x1"]), self.toUnit(v["y1"]) )
-        cur_x = x
-        cur_y = y
-
-    grb.end()
-    grb._print()
-
-
-    #self.dump_json()
+#    # back solder mask
+#    if self.layer == 22:
+#      self.generate_solder_mask(0)
+#      return
+#
+#    # front solder mask
+#    if self.layer == 23:
+#      self.generate_solder_mask(15)
+#      return
 
 ####
 # Code taken from question by Daniel Goldberg :
