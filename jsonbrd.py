@@ -169,9 +169,14 @@ if __name__ == "__main__":
   print 
 
   eqpot = json_data["equipot"]
+
+  eqpot_map = {}
+
   for ep in eqpot:
     name = ep["net_name"]
     number = ep["net_number"]
+
+    eqpot_map[ int(number) ] = name
 
     print "$EQUIPOT"
     print "Na", number, "\"" + name + "\""
@@ -415,7 +420,13 @@ if __name__ == "__main__":
       if len(sch_to_brd_net_map[str(sch_nc)]) > 0:
         nc = sch_to_brd_net_map[str(sch_nc)][0]
 
-      print "ZInfo", ele["timestamp"], ele["netcode"], "\"" + eqpot[ nc ]["net_name"] + "\""
+      net_name = ""
+      if int(nc) in eqpot_map:
+        net_name = eqpot_map[ int(nc) ]
+
+      #print "ZInfo", ele["timestamp"], ele["netcode"], "\"" + eqpot[ nc ]["net_name"] + "\""
+      print "ZInfo", ele["timestamp"], ele["netcode"], "\"" + str(net_name) + "\""
+
       print "ZLayer", ele["layer"]
       print "ZAux", len( ele["zcorner"] ), ele["hatching_option"]
       print "ZClearance", uc(ele["clearance"]), ele["pad_option"]
