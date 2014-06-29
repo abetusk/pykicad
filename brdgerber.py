@@ -57,6 +57,11 @@ import math
 import numpy as np
 import json
 
+import uuid
+import subprocess as sp
+
+weakpwh = os.path.join( os.environ["HOME"], "bin", "weakpwh" )
+
 class brdgerber(brdjson.brdjson):
 
   def __init__(self, fontFile = None):
@@ -160,6 +165,9 @@ class brdgerber(brdjson.brdjson):
     print json.dumps( self.json_obj, indent=2 )
 
 
+  def weaklysimple( self, pnts ):
+
+    pass
 
   def _find_czone_islands_r( self, islands, pnts, start_pos, end_pos , layer, width, ap_key ):
 
@@ -1023,9 +1031,7 @@ class brdgerber(brdjson.brdjson):
 
   def second_pass(self):
 
-
     for v in self.json_obj["element"]:
-
 
       ele_type = v["type"]
 
@@ -1100,43 +1106,73 @@ class brdgerber(brdjson.brdjson):
         elif shape == "arc":        self.drawsegment_arc(v)
       #elif ele_type == "czone": self.czone(v)
 
+
+      # Horrible and hacky, but gets the job done.
+      # Makes an external call to 'weakpwh' to construct
+      # a filled region that does not streak across unfilled
+      # regions.
+      # We need to make sure houses don't expect an actual
+      # stricly weakly simple polygon.
+      #
       elif ele_type == "czone":
 
         if self.layer != int(v["layer"]): continue
 
         if len(v["polyscorners"]) < 3: continue
 
-        pnts = v["polyscorners"]
-        for i,p in enumerate(pnts):
-          if i==0:
+        islands = []
+        self._find_czone_islands( islands, v, "CZ" )
+
+        inp_ufn = os.path.join( "/tmp", str(uuid.uuid4()) )
+        out_ufn = os.path.join( "/tmp", str(uuid.uuid4()) )
+
+        ifp = open( inp_ufn, "w" )
+        N = len(islands)
+        ifp.write("#N" + str(N) + "\n")
+
+        ifp.write("# OB\n")
+        for k,p in enumerate( islands[N-1]["island"] ):
+          ifp.write( str(int(p["x"])) + " " + str(int(p["y"])) + "\n" )
+        ifp.write("\n")
+
+        for i in range(N-1):
+          ifp.write("#" + str(i) + "\n")
+          for j,p in enumerate( islands[i]["island"] ):
+            ifp.write( str(int(p["x"])) + " " + str(int(p["y"])) + "\n" )
+          ifp.write("\n")
+
+        ifp.close()
+
+        r = sp.check_output( [ weakpwh, "-i", inp_ufn, "-o", out_ufn ] )
+
+        ofp = open( out_ufn, "r" )
+        line_no = -1
+        point_count = 0
+        first_point = []
+        for l in ofp:
+          if l[0] == '#': next
+
+          line_no += 1
+          point_count += 1
+
+          xy = l.strip().split(" ")
+          if line_no == 0:
+
+            first_point = [ xy[0], xy[1] ]
             self.grb.regionStart()
-            self.grb.moveTo( self.toUnit(p["x0"]), self.toUnit(p["y0"]) )
+            self.grb.moveTo( self.toUnit(xy[0]), self.toUnit(xy[1]) )
             continue
-          self.grb.lineTo( self.toUnit(p["x0"]), self.toUnit(p["y0"]) )
-        self.grb.lineTo( self.toUnit(pnts[0]["x0"]), self.toUnit(pnts[0]["y0"]) )
-        self.grb.regionEnd();
 
+          self.grb.lineTo( self.toUnit(xy[0]), self.toUnit(xy[1]) )
 
+        ofp.close()
 
-#    # print pours
-#    #
-#    for ele in self.islands:
-#      first = True
-#      island = ele["island"]
-#      layer = int(ele["layer"])
-#
-#      if int(self.layer) != int(layer): continue
-#
-#      for pnt in island:
-#        if first:
-#          self.grb.regionStart()
-#          self.grb.moveTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
-#          first = False
-#        else:
-#          self.grb.lineTo( self.toUnit(pnt["x"]), self.toUnit(pnt["y"]) )
-#      if not first:
-#        self.grb.lineTo( self.toUnit(island[0]["x"]), self.toUnit(island[0]["y"]) )
-#        self.grb.regionEnd()
+        if point_count > 0:
+          self.grb.lineTo( self.toUnit( first_point[0] ), self.toUnit( first_point[1] ) )
+          self.grb.regionEnd();
+
+        os.unlink( inp_ufn )
+        os.unlink( out_ufn )
 
     # print pour outlines
     #
