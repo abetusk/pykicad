@@ -36,6 +36,7 @@ class brd(object):
   #          note that this must be followed by a '#' field to get rid of extraneous RE match
   #     #  - ignore (that is, "")
   #     =  - real number
+  #     "  - quoted string
   #
   op_descr = {
     "header" : [ "PCBNEW-BOARD", "*text" ],
@@ -169,7 +170,8 @@ class brd(object):
     "textpcb_te" : [ "Te", "\"string", "#dummy" ],
     "textpcb_nl" : [ "nl", "\"string", "#dummy" ],
     "textpcb_po" : [ "Po", "x0", "y0", "x1", "y1", "width", "rotation" ],
-    "textpcb_de" : [ "De", "layer", "normal_flag", "timestamp", "style" ],
+    #"textpcb_de" : [ "De", "layer", "normal_flag", "timestamp", "style" ],
+    "textpcb_de" : [ "De", "layer", "normal_flag", "timestamp", "style", "?extra" ],
     "textpcb_end" : [ "\$EndTEXTPCB" ],
 
     "mirepcb" : [ "\$MIREPCB" ],
@@ -1438,7 +1440,8 @@ class brd(object):
           break
 
       if not found_match:
-        raise parse_exception("ERROR, couldn't match line '" + str(l) + "', line_no: " +  str(line_no) + " (parse_state:" + str(self.parse_state) + ")" )
+        extra = str( self.parse_state )
+        raise parse_exception("ERROR, couldn't match line '" + str(l) + "', line_no: " +  str(line_no) + " (parse_state:" + str(self.parse_state) + ")" +", state: " + extra )
 
       self.op_callback[ op ]( matched_arg )
 

@@ -605,7 +605,8 @@ class brdjson(brd.brd):
     self.cur_text["angle"] = math.radians( -float(rotation)/10.0 )
 
   def cb_textpcb_de(self, arg):
-    layer, mirror_code, ts, style = arg
+    #layer, mirror_code, ts, style = arg
+    layer, mirror_code, ts, style, extra = arg
 
     self.cur_text["layer"] = layer
     self.cur_text["mirror_code"] = mirror_code
