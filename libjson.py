@@ -320,7 +320,7 @@ class libjson(lib.lib):
 
     json_file = self.json_prefix + json_base_fn
 
-    print json_file
+    #print json_file
 
     f = open( json_file, "w" )
     f.write( json.dumps( self.json_obj, indent=2 ) )
