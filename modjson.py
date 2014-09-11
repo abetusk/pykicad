@@ -309,6 +309,8 @@ class modjson(mod.mod):
 
     #print "### file:", self.json_file
 
+    print self.json_obj["name"], self.json_file
+
     f = open( self.json_file, "w" )
     f.write( json.dumps( self.json_obj, indent=2 ))
     f.close()
