@@ -313,7 +313,7 @@ class libjson(lib.lib):
     #munged_name = re.sub('\/', '#', self.json_obj["name"])
     munged_name = self.json_obj["name"]
     munged_name = urllib.quote( munged_name )
-    munged_name = re.sub('\/', '%2F', self.json_obj["name"])
+    munged_name = re.sub('\/', '%2F',  munged_name )
 
     #json_base_fn = urllib.quote( munged_name ) + self.json_suffix 
     json_base_fn = munged_name  + self.json_suffix 
