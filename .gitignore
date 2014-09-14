@@ -1,7 +1,6 @@
 *.pyc
 *.gz
 library
-eeschema
 *~
 modules
 pcbnew
