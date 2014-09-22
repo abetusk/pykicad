@@ -62,6 +62,9 @@ class mod(object):
     "MODULE_DA" : [ "DA", "centerx", "centery", "startx", "starty", "angle", "width", "layer" ], # draw arc
     "MODULE_DP" : [ "DP", "zero", "zero", "zero", "zero", "corners_count", "width", "layer" ], # draw polygon
     "MODULE_DI" : [ "DI", "cornerx", "cornery" ], # polygon point 
+    "MODULE_Dl" : [ "Dl", "cornerx", "cornery" ], # polygon point (?).
+                                                  # I think someone mistook the 'I' for a lc 'l'
+                                                  # or am I mistaken and it should relaly be a 'Dl' and not a 'DI'?
 
     "MODULE_SolderMask" : [ "\.SolderMask", "layer" ],
     "MODULE_SolderPaste" : [ "\.SolderPaste", "layer" ],
@@ -81,6 +84,7 @@ class mod(object):
     "PAD" : [ "\$PAD" ],
     "PAD_Sh" : [ "Sh", "pad_name", "shape", "sizex", "sizey", "deltax", "deltay", "orientation" ], # shape
     "PAD_Dr" : [ "Dr", "pad_drill", "offsetx", "offsety", "?hole_shape", "?pad_drill_x", "?pad_drill_y" ], # drill
+    "PAD_Dl" : [ "Dl", "corner_posx", "corner_posy", ], # corner coordinate?
     "PAD_At" : [ "At", "pad_type", "n", "layer_mask" ], # attribute
     "PAD_Ne" : [ "Ne", "net_number", "net_name" ], # net
     "PAD_Po" : [ "Po", "posx", "posy" ], # position
@@ -224,6 +228,11 @@ class mod(object):
       print "cb_MODULE_DI",arg
     pass
 
+  def cb_MODULE_Dl(self, arg): 
+    if self.parrot_flag:
+      print "cb_MODULE_Dl",arg
+    pass
+
 
   def cb_MODULE_SolderMask(self, arg): 
     if self.parrot_flag:
@@ -302,6 +311,11 @@ class mod(object):
       print "cb_PAD_Dr",arg
     pass
 
+  def cb_PAD_Dl(self, arg): 
+    if self.parrot_flag:
+      print "cb_PAD_Dl",arg
+    pass
+
 
   def cb_PAD_At(self, arg): 
     if self.parrot_flag:
@@ -374,6 +388,7 @@ class mod(object):
                  "MODULE_DA"  : "module",
                  "MODULE_DP"  : "module",
                  "MODULE_DI"  : "module",
+                 "MODULE_Dl"  : "module",
 
                  "MODULE_SolderMask"  : "module",
                  "MODULE_SolderPaste"  : "module",
@@ -394,6 +409,7 @@ class mod(object):
     "pad" : { "PAD" : "pad", 
               "PAD_Sh" : "pad", 
               "PAD_Dr" : "pad", 
+              "PAD_Dl" : "pad", 
               "PAD_At" : "pad", 
               "PAD_Ne" : "pad", 
               "PAD_Po" : "pad", 
@@ -447,6 +463,7 @@ class mod(object):
       "MODULE_DA" : self.cb_MODULE_DA,
       "MODULE_DP" : self.cb_MODULE_DP,
       "MODULE_DI" : self.cb_MODULE_DI,
+      "MODULE_Dl" : self.cb_MODULE_Dl,
       "MODULE_SolderMask" : self.cb_MODULE_SolderMask,
       "MODULE_SolderPaste" : self.cb_MODULE_SolderPaste,
       "MODULE_SolderPasteRatio" : self.cb_MODULE_SolderPasteRatio,
@@ -463,6 +480,7 @@ class mod(object):
       "PAD" : self.cb_PAD,
       "PAD_Sh" : self.cb_PAD_Sh,
       "PAD_Dr" : self.cb_PAD_Dr,
+      "PAD_Dl" : self.cb_PAD_Dl,
       "PAD_At" : self.cb_PAD_At,
       "PAD_Ne" : self.cb_PAD_Ne,
       "PAD_Po" : self.cb_PAD_Po,

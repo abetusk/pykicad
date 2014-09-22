@@ -173,6 +173,11 @@ class lib(object):
                "Fn" : "def",
                "ALIAS" : "def",
                "DRAW" : "def.draw", 
+
+               # be a little more fogiving if we see an endrawy without a beginning draw
+               #
+               "ENDDRAW" : "def",
+
                "FPLIST" : "def.fplist" },
     "def.fplist" : { "ENDFPLIST" : "def", 
                      "FPLIST_item" : "def.fplist"  },

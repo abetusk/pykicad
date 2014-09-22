@@ -60,7 +60,11 @@ import json
 import uuid
 import subprocess as sp
 
-weakpwh = os.path.join( os.environ["HOME"], "bin", "weakpwh" )
+HOME = "/home/meow"
+if "HOME" in os.environ:
+  HOME = os.environ["HOME"]
+#weakpwh = os.path.join( os.environ["HOME"], "bin", "weakpwh" )
+weakpwh = os.path.join( HOME, "bin", "weakpwh" )
 
 class brdgerber(brdjson.brdjson):
 
