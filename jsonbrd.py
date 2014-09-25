@@ -228,8 +228,14 @@ if __name__ == "__main__":
       y = uc(ele["y"])
       layer = ele["layer"]
       orientation = ele["orientation"]
-      timestamp = ele["timestamp"]
-      timestamp_op = ele["timestamp_op"]
+
+      timestamp = "43A670DA"
+      if "timestamp" in ele:
+        timestamp = ele["timestamp"]
+
+      timestamp_op = "43A670DA"
+      if "timestamp_op" in ele:
+        timestamp_op = ele["timestamp_op"]
 
       attr1 = ele["attribute1"]
       attr2 = ele["attribute2"]
