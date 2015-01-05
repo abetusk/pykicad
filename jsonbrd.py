@@ -216,8 +216,13 @@ if __name__ == "__main__":
 
   tracks = []
 
-  sch_to_brd_net_map = json_data["sch_to_brd_net_map"]
-  brd_to_sch_net_map = json_data["brd_to_sch_net_map"]
+  sch_to_brd_net_map = {}
+  if "sch_to_brd_net_map" in json_data:
+    sch_to_brd_net_map = json_data["sch_to_brd_net_map"]
+
+  brd_to_sch_net_map = {}
+  if "brd_to_sch_net_map" in json_data:
+    brd_to_sch_net_map = json_data["brd_to_sch_net_map"]
 
   eles = json_data["element"]
   for ele in eles:
