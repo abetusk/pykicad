@@ -250,12 +250,27 @@ class modjson(mod.mod):
     dy2 = dy*dy
     r = math.sqrt( dx2 + dy2 )
 
+    # 'angle' is clockwise and in decidegrees.
+    # Turn it into radians (still clockwise).
+    #
     ang = math.radians(float(angle)/10.0)
+
+    if ang > 2.0 * math.pi:
+      ang = ang - float( int( ang / (2.0*math.pi) ) ) * math.pi
+    if ang < 2.0 * math.pi:
+      ang = ang + float( int( -ang / (2.0*math.pi) ) ) * math.pi
+
+    sa = math.atan2( sy - cy, sx - cx )
 
     art_field["r"] = r
     art_field["angle"] = ang
 
+    art_field["start_x"] = startx
+    art_field["start_y"] = starty
+
     art_field["start_angle"] = math.atan2(dy, dx)
+
+    #art_field["counterclockwise_flag"] = True
     art_field["line_width"] = self.decithou(stroke_width)
     art_field["layer"] = layer
 
