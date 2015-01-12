@@ -352,35 +352,41 @@ class libjson(lib.lib):
   def cb_A(self, arg):
     posx,posy,radius,start_angle,end_angle,unit,convert,thickness,fill,startx,starty,endx,endy = arg
 
-    sa_deg = float(start_angle)/10.0 
-    ea_deg = float(end_angle)/10.0 
+    # start_angle and end_angle are only used in EESchema libraries.
+    # Newer versions of KiCAD use x1, y1, x2, y2 as the "truth"
+    # about where to render the start and end points of the arc.
+    # start_angle and end_angle are used, but ONLY to swap (x1,y1) with
+    # (x2,y2) under the following conditions:
+    #   - normalize start_angle and end_angle by adding 3600 if they're less than 0
+    #   - if end_angle > start_angle, add 3600 to end_angle
+    #   - if (end_angle-start_angle) > 180 then SWAP
+    #
+    # Since the start_angle and end_angle values are ignored and it's only their relative
+    # value that's of relevance, stuff dummy values here in order to make
+    # sure the arc gets rendered properly.
+    #
 
+    sa = float(start_angle)
+    ea = float(end_angle)
 
-    if ea_deg > sa_deg:
-      deg_se_f = ea_deg - sa_deg
-      deg_es_f = 360 - deg_se_f
-    else:
-      deg_es_f = sa_deg - ea_deg
-      deg_se_f = 360 - deg_es_f
+    swap_flag = False
+    if sa < 0: sa += 3600
+    if ea < 0: ea += 3600
+    if ea < sa: ea+=3600
+    if (ea-sa) > 1800: swap_flag = True
 
-    if deg_se_f < deg_es_f:
-      sa_rad = math.radians(sa_deg)
-      ea_rad = math.radians(ea_deg)
-    else:
-      sa_rad = math.radians(ea_deg)
-      ea_rad = math.radians(sa_deg)
+    if swap_flag:
+      startx,starty,endx,endy = endx,endy,startx,starty
 
+    sx = float(startx)
+    sy = float(starty)
+    ex = float(endx)
+    ey = float(endy)
+    cx = float(posx)
+    cy = float(posy)
 
-
-
-    sa = math.radians( float(start_angle)/10.0 )
-    ea = math.radians( float(end_angle)/10.0 )
-
-    # I think KiCAD is just taking the minor arc
-
-    ccw = True
-    if abs(ea - sa) > (math.pi/2.0):
-      ccw = False
+    sa_rad = math.atan2( sy - cy, sx - cx )
+    ea_rad = math.atan2( ey - cy, ex - cx )
 
     arc_obj = {}
     arc_obj["shape"] = "arc"
@@ -388,9 +394,6 @@ class libjson(lib.lib):
     arc_obj["y"] = float(posy)
     arc_obj["r"] = float(radius)
 
-    #arc_obj["start_angle"] = math.radians( float(start_angle)/10.0 )
-    #arc_obj["end_angle"] = math.radians( float(end_angle)/10.0 )
-    #arc_obj["counterclockwise"] = ccw
     arc_obj["start_angle"] = sa_rad
     arc_obj["end_angle"]   = ea_rad
     arc_obj["counterclockwise"] = True
@@ -403,9 +406,8 @@ class libjson(lib.lib):
     if fill is not None:
       fill_opt = fill.strip()
     arc_obj["fill"] = fill_opt
-
-
     self.json_obj["art"].append( arc_obj )
+
 
   def cb_C(self, arg):
     posx, posy, radius, unit, convert, thickness, fill = arg
