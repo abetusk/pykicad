@@ -1130,6 +1130,9 @@ class brdgerber(brdjson.brdjson):
         inp_ufn = os.path.join( "/tmp", str(uuid.uuid4()) )
         out_ufn = os.path.join( "/tmp", str(uuid.uuid4()) )
 
+        #DEBUG
+        print "inp_ufn", inp_ufn, "out_ufn", out_ufn
+
         ifp = open( inp_ufn, "w" )
         N = len(islands)
         ifp.write("#N" + str(N) + "\n")
@@ -1154,16 +1157,31 @@ class brdgerber(brdjson.brdjson):
         point_count = 0
         first_point = []
         for l in ofp:
-          if l[0] == '#': next
-
           line_no += 1
+
+          if l[0] == '\n': continue
+          if l[0] == ' ': continue
+          if len(l) == 0: continue
+
+          #if l[0] == '#': next
+          if l[0] == '#':
+
+            if point_count > 0:
+              self.grb.lineTo( self.toUnit( first_point[0] ), self.toUnit( first_point[1] ) )
+              self.grb.regionEnd();
+
+            first_point = []
+            point_count = 0
+            continue
+
           point_count += 1
 
           xy = l.strip().split(" ")
-          if line_no == 0:
+          if point_count == 1:
 
             first_point = [ xy[0], xy[1] ]
             self.grb.regionStart()
+
             self.grb.moveTo( self.toUnit(xy[0]), self.toUnit(xy[1]) )
             continue
 
