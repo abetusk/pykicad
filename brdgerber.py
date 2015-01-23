@@ -35,6 +35,15 @@ VERSION="( brdgerber.py v0.1 2014-03-12 )"
 ##
 ##
 
+## NOTE: This has an external dependency on weakpwh.  Figuring out the
+## proper path for the weak polygon with holes is too complicated to put
+## here.  Instead, we pass it off to weakpwh to figure out.
+##
+## At some future date we might try and do it all here but that requires
+## some work.
+## https://github.com/Skyrpex/clipper looks promising?
+##
+
 import re
 import sys
 import os
