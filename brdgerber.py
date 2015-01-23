@@ -1139,9 +1139,6 @@ class brdgerber(brdjson.brdjson):
         inp_ufn = os.path.join( "/tmp", str(uuid.uuid4()) )
         out_ufn = os.path.join( "/tmp", str(uuid.uuid4()) )
 
-        #DEBUG
-        print "inp_ufn", inp_ufn, "out_ufn", out_ufn
-
         ifp = open( inp_ufn, "w" )
         N = len(islands)
         ifp.write("#N" + str(N) + "\n")
@@ -1172,7 +1169,6 @@ class brdgerber(brdjson.brdjson):
           if l[0] == ' ': continue
           if len(l) == 0: continue
 
-          #if l[0] == '#': next
           if l[0] == '#':
 
             if point_count > 0:
