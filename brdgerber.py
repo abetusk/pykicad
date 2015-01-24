@@ -44,6 +44,23 @@ VERSION="( brdgerber.py v0.1 2014-03-12 )"
 ## https://github.com/Skyrpex/clipper looks promising?
 ##
 
+## from http://en.wikibooks.org/wiki/Kicad/file_formats
+##
+## 0 Back - Solder
+## 1 Inner-B, 2 Inner_frent (?)
+## 3-14 Inner
+## 15 Component-F
+## 16 Adhestive/glue-B, 17 Adhestive/glue-F
+## 18 Solder Paste-B, 19 Solder Paste-F
+## 20 SilkScreen-B, 21 SilkScreen-F
+## 22 SolderMask-B, 23 SolderMask-F
+## 24 Drawings
+## 25 Comments
+## 26 ECO1, 27 ECO2
+## 28 Edge Cuts
+
+
+
 import re
 import sys
 import os
