@@ -69,6 +69,8 @@ import json
 import uuid
 import subprocess as sp
 
+import argparse
+
 HOME = "/home/meow"
 if "HOME" in os.environ:
   HOME = os.environ["HOME"]
@@ -83,6 +85,9 @@ class brdgerber(brdjson.brdjson):
     self._id = 1
     self.apertureIdMap = {}
     self.apertureTrack = {}
+
+    self.outfile = "-"
+    self.pad_only = False
 
     self.aperture = {}
     self.invertY = False
@@ -1401,12 +1406,31 @@ if __name__ == "__main__":
   layer = 0
   font_file = None
 
-  if len(sys.argv) >= 2:
-    infile = sys.argv[1]
-    if len(sys.argv) >= 3:
-      layer = int(sys.argv[2])
-      if len(sys.argv) >= 4:
-        font_file = sys.argv[3]
+  outfile = "-"
+  pad_only = False
+
+  parser = argparse.ArgumentParser()
+  parser.add_argument( '-i', '--input', action='store', help="Input KiCAD brd file", required=True)
+  parser.add_argument( '-o', '--output', help="Output Gerber file" )
+  parser.add_argument( '-F', '--font-file', help="Font file to use" )
+  parser.add_argument( '-L', '--layer', help="Layer to filter on" )
+  parser.add_argument( '-P', '--pad-only', help="Only render pads", action='store_true' )
+  args = parser.parse_args()
+
+  if args.input:
+    infile = args.input
+
+  if args.output:
+    outfile = args.output
+
+  if args.font_file:
+    font_file = args.font_file
+
+  if args.layer:
+    layer = int(args.layer)
+
+  if args.pad_only:
+    pad_only=True
 
   if infile is None:
     print "provide infile"
@@ -1416,6 +1440,9 @@ if __name__ == "__main__":
   b = brdgerber(font_file)
 
   b.layer = layer
+  b.pad_only = pad_only
+  b.outfile = outfile
+
 
   str_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
   str_date += " " + time.strftime("%Z")

@@ -1402,13 +1402,17 @@ class brd(object):
 
     self.brd_file = fn
 
-    f = open( fn, "r" )
-    self.brd = f.read()
-    f.close()
+    if fn != "-":
+      f = open( fn, "r" )
+      self.brd = f.read()
+      f.close()
 
-    f = open( fn, "r" )
-    self.brd_lines = f.readlines()
-    f.close()
+      f = open( fn, "r" )
+      self.brd_lines = f.readlines()
+      f.close()
+    else:
+      self.brd_lines = sys.stdin.readlines()
+      self.brd = "\n".join( self.brd_lines )
 
 
   def parse_brd(self, fn):

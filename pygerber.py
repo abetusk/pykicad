@@ -310,10 +310,18 @@ class pygerber(object):
   def end(self):
     self._command.append( "M02*" )
 
-  def _print(self):
+  def _print(self, outfile=""):
 
-    for l in self._command:
-      print l
+    if len(outfile)==0 or outfile == "-":
+      for l in self._command:
+        print l
+    else:
+      fp = open( outfile, "w" )
+      for l in self._command:
+        fp.write(l)
+        fp.write("\n")
+      fp.close()
+
 
     #print "M02*"
 
