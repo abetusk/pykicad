@@ -100,7 +100,9 @@ class brdgerber(brdjson.brdjson):
     self.island_layer = []
 
     self.layer = 0
-    self.solderMaskClearance = 100
+    #self.solderMaskClearance = 100
+    self.solderPasteClearance = 100
+    self.isSolderPasteLayer = False
     self.isSolderMaskLayer = False
     self.isSilkScreenLayer = False
 
@@ -269,12 +271,17 @@ class brdgerber(brdjson.brdjson):
 
     aperture_set = {}
     ds = 0.0
-    if self.isSolderMaskLayer:
-      ds = self.toUnit(self.solderMaskClearance)
+    #if self.isSolderMaskLayer:
+    if self.isSolderPasteLayer:
+      #ds = self.toUnit(self.solderMaskClearance)
+      ds = self.toUnit(self.solderPasteClearance)
 
     for v in self.json_obj["element"]:
 
       if self.isSolderMaskLayer and v["type"] != "module":
+        continue
+
+      if self.isSolderPasteLayer and v["type"] != "module":
         continue
 
       if (v["type"] == "track") or (v["type"] == "drawsegment"):
@@ -426,6 +433,9 @@ class brdgerber(brdjson.brdjson):
             pass
 
         if self.isSolderMaskLayer:
+          continue
+
+        if self.isSolderPasteLayer:
           continue
 
         for text in v["text"]:
@@ -1056,6 +1066,9 @@ class brdgerber(brdjson.brdjson):
       if self.isSolderMaskLayer and ele_type != "module":
         continue
 
+      if self.isSolderPasteLayer and ele_type != "module":
+        continue
+
       if ele_type == "module":
 
         for pad in v["pad"]:
@@ -1071,6 +1084,9 @@ class brdgerber(brdjson.brdjson):
             elif shape == "trapeze":    self.pad_trapeze(v, pad )
 
         if self.isSolderMaskLayer:
+          continue
+
+        if self.isSolderPasteLayer:
           continue
 
         for art in v["art"]:
@@ -1322,7 +1338,11 @@ class brdgerber(brdjson.brdjson):
     print "M30"
 
 
-  def dump_gerber(self):
+  def dump_gerber(self, outfile):
+
+    self.isSolderPasteLayer = False
+    if (int(self.layer) == 18) or (int(self.layer) == 19):
+      self.isSolderPasteLayer = True
 
     self.isSolderMaskLayer = False
     if (int(self.layer) == 22) or (int(self.layer) == 23):
@@ -1375,7 +1395,7 @@ class brdgerber(brdjson.brdjson):
 
     
     self.grb.end()
-    self.grb._print()
+    self.grb._print(outfile)
 
 #    # back solder mask
 #    if self.layer == 22:
@@ -1451,7 +1471,7 @@ if __name__ == "__main__":
 
   b.parse_brd(infile)
 
-  b.dump_gerber()
+  b.dump_gerber(outfile)
 
 
 
