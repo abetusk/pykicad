@@ -86,6 +86,7 @@ if __name__ == "__main__":
   f.close()
 
   json_data = json.loads(s)
+  #net_map = json_data.net_code_map
 
   SRC_UNIT = "mm"
   if "units" in json_data:
@@ -329,7 +330,8 @@ if __name__ == "__main__":
               uc(p["deltax"]), uc(p["deltay"]), p["orientation"]
           print "Dr", uc(p["drill_diam"]), uc(p["drill_x"]), uc(p["drill_y"])
           print "At", pad_type, "N", p["layer_mask"]
-          print "Ne", p["net_number"], "\"" + str(p["net_name"]) + "\""
+          #print "Ne", p["net_number"], "\"" + str(p["net_name"]) + "\""
+          print "Ne", p["net_number"], "\"" + str(eqpot_map[int(p["net_number"])] ) + "\""
           print "Po", uc(p["posx"]), uc(p["posy"])
           print "$EndPAD"
 
