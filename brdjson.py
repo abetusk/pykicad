@@ -45,6 +45,7 @@ class brdjson(brd.brd):
     self.json_obj["units"] = "deci-thou"
     self.json_obj["element"] = []
     self.json_obj["equipot"] = []
+    self.json_obj["net_class"] = []
 
 
     self.destination_units = "deci-thou"
@@ -131,6 +132,56 @@ class brdjson(brd.brd):
 
   def cb_track_end(self, arg):
     pass
+
+
+  def cb_nclass(self, arg):
+    self.cur_net_class = {}
+
+  def cb_nclass_name(self, arg):
+    name,dummy = arg
+    name = re.sub('"', '', name)
+    self.cur_net_class["name"] = name
+
+  def cb_nclass_desc(self,arg):
+    desc,dummy = arg
+    desc = re.sub('"', '', desc)
+    self.cur_net_class["description"] = desc
+
+  def cb_nclass_clearance(self,arg):
+    sz = arg[0]
+    self.cur_net_class["clearance"] = self.decithou(float(sz))
+
+  def cb_nclass_trackwidth(self,arg):
+    tw = arg[0]
+    self.cur_net_class["track_width"] = self.decithou(float(tw))
+
+  def cb_nclass_viadia(self,arg):
+    viadia = arg[0]
+    self.cur_net_class["via_diameter"] = self.decithou(float(viadia))
+
+  def cb_nclass_viadrill(self,arg):
+    viadrill = arg[0]
+    self.cur_net_class["via_drill_diameter"] = self.decithou(float(viadrill))
+
+  def cb_nclass_uviadia(self,arg):
+    uviadia = arg[0]
+    self.cur_net_class["uvia_diameter"] = self.decithou(float(uviadia))
+
+  def cb_nclass_uviadrill(self,arg):
+    uviadrill = arg[0]
+    self.cur_net_class["uvia_drill_diameter"] = self.decithou(float(uviadrill))
+
+  def cb_nclass_addnet(self,arg):
+    net_name,dummy = arg
+    if "net" not in self.cur_net_class:
+      self.cur_net_class["net"] = []
+    self.cur_net_class["net"].append(net_name)
+
+  def cb_nclass_end(self,arg):
+    self.json_obj["net_class"].append(self.cur_net_class)
+    self.cur_net_class = {}
+    pass
+
 
 
   def cb_drawsegment(self, arg):
@@ -620,7 +671,6 @@ class brdjson(brd.brd):
 
   def cb_textpcb_end(self, arg):
     self.json_obj["element"].append( self.cur_text )
-
 
 
   def cb_endboard(self, arg):

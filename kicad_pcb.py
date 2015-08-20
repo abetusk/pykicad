@@ -26,7 +26,7 @@ class kicad_pcb_node(object):
     if name in self.children_bp:
       self.children_bp[name] = [ len(self.children) ]
     else:
-      self.children_bp[name].append( len(self.children) ]
+      self.children_bp[name].append( len(self.children) )
     self.children_name.append(name)
     self.children.append(a)
 
@@ -64,7 +64,8 @@ class kicad_pcb(sexpression.sexpression):
     print "cb_end:", args
 
 
-fn = "example/osh_heart_v2.kicad_pcb"
+
+fn = "example/example.kicad_pcb"
 
 kp = kicad_pcb()
 kp.parse_file(fn)

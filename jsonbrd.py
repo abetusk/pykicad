@@ -319,10 +319,9 @@ if __name__ == "__main__":
           x = uc(p["posx"])
           y = uc(p["posy"])
 
-          #pad_type = "SMD"
           pad_type = "STD"
-          if "type" in pad:
-            pad_type = pad["type"]
+          if "type" in p:
+            pad_type = p["type"]
 
           print "$PAD"
           print "Sh", "\"" + str(p["name"]) + "\"", p["shape_code"], uc(p["sizex"]), uc(p["sizey"]), \
