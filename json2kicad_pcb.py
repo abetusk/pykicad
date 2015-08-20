@@ -339,7 +339,6 @@ if __name__ == "__main__":
   for net_class_name in json_data["net_class"]:
 
     ele = json_data["net_class"][net_class_name]
-    print net_class_name, ele
 
     print "  (net_class " + str(ele["name"]) + " \"" + str(ele["description"]) + "\""
     for ke in ele:
