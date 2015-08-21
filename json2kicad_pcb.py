@@ -493,7 +493,11 @@ if __name__ == "__main__":
           layer_names = '"' + '" "'.join(layer_name_array) + '"'
 
           t += " (layers " + str(layer_names) + ")"
-          t += " (net " + str(pad_ele["net_number"]) + " " + str(pad_ele["net_name"]) + ")"
+          if "net_number" in pad_ele and "net_name" in pad_ele:
+            t += " (net " + str(pad_ele["net_number"]) + " " + str(pad_ele["net_name"]) + ")"
+          else:
+            t += " (net 0 \"\")"
+
           t += ")"
           print t
           pass
