@@ -368,6 +368,7 @@ if __name__ == "__main__":
       t += " (end " + str(uc(ele["x1"])) + " " + str(uc(ele["y1"])) + ")" 
       t += " (angle " + ac_r(float(ele["angle"])) + ")"
       t += " (width " + str(uc(ele["width"])) + ")"
+      t += " (layer " + str(layer_num_to_name(ele["layer"])) + ")"
       t += ")"
       print t
     elif "type" in ele and ele["type"] == "track":
@@ -425,7 +426,7 @@ if __name__ == "__main__":
       print "    (layer \"" + str(layer_name) + "\")"
       print "    (tedit 0)"
       print "    (tstamp 0)"
-      print "    (at " + str(uc(ele["x"])) + " " + str(uc(ele["y"])) + ")"
+      print "    (at " + str(uc(ele["x"])) + " " + str(uc(ele["y"])) + " " + ac_r(float(ele["angle"])) + ")"
 
       # todo:
       # * layer to text layer conversion (lookup)
@@ -506,7 +507,7 @@ if __name__ == "__main__":
           t += " " + str(pad_ele["name"])
           t += " " + PAD_TYPE_LOOKUP[str(pad_ele["type"])]
           t += " " + PAD_SHAPE_LOOKUP[str(pad_ele["shape"])]
-          t += " (at " + str(uc(pad_ele["posx"])) + " " + str(uc(pad_ele["posy"])) + ")"
+          t += " (at " + str(uc(pad_ele["posx"])) + " " + str(uc(pad_ele["posy"])) + " " + ac_r(float(pad_ele["angle"])) + ")"
           t += " (size " + str(uc(pad_ele["sizex"])) + " " + str(uc(pad_ele["sizey"])) + ")"
           t += " (drill " + str(uc(pad_ele["drill_diam"])) + ")"
 
