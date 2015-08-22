@@ -467,7 +467,28 @@ if __name__ == "__main__":
           elif "shape" in art_ele and art_ele["shape"] == "arc":
             t = "    "
             t += "(fp_arc"
-            t += " (start " + str(uc(art_ele["x"])) + " " + str(uc(art_ele["y"])) + ")"
+
+            x = float(art_ele["x"])
+            y = float(art_ele["y"])
+            #x = float(art_ele["start_x"])
+            #y = float(art_ele["start_y"])
+            a = float(art_ele["angle"])
+            sa = float(art_ele["start_angle"])
+            r = float(art_ele["r"])
+
+            sx = x
+            sy = y
+            ex = math.cos(sa)*r + x
+            ey = math.sin(sa)*r + y
+            #sx =  math.sin(sa)*r + math.cos(sa)*r
+            #sy = -math.cos(sa)*r + math.sin(sa)*r
+            #ex =  math.sin(sa+a)*r + math.cos(sa+a)*r
+            #ey = -math.cos(sa+a)*r + math.sin(sa+a)*r
+
+            #t += " (start " + str(uc(art_ele["x"])) + " " + str(uc(art_ele["y"])) + ")"
+            t += " (start " + str(uc(sx)) + " " + str(uc(sy)) + ")"
+            t += " (end "   + str(uc(ex)) + " " + str(uc(ey)) + ")"
+
             t += " (angle " + ac_r(float(art_ele["angle"])) + ")"
 
             layer_name = layer_num_to_name(art_ele["layer"])
