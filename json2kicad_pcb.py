@@ -223,15 +223,23 @@ if __name__ == "__main__":
     typ = ele["type"]
 
     if typ == "drawsegment" or typ == "track":
-      if typ == "track": brd_info["n_track"] += 1
-      if first_pass:
-        area_bounds[0][0] = float(ele["x0"])
-        area_bounds[0][1] = float(ele["y0"])
-        area_bounds[1][0] = float(ele["x0"])
-        area_bounds[1][1] = float(ele["y0"])
-      update_bounds(area_bounds, [ float(ele["x0"]), float(ele["y0"]) ] )
-      update_bounds(area_bounds, [ float(ele["x1"]), float(ele["y1"]) ] )
+
+      if ("shape" in ele) and (ele["shape"] == "arc"):
+        update_bounds(area_bounds, [ float(ele["x"]), float(ele["y"]) ] )
+      else:
+  
+        if typ == "track": brd_info["n_track"] += 1
+        if first_pass:
+          area_bounds[0][0] = float(ele["x0"])
+          area_bounds[0][1] = float(ele["y0"])
+          area_bounds[1][0] = float(ele["x0"])
+          area_bounds[1][1] = float(ele["y0"])
+  
+        update_bounds(area_bounds, [ float(ele["x0"]), float(ele["y0"]) ] )
+        update_bounds(area_bounds, [ float(ele["x1"]), float(ele["y1"]) ] )
+
       first_pass = False
+
     elif typ == "czone":
       brd_info["n_zone"]+=1
 
@@ -364,8 +372,13 @@ if __name__ == "__main__":
     if "type" in ele and ele["type"] == "drawsegment":
       t = "  "
       t += "(gr_line"
-      t += " (start " + str(uc(ele["x0"])) + " " + str(uc(ele["y0"])) + ")" 
-      t += " (end " + str(uc(ele["x1"])) + " " + str(uc(ele["y1"])) + ")" 
+
+      if ("shape" in ele) and (ele["shape"] == "arc"):
+        t += " (start " + str(uc(ele["x"])) + " " + str(uc(ele["y"])) + ")" 
+        t += " (end " + str(uc(ele["x"])) + " " + str(uc(ele["y"])) + ")" 
+      else:
+        t += " (start " + str(uc(ele["x0"])) + " " + str(uc(ele["y0"])) + ")" 
+        t += " (end " + str(uc(ele["x1"])) + " " + str(uc(ele["y1"])) + ")" 
       t += " (angle " + ac_r(float(ele["angle"])) + ")"
       t += " (width " + str(uc(ele["width"])) + ")"
       t += " (layer " + str(layer_num_to_name(ele["layer"])) + ")"
