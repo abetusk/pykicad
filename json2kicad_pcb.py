@@ -344,29 +344,30 @@ if __name__ == "__main__":
     NET_LOOKUP[int(v["net_number"])] = v["net_name"]
   print ""
 
-  for net_class_name in json_data["net_class"]:
-
-    valid_net_kw = { "clearance" : "clearance", "via_diameter":"via_dia", "via_drill_diameter": "via_drill",
-                  "uvia_diameter" : "uvia_dia", "uvia_drill_diameter" : "uvia_drill", "track_width" : "trace_width" }
-
-    ele = json_data["net_class"][net_class_name]
-
-    print "  (net_class " + str(ele["name"]) + " \"" + str(ele["description"]) + "\""
-    for ke in ele:
-      if ke not in valid_net_kw: continue
-      field = valid_net_kw[ke]
-      if type(ele[ke]) == type("") or type(ele[ke]) == unicode:
-        #print "    (" + str(ke) + " \"" + str(ele[ke]) + "\")"
-        print "    (" + str(field) + " \"" + str(ele[ke]) + "\")"
-      elif type(ele[ke]) == type(1.25) or type(ele[ke]) == type(1):
-        #print "    (" + str(ke) + " " + str(uc(ele[ke])) + ")"
-        print "    (" + str(field) + " " + str(uc(ele[ke])) + ")"
-      else:
-        #print "    (" + str(ke) + " " + str(ele[ke]) + ")"
-        print "    (" + str(field) + " " + str(ele[ke]) + ")"
-    for net in NET_LOOKUP:
-      print "    (add_net \"" + str(NET_LOOKUP[net]) + "\")"
-    print "  )"
+  if "net_class" in json_data:
+    for net_class_name in json_data["net_class"]:
+  
+      valid_net_kw = { "clearance" : "clearance", "via_diameter":"via_dia", "via_drill_diameter": "via_drill",
+                    "uvia_diameter" : "uvia_dia", "uvia_drill_diameter" : "uvia_drill", "track_width" : "trace_width" }
+  
+      ele = json_data["net_class"][net_class_name]
+  
+      print "  (net_class " + str(ele["name"]) + " \"" + str(ele["description"]) + "\""
+      for ke in ele:
+        if ke not in valid_net_kw: continue
+        field = valid_net_kw[ke]
+        if type(ele[ke]) == type("") or type(ele[ke]) == unicode:
+          #print "    (" + str(ke) + " \"" + str(ele[ke]) + "\")"
+          print "    (" + str(field) + " \"" + str(ele[ke]) + "\")"
+        elif type(ele[ke]) == type(1.25) or type(ele[ke]) == type(1):
+          #print "    (" + str(ke) + " " + str(uc(ele[ke])) + ")"
+          print "    (" + str(field) + " " + str(uc(ele[ke])) + ")"
+        else:
+          #print "    (" + str(ke) + " " + str(ele[ke]) + ")"
+          print "    (" + str(field) + " " + str(ele[ke]) + ")"
+      for net in NET_LOOKUP:
+        print "    (add_net \"" + str(NET_LOOKUP[net]) + "\")"
+      print "  )"
 
   for ele in json_data["element"]:
     if "type" in ele and ele["type"] == "drawsegment":
