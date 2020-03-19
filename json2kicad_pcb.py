@@ -264,11 +264,31 @@ if __name__ == "__main__":
       if "text" in ele:
         for txt_ele in ele["text"]:
           if first_pass:
-            area_bounds[0][0] = float(txt_ele["x"])
-            area_bounds[0][1] = float(txt_ele["y"])
-            area_bounds[1][0] = float(txt_ele["x"])
-            area_bounds[1][1] = float(txt_ele["y"])
-          update_bounds(area_bounds, [ float(txt_ele["x"]), float(txt_ele["y"]) ] )
+            x = 0
+            y = 0
+            if "x" in txt_ele:
+              x = float(txt_ele["x"])
+            if "y" in txt_ele:
+              y = float(txt_ele["y"])
+
+            area_bounds[0][0] = x
+            area_bounds[0][1] = y
+            area_bounds[1][0] = x
+            area_bounds[1][1] = y
+
+            #area_bounds[0][0] = float(txt_ele["x"])
+            #area_bounds[0][1] = float(txt_ele["y"])
+            #area_bounds[1][0] = float(txt_ele["x"])
+            #area_bounds[1][1] = float(txt_ele["y"])
+
+          x = 0
+          y = 0
+          if "x" in txt_ele:
+            x = float(txt_ele["x"])
+          if "y" in txt_ele:
+            y = float(txt_ele["y"])
+          #update_bounds(area_bounds, [ float(txt_ele["x"]), float(txt_ele["y"]) ] )
+          update_bounds(area_bounds, [ x,y ] )
           first_pass = False
       if "art" in ele:
         for art_ele in ele["art"]:
@@ -451,18 +471,42 @@ if __name__ == "__main__":
         for txt_ele in ele["text"]:
 
           fp_txt = "user"
-          if int(txt_ele["number"])<2:
-            fp_txt = FP_TEXT_LOOKUP[txt_ele["number"]]
+          ele_num = 0
+          if "number" in txt_ele:
+            ele_num = int(txt_ele["number"])
+          #if int(txt_ele["number"])<2:
+            #fp_txt = FP_TEXT_LOOKUP[txt_ele["number"]]
+          if ele_num < 2:
+            fp_txt = FP_TEXT_LOOKUP[ele_num]
           if fp_txt == "": fp_txt = "user"
 
-          print "    (fp_text " + fp_txt + " \"" + txt_ele["text"] + "\""
-          print "      (at " + str(uc(txt_ele["x"])) + " " + str(uc(txt_ele["y"])) + " " + ac_r(float(txt_ele["angle"])) + ")"
+          x = 0
+          y = 0
+          ang = 0
+          if "x" in txt_ele: x = txt_ele["x"]
+          if "y" in txt_ele: x = txt_ele["y"]
+          if "ang" in txt_ele: x = txt_ele["ang"]
 
-          layer_name = layer_num_to_name(txt_ele["layer"])
+          print "    (fp_text " + fp_txt + " \"" + txt_ele["text"] + "\""
+          #print "      (at " + str(uc(txt_ele["x"])) + " " + str(uc(txt_ele["y"])) + " " + ac_r(float(txt_ele["angle"])) + ")"
+          print "      (at " + str(uc(x)) + " " + str(uc(y)) + " " + ac_r(float(ang)) + ")"
+
+          layer_name = ""
+          if "layer" in txt_ele:
+            layer_name = layer_num_to_name(txt_ele["layer"])
+
+          sizex = "0"
+          sizey = "0"
+          penwidth = "0"
+          if "sizex" in txt_ele: sizex = txt_ele["sizex"]
+          if "sizey" in txt_ele: sizex = txt_ele["sizey"]
+          if "penWidth" in txt_ele: penwidth = txt_ele["penWidth"]
 
           print "      (layer " + str(layer_name) + ")"
-          print "      (effects (font (size " + str(uc(txt_ele["sizex"])) + " " + str(uc(txt_ele["sizey"])) + ")"
-          print "        (thickness " + str(uc(txt_ele["penwidth"])) + ")))"
+          #print "      (effects (font (size " + str(uc(txt_ele["sizex"])) + " " + str(uc(txt_ele["sizey"])) + ")"
+          #print "        (thickness " + str(uc(txt_ele["penwidth"])) + ")))"
+          print "      (effects (font (size " + str(uc(sizex)) + " " + str(uc(sizey)) + ")"
+          print "        (thickness " + str(uc(penwidth)) + ")))"
           print "    )"
 
       if "art" in ele:

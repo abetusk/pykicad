@@ -255,22 +255,46 @@ if __name__ == "__main__":
 
       text = ele["text"]
       for t in text:
-        num = t["number"]
-        x = uc(t["x"])
-        y = uc(t["y"])
+        num = 0
+        if "number" in t:
+          num = t["number"]
+        x = 0
+        y = 0
+        if "x" in t:
+          x = uc(t["x"])
+        if "y" in t:
+          y = uc(t["y"])
         #sizex = uc(t["sizex"])
         #sizey = uc(t["sizey"])
-        sizex = uc(t["sizey"])
-        sizey = uc(t["sizex"])
-        rot = t["rotation"]
-        w = uc(t["penwidth"])
-        flag = t["flag"]
+        sizex = 0
+        sizey = 0
+        if "sizex" in t:
+          sizex = uc(t["sizey"])
+        if "sizey" in t:
+          sizey = uc(t["sizex"])
+        rot = 0
+        if "rotation" in t:
+          rot = t["rotation"]
+
+        w = 0
+        if "penWidth" in t:
+          w = uc(t["penwidth"])
+        flag = ""
+        if "flag" in t:
+          flag = t["flag"]
         visible = "I"
-        if t["visible"]:
+        visible = ""
+        if ("visible" in t) and t["visible"]:
           visible = "V"
-        layer = t["layer"]
-        misc = t["misc"]
-        ele_text = t["text"]
+        layer = ""
+        if "layer" in t:
+          layer = t["layer"]
+        misc = ""
+        if "misc" in t:
+          misc = t["misc"]
+        ele_text = ""
+        if "text" in t:
+          ele_text = t["text"]
 
         #print "T" + str(num), x, y, sizex, sizey, rot, w, flag, visible, layer, misc
         print "T" + str(num), x, y, sizex, sizey, rot, w, flag, visible, layer, " N", "\"" + ele_text + "\""

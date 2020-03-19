@@ -1117,7 +1117,7 @@ class brdgerber(brdjson.brdjson):
           if shape == "polygon":      self.art_polygon(v, art)
 
         for text in v["text"]:
-          if int(text["layer"]) != self.layer: continue
+          if (text["layer"] != "N") and (int(text["layer"]) != self.layer): continue
           self.text_module(v, text)
 
       elif ele_type == "text":
