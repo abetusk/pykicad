@@ -169,6 +169,9 @@ if __name__ == "__main__":
   print "$EndSETUP"
   print 
 
+
+  if "equipot" not in json_data:
+    json_data["equipot"] = {}
   eqpot = json_data["equipot"]
 
   eqpot_map = {}
@@ -225,6 +228,8 @@ if __name__ == "__main__":
   if "brd_to_sch_net_map" in json_data:
     brd_to_sch_net_map = json_data["brd_to_sch_net_map"]
 
+  if "element" not in json_data:
+    json_data["element"] = []
   eles = json_data["element"]
   for ele in eles:
     ele_type = ele["type"]

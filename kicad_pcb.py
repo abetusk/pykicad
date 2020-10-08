@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
+
 import os
 import re
+import sys
 import sexpression
 
 class kicad_pcb_node(object):
@@ -24,9 +26,9 @@ class kicad_pcb_node(object):
 
   def add_child(self, name, a):
     if name in self.children_bp:
-      self.children_bp[name] = [ len(self.children) ]
-    else:
       self.children_bp[name].append( len(self.children) )
+    else:
+      self.children_bp[name] = [ len(self.children) ]
     self.children_name.append(name)
     self.children.append(a)
 
@@ -64,10 +66,10 @@ class kicad_pcb(sexpression.sexpression):
     print "cb_end:", args
 
 
-
-fn = "example/example.kicad_pcb"
-
-kp = kicad_pcb()
-kp.parse_file(fn)
-
+if __name__ == "__main__":
+  if (len(sys.argv) < 2):
+    print "provide kicad_pcb file"
+    sys.exit(-1)
+  s = kicad_pcb()
+  s.parse_file(sys.argv[1])
 
