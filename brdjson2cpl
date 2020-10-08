@@ -31,7 +31,6 @@ def generate_cpl(brdjson, jsonfilter = {"type": "module", "layer":"15", "padtype
 
   layer_code = { "15":"Top", "0":"Bottom" }
 
-
   eles = brdjson["element"]
   for ele in eles:
 
