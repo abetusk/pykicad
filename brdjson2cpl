@@ -1,0 +1,97 @@
+#!/usr/bin/python3
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import re, sys, os, math, numpy
+import json
+
+def _u(f, src_unit = "deci-mil", dst_unit = "mm"):
+  conv = 1.0
+  if (src_unit == "deci-mil") and (dst_unit == "mm"):
+    conv = 25.4 / 10000.0
+  return "{0:.8f}".format(float(f)*conv)
+
+
+
+def generate_cpl(brdjson, jsonfilter = {"type": "module", "layer":"15", "padtype": "SMD" } ):
+
+  yflip = -1.0
+
+  layer_code = { "15":"Top", "0":"Bottom" }
+
+
+  eles = brdjson["element"]
+  for ele in eles:
+
+    ele_x = 0.0
+    ele_y = 0.0
+    if "x" in ele: ele_x = float(ele["x"])
+    if "y" in ele: ele_y = yflip*float(ele["y"])
+
+    if not ("type" in ele): continue
+    if ele["type"] == jsonfilter["type"]:
+      if ("layer" in ele) and (ele["layer"] != jsonfilter["layer"]): continue
+      #if ("text" in ele) and (len(ele["text"]) > 0) and ("text" in ele["text"][0]):
+      #  if ele["text"][0]["text"] != "aC0": continue
+      #else: continue
+      if not ("pad" in ele): continue
+
+      is_smd = False
+
+      n = 0.0
+      com = [0.0, 0.0]
+      for pad in ele["pad"]:
+        com[0] += float(pad["posx"])
+        com[1] += yflip*float(pad["posy"])
+        n += 1.0
+        if ("type" in pad) and (pad["type"] == "SMD"): is_smd = True
+      if n > 0.0:
+        com[0] /= n
+        com[1] /= n
+      com[0] += ele_x
+      com[1] += ele_y
+
+      if not is_smd: continue
+
+      rot = 0
+      if "orientation" in ele:
+        _r = float(ele["orientation"])
+        if _r < 0: _r += 3600.0
+        rot = int(_r/10.0)
+
+      #print(json.dumps(ele))
+      print( str(ele["text"][0]["text"]) + "," + _u(ele_x) + "mm," + _u(ele_y) + "mm," + layer_code[ele["layer"]] + "," + str(rot))
+      #print("\n\n")
+
+
+
+
+if __name__ == "__main__":
+  ifn = None
+  ofn = None
+
+  ifn = sys.argv[1]
+
+  brdjson = {}
+  with open(ifn) as fp:
+    brdjson = json.loads(fp.read())
+  
+  #print(brdjson)
+  cpl = generate_cpl(brdjson)
+
+
+  #print(cpl2csv(cpl))
+
+
