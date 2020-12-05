@@ -19,6 +19,9 @@ Loads KiCAD brd file (pcb(new?) file), parses it with brd.py, writes to gerber f
 
 VERSION="( brdgerber.py v0.1 2014-03-12 )"
 
+DEFAULT_FONT_FILE = "./aux/hershey_ascii.json"
+
+
 # TODO: 
 #  - contours and regions (somewhat done, needs to be more inteligent about how it splits
 #       up regions so nasty strands don't leave trails)
@@ -146,7 +149,8 @@ class brdgerber(brdjson.brdjson):
     self.netcodeMap = { "0" : "Default" }
 
 
-    self.font_file = "./aux/hershey_ascii.json"
+    #self.font_file = "./aux/hershey_ascii.json"
+    self.font_file = DEFAULT_FONT_FILE
     if fontFile is not None:
       self.font_file = fontFile
 
@@ -479,12 +483,18 @@ class brdgerber(brdjson.brdjson):
             art["starty"] = -float(art["starty"])
             art["endy"] = -float(art["endy"])
 
-          if (shape == "circle") or (shape == "arc") or (shape == "polygon"):
+          if (shape == "circle") or (shape == "arc"):
             art["y"] = -float(art["y"])
 
             if shape == "arc":
               art["start_angle"] = -float(art["start_angle"])
               art["angle"] = -float(art["angle"])
+
+          if shape == "polygon":
+            art["y"] = -float(art["y"])
+            for idx in range(len(art["points"])):
+              art["points"][idx]["y"] = -float(art["points"][idx]["y"])
+
 
           if (shape == "segment") or (shape == "circle") or (shape == "arc") or (shape == "polygon"):
             if "line_width" in art:
@@ -1495,7 +1505,7 @@ def usage(fp):
   fp.write("  -i brd        legacy KiCad board file\n")
   fp.write("  -I jsonbrd    JSON board file\n")
   fp.write("  -o outfn      output filename\n")
-  fp.write("  -F            font file (default " + 'x' + ")\n")
+  fp.write("  -F fontfile   font file (default " + DEFAULT_FONT_FILE + ")\n")
   fp.write("  -L layernum   render layer <layernum> (default " + '0' + ")\n")
   fp.write("  -P            pad only\n")
   fp.write("  -h            help\n")
