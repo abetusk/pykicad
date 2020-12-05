@@ -226,770 +226,770 @@ class brd(object):
 
   def cb_header(self, arg):
     if self.parrot_flag:
-      print "cb_header",arg
+      print("cb_header",arg)
     pass
 
 
   def cb_general(self, arg):
     if self.parrot_flag:
-      print "cb_general",arg
+      print("cb_general",arg)
     pass
 
   def cb_general_encoding(self, arg):
     if self.parrot_flag:
-      print "cb_general_encoding",arg
+      print("cb_general_encoding",arg)
     pass
 
   def cb_general_units(self, arg):
     if self.parrot_flag:
-      print "cb_general_units",arg
+      print("cb_general_units",arg)
     pass
 
   def cb_general_layercount(self, arg):
     if self.parrot_flag:
-      print "cb_general_layercount",arg
+      print("cb_general_layercount",arg)
     pass
 
   def cb_general_ly(self, arg):
     if self.parrot_flag:
-      print "cb_general_ly",arg
+      print("cb_general_ly",arg)
     pass
 
   def cb_general_enabledlayers(self, arg):
     if self.parrot_flag:
-      print "cb_general_enabledlayers",arg
+      print("cb_general_enabledlayers",arg)
     pass
 
   def cb_general_links(self, arg):
     if self.parrot_flag:
-      print "cb_general_links",arg
+      print("cb_general_links",arg)
     pass
 
   def cb_general_noconn(self, arg):
     if self.parrot_flag:
-      print "cb_general_noconn",arg
+      print("cb_general_noconn",arg)
     pass
 
   def cb_general_di(self, arg):
     if self.parrot_flag:
-      print "cb_general_di",arg
+      print("cb_general_di",arg)
     pass
 
   def cb_general_ndraw(self, arg):
     if self.parrot_flag:
-      print "cb_general_ndraw",arg
+      print("cb_general_ndraw",arg)
     pass
 
   def cb_general_ntrack(self, arg):
     if self.parrot_flag:
-      print "cb_general_ntrack",arg
+      print("cb_general_ntrack",arg)
     pass
 
   def cb_general_nzone(self, arg):
     if self.parrot_flag:
-      print "cb_general_nzone",arg
+      print("cb_general_nzone",arg)
     pass
 
   def cb_general_nmodule(self, arg):
     if self.parrot_flag:
-      print "cb_general_nmodule",arg
+      print("cb_general_nmodule",arg)
     pass
 
 
   def cb_general_boardthickness(self, arg):
     if self.parrot_flag:
-      print "cb_general_boardthickness",arg
+      print("cb_general_boardthickness",arg)
     pass
 
   def cb_general_nnets(self, arg):
     if self.parrot_flag:
-      print "cb_general_nnets",arg
+      print("cb_general_nnets",arg)
     pass
 
   def cb_general_end(self, arg):
     if self.parrot_flag:
-      print "cb_general_end",arg
+      print("cb_general_end",arg)
     pass
 
 
   def cb_sheetdescr(self, arg):
     if self.parrot_flag:
-      print "cb_sheetdescr",arg
+      print("cb_sheetdescr",arg)
     pass
 
   def cb_sheetdescr_sheet(self, arg):
     if self.parrot_flag:
-      print "cb_sheetdescr_sheet",arg
+      print("cb_sheetdescr_sheet",arg)
     pass
 
   def cb_sheetdescr_title(self, arg):
     if self.parrot_flag:
-      print "cb_sheetdescr_title",arg
+      print("cb_sheetdescr_title",arg)
     pass
 
   def cb_sheetdescr_date(self, arg):
     if self.parrot_flag:
-      print "cb_sheetdescr_date",arg
+      print("cb_sheetdescr_date",arg)
     pass
 
   def cb_sheetdescr_rev(self, arg):
     if self.parrot_flag:
-      print "cb_sheetdescr_rev",arg
+      print("cb_sheetdescr_rev",arg)
     pass
 
   def cb_sheetdescr_comp(self, arg):
     if self.parrot_flag:
-      print "cb_sheetdescr_comp",arg
+      print("cb_sheetdescr_comp",arg)
     pass
 
   def cb_sheetdescr_commentN(self, arg):
     if self.parrot_flag:
-      print "cb_sheetdescr_commentN",arg
+      print("cb_sheetdescr_commentN",arg)
     pass
 
   def cb_sheetdescr_end(self, arg):
     if self.parrot_flag:
-      print "cb_sheetdescr_end",arg
+      print("cb_sheetdescr_end",arg)
     pass
 
 
   def cb_setup(self, arg):
     if self.parrot_flag:
-      print "cb_setup",arg
+      print("cb_setup",arg)
     pass
 
   def cb_setup_internalunit(self, arg):
     if self.parrot_flag:
-      print "cb_setup_internalunit",arg
+      print("cb_setup_internalunit",arg)
     pass
 
   def cb_setup_layers(self, arg):
     if self.parrot_flag:
-      print "cb_setup_layers",arg
+      print("cb_setup_layers",arg)
     pass
 
   def cb_setup_layerN(self, arg):
     if self.parrot_flag:
-      print "cb_setup_layerN",arg
+      print("cb_setup_layerN",arg)
     pass
 
   def cb_setup_trackwidth(self, arg):
     if self.parrot_flag:
-      print "cb_setup_trackwidth",arg
+      print("cb_setup_trackwidth",arg)
     pass
 
   def cb_setup_trackclearence(self, arg):
     if self.parrot_flag:
-      print "cb_setup_trackclearence",arg
+      print("cb_setup_trackclearence",arg)
     pass
 
   def cb_setup_zoneclearence(self, arg):
     if self.parrot_flag:
-      print "cb_setup_zoneclearence",arg
+      print("cb_setup_zoneclearence",arg)
     pass
 
   def cb_setup_zone45only(self, arg):
     if self.parrot_flag:
-      print "cb_setup_zone45only",arg
+      print("cb_setup_zone45only",arg)
     pass
 
   def cb_setup_trackminwidth(self, arg):
     if self.parrot_flag:
-      print "cb_setup_trackminwidth",arg
+      print("cb_setup_trackminwidth",arg)
     pass
 
   def cb_setup_drawsegmwidth(self, arg):
     if self.parrot_flag:
-      print "cb_setup_drawsegmwidth",arg
+      print("cb_setup_drawsegmwidth",arg)
     pass
 
   def cb_setup_edgesegmwidth(self, arg):
     if self.parrot_flag:
-      print "cb_setup_edgesegmwidth",arg
+      print("cb_setup_edgesegmwidth",arg)
     pass
 
   def cb_setup_viasize(self, arg):
     if self.parrot_flag:
-      print "cb_setup_viasize",arg
+      print("cb_setup_viasize",arg)
     pass
 
   def cb_setup_viadrill(self, arg):
     if self.parrot_flag:
-      print "cb_setup_viadrill",arg
+      print("cb_setup_viadrill",arg)
     pass
 
   def cb_setup_viaminsize(self, arg):
     if self.parrot_flag:
-      print "cb_setup_viaminsize",arg
+      print("cb_setup_viaminsize",arg)
     pass
 
   def cb_setup_viamindrill(self, arg):
     if self.parrot_flag:
-      print "cb_setup_viamindrill",arg
+      print("cb_setup_viamindrill",arg)
     pass
 
   def cb_setup_microviasize(self, arg):
     if self.parrot_flag:
-      print "cb_setup_microviasize",arg
+      print("cb_setup_microviasize",arg)
     pass
 
   def cb_setup_microviadrill(self, arg):
     if self.parrot_flag:
-      print "cb_setup_microviadrill",arg
+      print("cb_setup_microviadrill",arg)
     pass
 
   def cb_setup_microviasallowed(self, arg):
     if self.parrot_flag:
-      print "cb_setup_microviasallowed",arg
+      print("cb_setup_microviasallowed",arg)
     pass
 
   def cb_setup_microviaminsize(self, arg):
     if self.parrot_flag:
-      print "cb_setup_microviaminsize",arg
+      print("cb_setup_microviaminsize",arg)
     pass
 
   def cb_setup_microviamindrill(self, arg):
     if self.parrot_flag:
-      print "cb_setup_microviamindrill",arg
+      print("cb_setup_microviamindrill",arg)
     pass
 
   def cb_setup_textpcbwidth(self, arg):
     if self.parrot_flag:
-      print "cb_setup_textpcbwidth",arg
+      print("cb_setup_textpcbwidth",arg)
     pass
 
   def cb_setup_textpcbsize(self, arg):
     if self.parrot_flag:
-      print "cb_setup_textpcbsize",arg
+      print("cb_setup_textpcbsize",arg)
     pass
 
   def cb_setup_edgemodwidth(self, arg):
     if self.parrot_flag:
-      print "cb_setup_edgemodwidth",arg
+      print("cb_setup_edgemodwidth",arg)
     pass
 
   def cb_setup_textmodsize(self, arg):
     if self.parrot_flag:
-      print "cb_setup_textmodsize",arg
+      print("cb_setup_textmodsize",arg)
     pass
 
   def cb_setup_textmodwidth(self, arg):
     if self.parrot_flag:
-      print "cb_setup_textmodwidth",arg
+      print("cb_setup_textmodwidth",arg)
     pass
 
   def cb_setup_padsize(self, arg):
     if self.parrot_flag:
-      print "cb_setup_padsize",arg
+      print("cb_setup_padsize",arg)
     pass
 
   def cb_setup_paddrill(self, arg):
     if self.parrot_flag:
-      print "cb_setup_paddrill",arg
+      print("cb_setup_paddrill",arg)
     pass
 
   def cb_setup_pad2maskclearance(self, arg):
     if self.parrot_flag:
-      print "cb_setup_pad2maskclearance",arg
+      print("cb_setup_pad2maskclearance",arg)
     pass
 
   def cb_setup_soldermaskminwidth(self, arg):
     if self.parrot_flag:
-      print "cb_setup_soldermaskminwidth",arg
+      print("cb_setup_soldermaskminwidth",arg)
     pass
 
   def cb_setup_visibleelements(self, arg):
     if self.parrot_flag:
-      print "cb_setup_visibleelements",arg
+      print("cb_setup_visibleelements",arg)
     pass
 
   def cb_setup_auxiliaryaxisorg(self, arg):
     if self.parrot_flag:
-      print "cb_setup_auxiliaryaxisorg",arg
+      print("cb_setup_auxiliaryaxisorg",arg)
     pass
 
   def cb_setup_pcbplotparams(self, arg):
     if self.parrot_flag:
-      print "cb_setup_pcbplotparams",arg
+      print("cb_setup_pcbplotparams",arg)
     pass
 
   def cb_setup_end(self, arg):
     if self.parrot_flag:
-      print "cb_setup_end",arg
+      print("cb_setup_end",arg)
     pass
 
 
   def cb_equipot(self, arg):
     if self.parrot_flag:
-      print "cb_equipot",arg
+      print("cb_equipot",arg)
     pass
 
   def cb_equipot_na(self, arg):
     if self.parrot_flag:
-      print "cb_equipot_na",arg
+      print("cb_equipot_na",arg)
     pass
 
   def cb_equipot_st(self, arg):
     if self.parrot_flag:
-      print "cb_equipot_st",arg
+      print("cb_equipot_st",arg)
     pass
 
   def cb_equipot_end(self, arg):
     if self.parrot_flag:
-      print "cb_equipot_end",arg
+      print("cb_equipot_end",arg)
     pass
 
 
   def cb_nclass(self, arg):
     if self.parrot_flag:
-      print "cb_nclass",arg
+      print("cb_nclass",arg)
     pass
 
   def cb_nclass_name(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_name",arg
+      print("cb_nclass_name",arg)
     pass
 
   def cb_nclass_desc(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_desc",arg
+      print("cb_nclass_desc",arg)
     pass
 
   def cb_nclass_clearance(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_clearance",arg
+      print("cb_nclass_clearance",arg)
     pass
 
   def cb_nclass_trackwidth(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_trackwidth",arg
+      print("cb_nclass_trackwidth",arg)
     pass
 
   def cb_nclass_viadia(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_viadia",arg
+      print("cb_nclass_viadia",arg)
     pass
 
   def cb_nclass_viadrill(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_viadrill",arg
+      print("cb_nclass_viadrill",arg)
     pass
 
   def cb_nclass_uviadia(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_uviadia",arg
+      print("cb_nclass_uviadia",arg)
     pass
 
   def cb_nclass_uviadrill(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_uviadrill",arg
+      print("cb_nclass_uviadrill",arg)
     pass
 
   def cb_nclass_addnet(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_addnet",arg
+      print("cb_nclass_addnet",arg)
     pass
 
   def cb_nclass_end(self, arg):
     if self.parrot_flag:
-      print "cb_nclass_end",arg
+      print("cb_nclass_end",arg)
     pass
 
 
   def cb_MODULE(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE",arg
+      print("cb_MODULE",arg)
     pass
 
   def cb_MODULE_Po(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_Po",arg
+      print("cb_MODULE_Po",arg)
     pass
 
   def cb_MODULE_Li(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_Li",arg
+      print("cb_MODULE_Li",arg)
     pass
 
   def cb_MODULE_Sc(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_Sc",arg
+      print("cb_MODULE_Sc",arg)
     pass
 
   def cb_MODULE_AR(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_AR",arg
+      print("cb_MODULE_AR",arg)
     pass
 
   def cb_MODULE_Op(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_Op",arg
+      print("cb_MODULE_Op",arg)
     pass
 
   def cb_MODULE_Tn(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_Tn",arg
+      print("cb_MODULE_Tn",arg)
     pass
 
   def cb_MODULE_Cd(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_Cd",arg
+      print("cb_MODULE_Cd",arg)
     pass
 
   def cb_MODULE_Kw(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_Kw",arg
+      print("cb_MODULE_Kw",arg)
     pass
 
   def cb_MODULE_At(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_At",arg
+      print("cb_MODULE_At",arg)
     pass
 
   def cb_MODULE_DS(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_DS",arg
+      print("cb_MODULE_DS",arg)
     pass
 
   def cb_MODULE_DC(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_DC",arg
+      print("cb_MODULE_DC",arg)
     pass
 
   def cb_MODULE_DA(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_DA",arg
+      print("cb_MODULE_DA",arg)
     pass
 
   def cb_MODULE_DP(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_DP",arg
+      print("cb_MODULE_DP",arg)
     pass
 
   def cb_MODULE_DI(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_DI",arg
+      print("cb_MODULE_DI",arg)
     pass
 
   def cb_MODULE_SolderMask(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_SolderMask",arg
+      print("cb_MODULE_SolderMask",arg)
     pass
 
   def cb_MODULE_SolderPaste(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_SolderPaste",arg
+      print("cb_MODULE_SolderPaste",arg)
     pass
 
   def cb_MODULE_SolderPasteRatio(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_SolderPasteRatio",arg
+      print("cb_MODULE_SolderPasteRatio",arg)
     pass
 
   def cb_MODULE_end(self, arg):
     if self.parrot_flag:
-      print "cb_MODULE_end",arg
+      print("cb_MODULE_end",arg)
     pass
 
 
   def cb_SHAPE3D(self, arg):
     if self.parrot_flag:
-      print "cb_SHAPE3D",arg
+      print("cb_SHAPE3D",arg)
     pass
 
   def cb_SHAPE3D_Na(self, arg):
     if self.parrot_flag:
-      print "cb_SHAPE3D_Na",arg
+      print("cb_SHAPE3D_Na",arg)
     pass
 
   def cb_SHAPE3D_Sc(self, arg):
     if self.parrot_flag:
-      print "cb_SHAPE3D_Sc",arg
+      print("cb_SHAPE3D_Sc",arg)
     pass
 
   def cb_SHAPE3D_Of(self, arg):
     if self.parrot_flag:
-      print "cb_SHAPE3D_Of",arg
+      print("cb_SHAPE3D_Of",arg)
     pass
 
   def cb_SHAPE3D_Ro(self, arg):
     if self.parrot_flag:
-      print "cb_SHAPE3D_Ro",arg
+      print("cb_SHAPE3D_Ro",arg)
     pass
 
   def cb_SHAPE3D_end(self, arg):
     if self.parrot_flag:
-      print "cb_SHAPE3D_end",arg
+      print("cb_SHAPE3D_end",arg)
     pass
 
 
   def cb_PAD(self, arg):
     if self.parrot_flag:
-      print "cb_PAD",arg
+      print("cb_PAD",arg)
     pass
 
   def cb_PAD_Sh(self, arg):
     if self.parrot_flag:
-      print "cb_PAD_Sh",arg
+      print("cb_PAD_Sh",arg)
     pass
 
   def cb_PAD_Dr(self, arg):
     if self.parrot_flag:
-      print "cb_PAD_Dr",arg
+      print("cb_PAD_Dr",arg)
     pass
 
   def cb_PAD_At(self, arg):
     if self.parrot_flag:
-      print "cb_PAD_At",arg
+      print("cb_PAD_At",arg)
     pass
 
   def cb_PAD_Ne(self, arg):
     if self.parrot_flag:
-      print "cb_PAD_Ne",arg
+      print("cb_PAD_Ne",arg)
     pass
 
   def cb_PAD_Po(self, arg):
     if self.parrot_flag:
-      print "cb_PAD_Po",arg
+      print("cb_PAD_Po",arg)
     pass
 
   def cb_PAD_SolderMask(self, arg):
     if self.parrot_flag:
-      print "cb_PAD_SolderMask",arg
+      print("cb_PAD_SolderMask",arg)
     pass
 
   def cb_PAD_end(self, arg):
     if self.parrot_flag:
-      print "cb_PAD_end",arg
+      print("cb_PAD_end",arg)
     pass
 
 
   def cb_drawsegment(self, arg):
     if self.parrot_flag:
-      print "cb_drawsegment",arg
+      print("cb_drawsegment",arg)
     pass
 
   def cb_drawsegment_po(self, arg):
     if self.parrot_flag:
-      print "cb_drawsegment_po",arg
+      print("cb_drawsegment_po",arg)
     pass
 
   def cb_drawsegment_de(self, arg):
     if self.parrot_flag:
-      print "cb_drawsegment_de",arg
+      print("cb_drawsegment_de",arg)
     pass
 
   def cb_drawsegment_end(self, arg):
     if self.parrot_flag:
-      print "cb_drawsegment_end",arg
+      print("cb_drawsegment_end",arg)
     pass
 
 
   def cb_textpcb(self, arg):
     if self.parrot_flag:
-      print "cb_textpcb",arg
+      print("cb_textpcb",arg)
     pass
 
   def cb_textpcb_te(self, arg):
     if self.parrot_flag:
-      print "cb_textpcb_te",arg
+      print("cb_textpcb_te",arg)
     pass
 
   def cb_textpcb_nl(self, arg):
     if self.parrot_flag:
-      print "cb_textpcb_nl",arg
+      print("cb_textpcb_nl",arg)
     pass
 
   def cb_textpcb_po(self, arg):
     if self.parrot_flag:
-      print "cb_textpcb_po",arg
+      print("cb_textpcb_po",arg)
     pass
 
   def cb_textpcb_de(self, arg):
     if self.parrot_flag:
-      print "cb_textpcb_de",arg
+      print("cb_textpcb_de",arg)
     pass
 
   def cb_textpcb_end(self, arg):
     if self.parrot_flag:
-      print "cb_textpcb_end",arg
+      print("cb_textpcb_end",arg)
     pass
 
 
   def cb_mirepcb(self, arg):
     if self.parrot_flag:
-      print "cb_mirepcb",arg
+      print("cb_mirepcb",arg)
     pass
 
   def cb_mirepcb_po(self, arg):
     if self.parrot_flag:
-      print "cb_mirepcb_po",arg
+      print("cb_mirepcb_po",arg)
     pass
 
   def cb_mirepcb_end(self, arg):
     if self.parrot_flag:
-      print "cb_mirepcb_end",arg
+      print("cb_mirepcb_end",arg)
     pass
 
 
   def cb_cotation(self, arg):
     if self.parrot_flag:
-      print "cb_cotation",arg
+      print("cb_cotation",arg)
     pass
 
   def cb_cotation_ge(self, arg):
     if self.parrot_flag:
-      print "cb_cotation_ge",arg
+      print("cb_cotation_ge",arg)
     pass
 
   def cb_cotation_te(self, arg):
     if self.parrot_flag:
-      print "cb_cotation_te",arg
+      print("cb_cotation_te",arg)
     pass
 
   def cb_cotation_po(self, arg):
     if self.parrot_flag:
-      print "cb_cotation_po",arg
+      print("cb_cotation_po",arg)
     pass
 
   def cb_cotation_sb(self, arg):
     if self.parrot_flag:
-      print "cb_cotation_sb",arg
+      print("cb_cotation_sb",arg)
     pass
 
   def cb_cotation_sd(self, arg):
     if self.parrot_flag:
-      print "cb_cotation_sd",arg
+      print("cb_cotation_sd",arg)
     pass
 
   def cb_cotation_sg(self, arg):
     if self.parrot_flag:
-      print "cb_cotation_sg",arg
+      print("cb_cotation_sg",arg)
     pass
 
   def cb_cotation_sN(self, arg):
     if self.parrot_flag:
-      print "cb_cotation_sN",arg
+      print("cb_cotation_sN",arg)
     pass
 
   def cb_cotation_end(self, arg):
     if self.parrot_flag:
-      print "cb_cotation_end",arg
+      print("cb_cotation_end",arg)
     pass
 
 
   def cb_track(self, arg):
     if self.parrot_flag:
-      print "cb_track",arg
+      print("cb_track",arg)
     pass
 
   def cb_track_po(self, arg):
     if self.parrot_flag:
-      print "cb_track_po",arg
+      print("cb_track_po",arg)
     pass
 
   def cb_track_de(self, arg):
     if self.parrot_flag:
-      print "cb_track_de",arg
+      print("cb_track_de",arg)
     pass
 
   def cb_track_end(self, arg):
     if self.parrot_flag:
-      print "cb_track_end",arg
+      print("cb_track_end",arg)
     pass
 
 
   def cb_zone(self, arg):
     if self.parrot_flag:
-      print "cb_zone",arg
+      print("cb_zone",arg)
     pass
 
   def cb_zone_po(self, arg):
     if self.parrot_flag:
-      print "cb_zone_po",arg
+      print("cb_zone_po",arg)
     pass
 
   def cb_zone_de(self, arg):
     if self.parrot_flag:
-      print "cb_zone_de",arg
+      print("cb_zone_de",arg)
     pass
 
   def cb_zone_end(self, arg):
     if self.parrot_flag:
-      print "cb_zone_end",arg
+      print("cb_zone_end",arg)
     pass
 
 
   def cb_czone(self, arg):
     if self.parrot_flag:
-      print "cb_czone",arg
+      print("cb_czone",arg)
     pass
 
   def cb_czone_zinfo(self, arg):
     if self.parrot_flag:
-      print "cb_czone_zinfo",arg
+      print("cb_czone_zinfo",arg)
     pass
 
   def cb_czone_zlayer(self, arg):
     if self.parrot_flag:
-      print "cb_czone_zlayer",arg
+      print("cb_czone_zlayer",arg)
     pass
 
   def cb_czone_zaux(self, arg):
     if self.parrot_flag:
-      print "cb_czone_zaux",arg
+      print("cb_czone_zaux",arg)
     pass
 
   def cb_czone_clearance(self, arg):
     if self.parrot_flag:
-      print "cb_czone_clearance",arg
+      print("cb_czone_clearance",arg)
     pass
 
   def cb_czone_zminthickness(self, arg):
     if self.parrot_flag:
-      print "cb_czone_zminthickness",arg
+      print("cb_czone_zminthickness",arg)
     pass
 
   def cb_czone_zoptions(self, arg):
     if self.parrot_flag:
-      print "cb_czone_zoptions",arg
+      print("cb_czone_zoptions",arg)
     pass
 
   def cb_czone_zcorner(self, arg):
     if self.parrot_flag:
-      print "cb_czone_zcorner",arg
+      print("cb_czone_zcorner",arg)
     pass
 
   def cb_czone_zsmoothing(self, arg):
     if self.parrot_flag:
-      print "cb_czone_zsmoothing",arg
+      print("cb_czone_zsmoothing",arg)
     pass
 
   def cb_czone_end(self, arg):
     if self.parrot_flag:
-      print "cb_czone_end",arg
+      print("cb_czone_end",arg)
     pass
 
 
   def cb_polyscorners(self, arg):
     if self.parrot_flag:
-      print "cb_polyscorners",arg
+      print("cb_polyscorners",arg)
     pass
 
   def cb_polyscorners_corner(self, arg):
     if self.parrot_flag:
-      print "cb_polyscorners_corner",arg
+      print("cb_polyscorners_corner",arg)
     pass
 
   def cb_polyscorners_end(self, arg):
     if self.parrot_flag:
-      print "cb_polyscorners_end",arg
+      print("cb_polyscorners_end",arg)
     pass
 
 
   def cb_endboard(self, arg):
     if self.parrot_flag:
-      print "cb_endboard",arg
+      print("cb_endboard",arg)
     pass
 
 
@@ -1384,18 +1384,18 @@ class brd(object):
     }
 
   def debug(self):
-    print "op_descr:"
+    print("op_descr:")
     for op in self.op_descr:
-      print op, self.op_descr[op]
+      print(op, self.op_descr[op])
 
-    print "\nop_state_transition:"
+    print("\nop_state_transition:")
     for s in self.op_state_transition:
       for op  in self.op_state_transition[s]:
-        print "state:", s, " op:", op, " transition:", self.op_state_transition[s][op]
+        print("state:", s, " op:", op, " transition:", self.op_state_transition[s][op])
 
-    print "\nop_re:"
+    print("\nop_re:")
     for op in self.op_re:
-      print "op:", op, "op_re:", self.op_re[op]
+      print("op:", op, "op_re:", self.op_re[op])
 
 
   def read_brd(self, fn):
@@ -1451,7 +1451,7 @@ class brd(object):
 
 if __name__ == "__main__":
   if (len(sys.argv) < 2):
-    print "provide board file"
+    print("provide board file")
     sys.exit(0)
   s = brd()
   s.parrot_flag = True

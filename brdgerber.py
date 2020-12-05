@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -68,7 +68,11 @@ import lib
 import math
 import numpy
 import cgi
-import urllib
+
+try:
+  from urllib  import quote
+except ImportError:
+  from urllib.parse import quote
 
 import datetime
 import time
@@ -81,12 +85,11 @@ import pygerber
 
 import math
 import numpy as np
-import json
 
 import uuid
 import subprocess as sp
 
-import argparse
+import getopt
 
 HOME = "/home/meow"
 if "HOME" in os.environ:
@@ -199,7 +202,7 @@ class brdgerber(brdjson.brdjson):
 
 
   def dump_json(self):
-    print json.dumps( self.json_obj, indent=2 )
+    print(json.dumps( self.json_obj, indent=2 ))
 
 
   def weaklysimple( self, pnts ):
@@ -484,7 +487,13 @@ class brdgerber(brdjson.brdjson):
               art["angle"] = -float(art["angle"])
 
           if (shape == "segment") or (shape == "circle") or (shape == "arc") or (shape == "polygon"):
-            d = self.toUnit( art["line_width"] )
+            if "line_width" in art:
+              d = self.toUnit( art["line_width"] )
+            elif "width" in art:
+              d = self.toUnit( art["width"] )
+            else:
+              d=0
+
             key = "circle:" + "{0:011.5f}".format(d) 
             if key not in aperture_set:
               aperture_set[key] = { "type" : "circle", "d" : d, "aperture_name" : self.genApertureName() }
@@ -603,11 +612,11 @@ class brdgerber(brdjson.brdjson):
       self.grb.lineTo( v[0,0] + mod_x, v[0,1] + mod_y )
 
     else:
-      print "# WARNING, no aperture for pad_oblong:", pad
+      print("# WARNING, no aperture for pad_oblong:", pad)
 
 
   def pad_trapeze(self, mod, pad):
-    print "# WARNIGN: pad_trapeze not implemented"
+    print("# WARNIGN: pad_trapeze not implemented")
 
 
   def track_line(self, track):
@@ -626,7 +635,7 @@ class brdgerber(brdjson.brdjson):
       self.grb.moveTo( x0, y0 )
       self.grb.lineTo( x1, y1 )
     else:
-      print "# WARNING: no aperture for track: ", track
+      print("# WARNING: no aperture for track: ", track)
 
 
   def drawsegment_line(self, segment):
@@ -645,7 +654,7 @@ class brdgerber(brdjson.brdjson):
       self.grb.moveTo( x0, y0 )
       self.grb.lineTo( x1, y1 )
     else:
-      print "# WARNING: no aperture for segment: ", segment
+      print("# WARNING: no aperture for segment: ", segment)
 
   def drawsegment_circle(self, segment):
     x = self.toUnit( segment["x"] )
@@ -729,7 +738,7 @@ class brdgerber(brdjson.brdjson):
       self.grb.apertureSet( ap["aperture_name"] )
       self.grb.flash( x0, y0 )
     else:
-      print "# WARNING: no aperture for via: ", via
+      print("# WARNING: no aperture for via: ", via)
 
 
   def art_segment(self, mod, art):
@@ -760,7 +769,7 @@ class brdgerber(brdjson.brdjson):
       self.grb.moveTo( x0, y0 )
       self.grb.lineTo( x1, y1 )
     else:
-      print "# WARNING: no aperture for art_segment: ", art
+      print("# WARNING: no aperture for art_segment: ", art)
 
 
   def art_circle(self, mod, art):
@@ -790,7 +799,7 @@ class brdgerber(brdjson.brdjson):
 
       #self.grb.arcTo(x + r, y, -r, 0  )
     else:
-      print "# WARNING: no aperture for art_circle: ", art
+      print("# WARNING: no aperture for art_circle: ", art)
 
 
   # We should come back and review all of our angle assumptions
@@ -840,11 +849,48 @@ class brdgerber(brdjson.brdjson):
 
 
     else:
-      print "# WARNING: no aperture for art_circle: ", art
+      print("# WARNING: no aperture for art_circle: ", art)
 
 
+  ## I'm not sure if the polygon is positions correctly and whether it's flipped or not
+  ##
   def art_polygon(self, mod, art):
-    pass
+
+    mod_x = self.toUnit( mod["x"] )
+    mod_y = self.toUnit( mod["y"] )
+    mod_a = float( mod["angle"] )
+
+    cx = self.toUnit( art["x"] )
+    cy = self.toUnit( art["y"] )
+
+    u = self._rot( mod_a, [ cx, cy ] )
+
+    x0 = u[0,0] + mod_x
+    y0 = u[0,1] + mod_y
+
+    first = True
+    points = art["points"]
+    for pnt in points:
+
+      x = self.toUnit( pnt["x"] )
+      y = self.toUnit( pnt["y"] )
+
+      if first:
+        self.grb.regionStart()
+        self.grb.moveTo( x0 + x, y0 + y )
+        first = False
+
+      else:
+        self.grb.lineTo( x0 + x, y0 + y )
+
+    if not first:
+      x = self.toUnit( points[0]["x"] )
+      y = self.toUnit( points[0]["y"] )
+
+      self.grb.lineTo( x0 + x, y0 + y )
+
+      self.grb.regionEnd()
+
 
 
   # first apply the rotation in ang radians, then apply the trnslation [x,y]
@@ -1330,29 +1376,29 @@ class brdgerber(brdjson.brdjson):
           drillDiamCode += 1
 
 
-    print "M48"
-    print ";DRILL file {brdgerber.py (" + str_date + ") date " + str_date + "}"
-    print ";FORMAT={-:-/ absolute / inch / decimal}"
-    print "FMAT,2"
-    print "INCH,TZ"
+    print( "M48")
+    print( ";DRILL file {brdgerber.py (" + str_date + ") date " + str_date + "}")
+    print( ";FORMAT={-:-/ absolute / inch / decimal}")
+    print( "FMAT,2")
+    print( "INCH,TZ")
 
     for d in drillDiam:
-      print "T" + str(drillDiam[d]["code"]) + "C" + str(d)
-    print "%"
-    print "G90"
-    print "G05"
-    print "M72"
+      print( "T" + str(drillDiam[d]["code"]) + "C" + str(d))
+    print( "%")
+    print( "G90")
+    print( "G05")
+    print( "M72")
 
     for d in drillDiam:
-      print "T" + str(drillDiam[d]["code"])
+      print( "T" + str(drillDiam[d]["code"]))
       for p in drillDiam[d]["pos"]:
-        print "X" + str( p[0] ) + "Y" + str( p[1] )
-      print "T0"
+        print( "X" + str( p[0] ) + "Y" + str( p[1] ))
+      print( "T0")
 
     #print "X3.6024y-1.8819"
     #print "T0"
 
-    print "M30"
+    print("M30")
 
 
   def dump_gerber(self, outfile):
@@ -1437,42 +1483,102 @@ def is_num(s):
 #
 ###
 
+def version(fp):
+  fp.write("brdgerber version 0.1.0\n")
+
+def usage(fp):
+  fp.write("\n")
+  fp.write("usage:\n")
+  fp.write("\n")
+  fp.write("    brdgerber [-h] [-v] <-i brd> <-I jsonbrd> [-o outfile] [-F fontfile] [-L layer_num] [-P]\n")
+  fp.write("\n")
+  fp.write("  -i brd        legacy KiCad board file\n")
+  fp.write("  -I jsonbrd    JSON board file\n")
+  fp.write("  -o outfn      output filename\n")
+  fp.write("  -F            font file (default " + 'x' + ")\n")
+  fp.write("  -L layernum   render layer <layernum> (default " + '0' + ")\n")
+  fp.write("  -P            pad only\n")
+  fp.write("  -h            help\n")
+  fp.write("  -v            version\n")
+  fp.write("\n")
+
 if __name__ == "__main__":
 
   infile = None
+  json_infile = None
   layer = 0
   font_file = None
 
   outfile = "-"
   pad_only = False
 
-  parser = argparse.ArgumentParser()
-  parser.add_argument( '-i', '--input', action='store', help="Input KiCAD brd file", required=True)
-  parser.add_argument( '-o', '--output', help="Output Gerber file" )
-  parser.add_argument( '-F', '--font-file', help="Font file to use" )
-  parser.add_argument( '-L', '--layer', help="Layer to filter on" )
-  parser.add_argument( '-P', '--pad-only', help="Only render pads", action='store_true' )
-  args = parser.parse_args()
+  try:
+    opts, args = getopt.getopt(sys.argv[1:], "hvi:o:F:L:PI:", ["help", "version", "input", "output", "font-file", "layer", "pad-only"])
+  except getopt.GetoptError as err:
+    print(err)
+    usage(sys.stderr)
+    sys.exit(2)
 
-  if args.input:
-    infile = args.input
 
-  if args.output:
-    outfile = args.output
+  for o,a in opts:
+    if o in ("-h", "--help"):
+      usage(sys.stdout)
+      sys.exit(0)
+    elif o in ("-v", "--version"):
+      version(sys.stdout)
+      sys.exit(0)
+    elif o in ("-i", "--input"):
+      infile = a
+    elif o in ("-o", "--output"):
+      outfile = a
+    elif o in ("-F", "--font-file"):
+      font_file = a
+    elif o in ("-P", "--pad-only"):
+      pad_only = True
+    elif o in ("-L", "--layer"):
+      layer = int(a)
+    elif o in ("-I"):
+      json_infile = a
+    else:
+      sys.stderr.write("unknown option: " + str(o) + "\n")
+      usage(sys.stdout)
+      sys.exit(2)
 
-  if args.font_file:
-    font_file = args.font_file
+  if len(args) > 0:
+    if not (infile is None):
+      sys.stderr.write("input file must be specified only once\n")
+      usage(sys.stderr)
+      sys.exit(2)
+    infile = args[0]
 
-  if args.layer:
-    layer = int(args.layer)
 
-  if args.pad_only:
-    pad_only=True
+#  parser = argparse.ArgumentParser()
+#  parser.add_argument( '-i', '--input', action='store', help="Input KiCAD brd file", required=True)
+#  parser.add_argument( '-o', '--output', help="Output Gerber file" )
+#  parser.add_argument( '-F', '--font-file', help="Font file to use" )
+#  parser.add_argument( '-L', '--layer', help="Layer to filter on" )
+#  parser.add_argument( '-P', '--pad-only', help="Only render pads", action='store_true' )
+#  args = parser.parse_args()
+#
+#  if args.input:
+#    infile = args.input
+#
+#  if args.output:
+#    outfile = args.output
+#
+#  if args.font_file:
+#    font_file = args.font_file
+#
+#  if args.layer:
+#    layer = int(args.layer)
+#
+#  if args.pad_only:
+#    pad_only=True
 
-  if infile is None:
-    print "provide infile"
-    sys.exit(0)
-
+  if (json_infile is None) and (infile is None):
+    sys.stderr.write("provide infile\n")
+    usage(sys.stderr)
+    sys.exit(-1)
 
   b = brdgerber(font_file)
 
@@ -1486,7 +1592,13 @@ if __name__ == "__main__":
   b.grb.comment("( created by brdgerber.py " + VERSION + " ) date " + str_date )
   b.grb.comment("Gerber Fmt 3.4, Leading zero omitted, Abs format")
 
-  b.parse_brd(infile)
+  if json_infile is None:
+    b.parse_brd(infile)
+  else:
+
+    with open(json_infile) as fp:
+      b.json_obj = json.loads(fp.read())
+
 
   b.dump_gerber(outfile)
 

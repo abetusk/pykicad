@@ -235,18 +235,18 @@ class lib(object):
     }
 
   def debug(self):
-    print "op_descr:"
+    print("op_descr:")
     for op in self.op_descr:
-      print op, self.op_descr[op]
+      print( op, self.op_descr[op])
 
-    print "\nop_state_transition:"
+    print( "\nop_state_transition:")
     for s in self.op_state_transition:
       for op  in self.op_state_transition[s]:
-        print "state:", s, " op:", op, " transition:", self.op_state_transition[s][op]
+        print( "state:", s, " op:", op, " transition:", self.op_state_transition[s][op])
 
-    print "\nop_re:"
+    print( "\nop_re:")
     for op in self.op_re:
-      print "op:", op, "op_re:", self.op_re[op]
+      print( "op:", op, "op_re:", self.op_re[op])
 
 
   def read_lib(self, fn):

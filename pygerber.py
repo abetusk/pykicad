@@ -52,17 +52,17 @@ class pygerber(object):
       n+=1
       lead_char = '-'
 
-    #print "_fmt:", fval, afval, lead_char, n
+    #print("_fmt:", fval, afval, lead_char, n)
 
     s = "{0:0" + str(n) + "." + str(n_frac) + "f}"
 
-    #print "_fmt:", fval, afval, lead_char, n, s
+    #print("_fmt:", fval, afval, lead_char, n, s)
 
     v = s.format( afval )
     v = v.strip()
 
 
-    #print "_fmt:", s, v
+    #print("_fmt:", s, v)
 
     if (self.leading_zero_flag == 'L'):
       v = re.sub('^0*', '', v )
@@ -73,7 +73,7 @@ class pygerber(object):
       v = re.sub('0*$', '', v )
       v = re.sub( '\.', '', v )
 
-    #print "_fmt...:", v
+    #print("_fmt...:", v)
 
     return lead_char + v
 
@@ -119,7 +119,7 @@ class pygerber(object):
 
     if n<=0: return
 
-    #print "_Yfmt:", y, n, self.Yfrac
+    #print("_Yfmt:", y, n, self.Yfrac)
 
     if self.invertY:
       return "Y" + self._fmt(n, self.Yfrac, -float(y) )
@@ -314,7 +314,7 @@ class pygerber(object):
 
     if len(outfile)==0 or outfile == "-":
       for l in self._command:
-        print l
+        print(l)
     else:
       fp = open( outfile, "w" )
       for l in self._command:
@@ -323,7 +323,7 @@ class pygerber(object):
       fp.close()
 
 
-    #print "M02*"
+    #print("M02*")
 
 
 if __name__ == "__main__":

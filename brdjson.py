@@ -24,7 +24,13 @@ import lib
 import math
 import numpy
 import cgi
-import urllib
+
+try:
+  from urllib  import quote
+except ImportError:
+  from urllib.parse import quote
+
+
 
 import brd
 
@@ -292,7 +298,8 @@ class brdjson(brd.brd):
     munged_name = name
     munged_name = re.sub( '^\s*', '', munged_name )
     munged_name = re.sub( '\s*$', '', munged_name )
-    munged_name = urllib.quote( munged_name )
+    #munged_name = urllib.quote( munged_name )
+    munged_name = quote( munged_name )
     munged_name = re.sub( '\/', '%2F', munged_name )
     self.cur_mod["name"] = clean_name
 
@@ -690,7 +697,7 @@ class brdjson(brd.brd):
 
 
   def cb_endboard(self, arg):
-    #print json.dumps( self.json_obj, indent=2 )
+    #print(json.dumps( self.json_obj, indent=2 )
     pass
 
 
@@ -706,7 +713,7 @@ if __name__ == "__main__":
     outfile = sys.argv[2]
 
   if infile is None:
-    print "provide infile"
+    print("provide infile")
     sys.exit(0)
 
   b = brdjson()
@@ -714,6 +721,5 @@ if __name__ == "__main__":
   b.parse_brd(infile)
 
   if outfile is None:
-    print json.dumps( b.json_obj, indent = 2 )
-
+    print(json.dumps( b.json_obj, indent = 2 ))
 
