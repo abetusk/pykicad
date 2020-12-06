@@ -996,11 +996,15 @@ class brdgerber(brdjson.brdjson):
 
     mod_x = float(mod["x"])
     mod_y = float(mod["y"])
-    mod_a = float(mod["angle"])
+    mod_a = 0.0
+    if "angle" in  mod:
+      mod_a = float(mod["angle"])
 
     x = float(text_obj["x"])
     y = float(text_obj["y"])
-    ang = float(text_obj["angle"])
+    ang = 0.0
+    if "angle" in text_obj:
+      ang = float(text_obj["angle"])
 
     width = float(text_obj["penwidth"])
     text_code = text_obj["flag"]
