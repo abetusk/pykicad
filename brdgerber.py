@@ -97,7 +97,6 @@ import getopt
 HOME = "/home/meow"
 if "HOME" in os.environ:
   HOME = os.environ["HOME"]
-#weakpwh = os.path.join( os.environ["HOME"], "bin", "weakpwh" )
 weakpwh = os.path.join( HOME, "bin", "weakpwh" )
 
 class brdgerber(brdjson.brdjson):
@@ -114,7 +113,7 @@ class brdgerber(brdjson.brdjson):
 
     self.aperture = {}
     self.invertY = False
-    #self.invertY = True
+    self.invertStartArcAngle = False
 
     self.grb = pygerber.pygerber()
     self.grb.invertY = self.invertY
@@ -123,7 +122,6 @@ class brdgerber(brdjson.brdjson):
     self.island_layer = []
 
     self.layer = 0
-    #self.solderMaskClearance = 100
     self.solderPasteClearance = 100
     self.isSolderPasteLayer = False
     self.isSolderMaskLayer = False
@@ -148,8 +146,6 @@ class brdgerber(brdjson.brdjson):
           
     self.netcodeMap = { "0" : "Default" }
 
-
-    #self.font_file = "./aux/hershey_ascii.json"
     self.font_file = DEFAULT_FONT_FILE
     if fontFile is not None:
       self.font_file = fontFile
@@ -160,7 +156,6 @@ class brdgerber(brdjson.brdjson):
       s += l
     f.close()
     self.hershey_font_json = json.loads(s)
-    #print json.dumps(self.hershey_font_json, indent = 2)
 
     self.hershey_scale_factor = float( self.hershey_font_json["scale_factor"] )
 
@@ -487,7 +482,13 @@ class brdgerber(brdjson.brdjson):
             art["y"] = -float(art["y"])
 
             if shape == "arc":
-              art["start_angle"] = -float(art["start_angle"])
+
+              ## EXPERIMENTAL
+              if self.invertStartArcAngle:
+                art["start_angle"] = -float(art["start_angle"])
+              else:
+                art["start_angle"] = float(art["start_angle"])
+
               art["angle"] = -float(art["angle"])
 
           if shape == "polygon":
@@ -1603,6 +1604,7 @@ if __name__ == "__main__":
   b.grb.comment("Gerber Fmt 3.4, Leading zero omitted, Abs format")
 
   if json_infile is None:
+    b.invertStartArcAngle = True
     b.parse_brd(infile)
   else:
 
