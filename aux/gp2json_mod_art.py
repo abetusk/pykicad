@@ -28,6 +28,8 @@ UNIT_DEST = "deci-mils"
 UNIT_CONV_FACTOR = (10000.0/25.4)
 SCALE_FACTOR = 1.0
 
+ART_TYPE = 'polygon'
+
 def toUnit(x):
   return (SCALE_FACTOR * UNIT_CONV_FACTOR * float(x))
   #return int(SCALE_FACTOR * UNIT_CONV_FACTOR * float(x))
@@ -109,15 +111,17 @@ def usage(fp):
   fp.write("\n")
   fp.write("  gp2json_mod_art [-h] [-v] [-i ifn] [-s scale] [ifn]\n")
   fp.write("\n")
-  fp.write("  [-s]      rescale factor\n")
-  fp.write("  [-h]      help\n")
-  fp.write("  [-v]      version\n")
+  fp.write("  [-s]        rescale factor\n")
+  fp.write("  [--simple]  create simple outline (segments only, no polygon)\n")
+  fp.write("  [-h]        help\n")
+  fp.write("  [-v]        version\n")
   fp.write("\n")
 
 def main():
+  global ART_TYPE
   global SCALE_FACTOR
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "hi:o:vs:", ["help", "version", "rescae="])
+    opts, args = getopt.getopt(sys.argv[1:], "hi:o:vs:", ["help", "version", "rescale=", "simple"])
   except getopt.GetoptError as err:
     print(err)
     usage(sys.stderr)
@@ -138,6 +142,8 @@ def main():
       ifn = a
     elif o in ("-s", "--rescale"):
       SCALE_FACTOR = float(a)
+    elif o in ("--simple"):
+      ART_TYPE = 'segment'
     else:
       assert False, "option not found"
 
@@ -185,11 +191,22 @@ def main():
 
   art_entry = {}
   for pgn in weak_pgns:
-    art_entry = copy.deepcopy(art_polygon_template)
-    for xy in pgn:
-      art_entry["points"].append( { "x" : xy[0], "y": xy[1] } )
-    json_mod["art"].append(art_entry)
 
+    if ART_TYPE == 'polygon':
+      art_entry = copy.deepcopy(art_polygon_template)
+      for xy in pgn:
+        art_entry["points"].append( { "x" : xy[0], "y": xy[1] } )
+      json_mod["art"].append(art_entry)
+
+    elif ART_TYPE == 'segment':
+      first = True
+      xy_prv = [0,0]
+      for xy in pgn:
+        #art_entry = copy.deepcopy(art_segment_template)
+        if not first:
+          json_mod["art"].append({"shape":"segment", "layer":"27", "startx":xy_prv[0], "starty":xy_prv[1], "endx":xy[0], "endy":xy[1], "line_width":50})
+        xy_prv = [xy[0], xy[1]]
+        first = False
 
   print(json.dumps(json_mod, indent=2))
 
