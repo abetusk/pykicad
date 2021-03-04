@@ -25,7 +25,7 @@ VERSION_STR = "0.1.0"
 UNIT_SRC = "mm"
 UNIT_DEST = "deci-mils"
 
-UNIT_CONV_FACTOR = (25.4 * 10000.0)
+UNIT_CONV_FACTOR = (10000.0/25.4)
 SCALE_FACTOR = 1.0
 
 def toUnit(x):
