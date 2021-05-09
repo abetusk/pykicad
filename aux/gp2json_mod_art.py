@@ -111,17 +111,19 @@ def usage(fp):
   fp.write("\n")
   fp.write("  gp2json_mod_art [-h] [-v] [-i ifn] [-s scale] [ifn]\n")
   fp.write("\n")
-  fp.write("  [-s]        rescale factor\n")
-  fp.write("  [--simple]  create simple outline (segments only, no polygon)\n")
-  fp.write("  [-h]        help\n")
-  fp.write("  [-v]        version\n")
+  fp.write("  [-s]          rescale factor\n")
+  fp.write("  [--deci-thou] input in imperial deci-thou (\"deci-mils\")\n")
+  fp.write("  [--mm]        input in mm (default)\n")
+  fp.write("  [--simple]    create simple outline (segments only, no polygon)\n")
+  fp.write("  [-h]          help\n")
+  fp.write("  [-v]          version\n")
   fp.write("\n")
 
 def main():
   global ART_TYPE
   global SCALE_FACTOR
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "hi:o:vs:", ["help", "version", "rescale=", "simple"])
+    opts, args = getopt.getopt(sys.argv[1:], "hi:o:vs:", ["help", "version", "rescale=", "simple", "deci-thou", "mm"])
   except getopt.GetoptError as err:
     print(err)
     usage(sys.stderr)
@@ -144,6 +146,10 @@ def main():
       SCALE_FACTOR = float(a)
     elif o in ("--simple"):
       ART_TYPE = 'segment'
+    elif o in ("--deci-thou", "--deci-mils"):
+      UNIT_CONV_FACTOR = 1.0
+    elif o in ("--mm"):
+      UNIT_CONV_FACTOR = 10000.0/25.4
     else:
       assert False, "option not found"
 
