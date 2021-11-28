@@ -238,7 +238,9 @@ if __name__ == "__main__":
       x = uc(ele["x"])
       y = uc(ele["y"])
       layer = ele["layer"]
-      orientation = ele["orientation"]
+      orientation = 0
+      if "orientation" in ele:
+          orientation = ele["orientation"]
 
       timestamp = "43A670DA"
       if "timestamp" in ele:
@@ -248,11 +250,15 @@ if __name__ == "__main__":
       if "timestamp_op" in ele:
         timestamp_op = ele["timestamp_op"]
 
-      attr1 = ele["attribute1"]
-      attr2 = ele["attribute2"]
+      attr1 = ""
+      if "attribute1" in ele:
+        attr1 = ele["attribute1"]
+      attr2 = ""
+      if "attribute2" in ele:
+        attr2 = ele["attribute2"]
 
       print "$MODULE", name
-      print "Po", x, y, orientation, layer, timestamp, attr1, attr2
+      print "Po", x, y, orientation, layer, timestamp, '"' + attr1 + '"', '"' + attr2 + '"'
       print "Li", name
       print "Sc", timestamp_op
       #print "Ar /" + timestamp_op

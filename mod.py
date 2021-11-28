@@ -90,6 +90,7 @@ class mod(object):
     "PAD_Po" : [ "Po", "posx", "posy" ], # position
 
     "PAD_SolderMask" : [ "\.SolderMask", "layer" ],
+    "PAD_SolderPaste" : [ "\.SolderPaste", "layer" ],
 
     "PAD_end" : [ "\$EndPAD" ],
 
@@ -340,6 +341,11 @@ class mod(object):
       print "cb_PAD_SolderMask",arg
     pass
 
+  def cb_PAD_SolderPaste(self, arg): 
+    if self.parrot_flag:
+      print "cb_PAD_SolderPaste",arg
+    pass
+
 
   def cb_PAD_end(self, arg): 
     if self.parrot_flag:
@@ -414,6 +420,7 @@ class mod(object):
               "PAD_Ne" : "pad", 
               "PAD_Po" : "pad", 
               "PAD_SolderMask" : "pad", 
+              "PAD_SolderPaste" : "pad", 
               "PAD_end" : "module" }
   }
 
@@ -485,6 +492,7 @@ class mod(object):
       "PAD_Ne" : self.cb_PAD_Ne,
       "PAD_Po" : self.cb_PAD_Po,
       "PAD_SolderMask" : self.cb_PAD_SolderMask ,
+      "PAD_SolderPaste" : self.cb_PAD_SolderPaste,
       "PAD_end" : self.cb_PAD_end,
 
       "LIBRARY_end" : self.cb_LIBRARY_end
