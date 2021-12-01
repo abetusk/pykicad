@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Loads KiCAD mod file (version 1, not the new S-expression), parses it with mod,
 writes to json.
@@ -6,6 +6,7 @@ writes to json.
 
 import re, sys, lib, math, numpy
 import urllib
+import urllib.parse
 import math
 import mod
 import json
@@ -113,7 +114,8 @@ class modjson(mod.mod):
     munged_name = name
     munged_name = re.sub( '^\s*', '', munged_name )
     munged_name = re.sub( '\s*$', '', munged_name )
-    munged_name = urllib.quote( munged_name )
+    #munged_name = urllib.quote( munged_name )
+    munged_name = urllib.parse.quote( munged_name )
     munged_name = re.sub( '\/', '%2F', munged_name )
     self.json_obj["units"] = self.units
     self.json_obj["name"] = clean_name
@@ -325,7 +327,8 @@ class modjson(mod.mod):
     #print "### file:", self.json_file
 
     #print self.json_obj["name"], self.json_file
-    print self.json_obj["name"], urllib.quote( self.json_file )
+    #print(self.json_obj["name"], urllib.quote( self.json_file ))
+    print(self.json_obj["name"], urllib.parse.quote( self.json_file ))
 
     f = open( self.json_file, "w" )
     f.write( json.dumps( self.json_obj, indent=2 ))
@@ -429,10 +432,11 @@ if __name__ == "__main__":
     outbase = sys.argv[2]
 
   if infile is None:
-    print "provide infile"
+    print("provide infile")
     sys.exit(0)
 
   s = modjson()
+
 
   if outbase is not None:
     s.json_prefix = outbase

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Parses KiCAD .mod files.
 Access state by callbacks.
@@ -106,261 +106,318 @@ class mod(object):
 
   def cb_header(self, arg): 
     if self.parrot_flag:
-      print "cb_header",arg
+      print("cb_header",arg)
     pass
 
 
   def cb_dollar_hash(self, arg):
     if self.parrot_flag:
-      print "cb_dollar_hash",arg
+      print("cb_dollar_hash",arg)
     pass
 
 
   def cb_UNITS(self, arg): 
     if self.parrot_flag:
-      print "cb_UNITS",arg
+      print("cb_UNITS",arg)
     pass
 
 
   def cb_INDEX(self, arg): 
     if self.parrot_flag:
-      print "cb_INDEX",arg
+      print("cb_INDEX",arg)
     pass
 
 
   def cb_INDEX_item(self, arg): 
     if self.parrot_flag:
-      print "cb_INDEX_item",arg
+      print("cb_INDEX_item",arg)
     pass
 
 
   def cb_INDEX_end(self, arg): 
     if self.parrot_flag:
-      print "cb_INDEX_end",arg
+      print("cb_INDEX_end",arg)
     pass
 
 
   def cb_MODULE(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE",arg
+      print("cb_MODULE",arg)
     pass
 
 
   def cb_MODULE_Po(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_Po",arg
+      print("cb_MODULE_Po",arg)
     pass
 
 
   def cb_MODULE_Li(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_Li",arg
+      print("cb_MODULE_Li",arg)
     pass
 
 
   def cb_MODULE_Sc(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_Sc",arg
+      print("cb_MODULE_Sc",arg)
     pass
 
 
   def cb_MODULE_AR(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_AR",arg
+      print("cb_MODULE_AR",arg)
     pass
 
 
   def cb_MODULE_Op(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_Op",arg
+      print("cb_MODULE_Op",arg)
     pass
 
 
   def cb_MODULE_Tn(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_Tn",arg
+      print("cb_MODULE_Tn",arg)
     pass
 
 
   def cb_MODULE_Kw(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_Kw",arg
+      print("cb_MODULE_Kw",arg)
     pass
 
 
   def cb_MODULE_Cd(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_Cd",arg
+      print("cb_MODULE_Cd",arg)
     pass
 
 
   def cb_MODULE_At(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_At",arg
+      print("cb_MODULE_At",arg)
     pass
 
 
   def cb_MODULE_DS(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_DS",arg
+      print("cb_MODULE_DS",arg)
     pass
 
 
   def cb_MODULE_DC(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_DC",arg
+      print("cb_MODULE_DC",arg)
     pass
 
 
   def cb_MODULE_DA(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_DA",arg
+      print("cb_MODULE_DA",arg)
     pass
 
 
   def cb_MODULE_DP(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_DP",arg
+      print("cb_MODULE_DP",arg)
     pass
 
 
   def cb_MODULE_DI(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_DI",arg
+      print("cb_MODULE_DI",arg)
     pass
 
   def cb_MODULE_Dl(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_Dl",arg
+      print("cb_MODULE_Dl",arg)
     pass
 
 
   def cb_MODULE_SolderMask(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_SolderMask",arg
+      print("cb_MODULE_SolderMask",arg)
     pass
 
 
   def cb_MODULE_SolderPaste(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_SolderPaste",arg
+      print("cb_MODULE_SolderPaste",arg)
     pass
 
 
   def cb_MODULE_SolderPasteRatio(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_SolderPasteRatio",arg
+      print("cb_MODULE_SolderPasteRatio",arg)
     pass
 
 
   def cb_MODULE_end(self, arg): 
     if self.parrot_flag:
-      print "cb_MODULE_end",arg
+      print("cb_MODULE_end",arg)
     pass
 
 
   def cb_SHAPE3D(self,arg): 
     if self.parrot_flag:
-      print "cb_SHAPE3D",arg
+      print("cb_SHAPE3D",arg)
     pass
 
 
   def cb_SHAPE3D_Na(self,arg): 
     if self.parrot_flag:
-      print "cb_SHAPE3D_Na",arg
+      print("cb_SHAPE3D_Na",arg)
     pass
 
 
   def cb_SHAPE3D_Sc(self,arg): 
     if self.parrot_flag:
-      print "cb_SHAPE3D_Sc",arg
+      print("cb_SHAPE3D_Sc",arg)
     pass
 
 
   def cb_SHAPE3D_Of(self,arg): 
     if self.parrot_flag:
-      print "cb_SHAPE3D_Of",arg
+      print("cb_SHAPE3D_Of",arg)
     pass
 
 
   def cb_SHAPE3D_Ro(self,arg): 
     if self.parrot_flag:
-      print "cb_SHAPE3D_Ro",arg
+      print("cb_SHAPE3D_Ro",arg)
     pass
 
 
   def cb_SHAPE3D_end(self,arg): 
     if self.parrot_flag:
-      print "cb_SHAPE3D_end",arg
+      print("cb_SHAPE3D_end",arg)
     pass
 
 
   def cb_PAD(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD",arg
+      print("cb_PAD",arg)
     pass
 
 
   def cb_PAD_Sh(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_Sh",arg
+      print("cb_PAD_Sh",arg)
     pass
 
 
   def cb_PAD_Dr(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_Dr",arg
+      print("cb_PAD_Dr",arg)
     pass
 
   def cb_PAD_Dl(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_Dl",arg
+      print("cb_PAD_Dl",arg)
     pass
 
 
   def cb_PAD_At(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_At",arg
+      print("cb_PAD_At",arg)
     pass
 
 
   def cb_PAD_Ne(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_Ne",arg
+      print("cb_PAD_Ne",arg)
     pass
 
 
   def cb_PAD_Po(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_Po",arg
+      print("cb_PAD_Po",arg)
     pass
 
 
   def cb_PAD_SolderMask(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_SolderMask",arg
+      print("cb_PAD_SolderMask",arg)
     pass
 
   def cb_PAD_SolderPaste(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_SolderPaste",arg
+      print("cb_PAD_SolderPaste",arg)
     pass
 
 
   def cb_PAD_end(self, arg): 
     if self.parrot_flag:
-      print "cb_PAD_end",arg
+      print("cb_PAD_end",arg)
     pass
 
 
   def cb_LIBRARY_end(self, arg): 
     if self.parrot_flag:
-      print "cb_LIBRARY_end",arg
+      print("cb_LIBRARY_end",arg)
     pass
 
 
   op_callback = {}
 
+  op_state_transition_eval_ord = {
+    "header" : [ "header" ],
+
+    "start" : [ "INDEX",
+                "MODULE",
+                "LIBRARY_end",
+                "UNITS",
+                "dollar_hash" ],
+
+    "index" : [ "INDEX_end",
+                "INDEX_item" ],
+
+    "module" : [ "MODULE",
+                 "MODULE_Po" ,
+                 "MODULE_Li" ,
+                 "MODULE_Sc" ,
+                 "MODULE_AR" ,
+                 "MODULE_Op" ,
+                 "MODULE_Tn" ,
+                 "MODULE_Kw" ,
+                 "MODULE_Cd" ,
+                 "MODULE_At" ,
+
+                 "MODULE_DS"  ,
+                 "MODULE_DC"  ,
+                 "MODULE_DA"  ,
+                 "MODULE_DP"  ,
+                 "MODULE_DI"  ,
+                 "MODULE_Dl"  ,
+
+                 "MODULE_SolderMask"  ,
+                 "MODULE_SolderPaste"  ,
+                 "MODULE_SolderPasteRatio"  ,
+
+                 "MODULE_end" ,
+
+                 "SHAPE3D" ,
+
+                 "PAD"  ],
+ 
+    "shape3d" : [ "SHAPE3D_Na" ,
+                  "SHAPE3D_Sc" ,
+                  "SHAPE3D_Of" ,
+                  "SHAPE3D_Ro" ,
+                  "SHAPE3D_end" ],
+
+    "pad" : [ "PAD" ,
+              "PAD_Sh" ,
+              "PAD_Dr" ,
+              "PAD_Dl" ,
+              "PAD_At" ,
+              "PAD_Ne" ,
+              "PAD_Po" ,
+              "PAD_SolderMask" ,
+              "PAD_SolderPaste" ,
+              "PAD_end" ]
+  }
 
   # Key entry is the state name.
   # Value is hash with name from op_descr as the key and the state to transition to.
@@ -500,18 +557,18 @@ class mod(object):
     }
 
   def debug(self):
-    print "op_descr:"
+    print("op_descr:")
     for op in self.op_descr:
-      print op, self.op_descr[op]
+      print(op, self.op_descr[op])
 
-    print "\nop_state_transition:"
+    print("\nop_state_transition:")
     for s in self.op_state_transition:
       for op  in self.op_state_transition[s]:
-        print "state:", s, " op:", op, " transition:", self.op_state_transition[s][op]
+        print("state:", s, " op:", op, " transition:", self.op_state_transition[s][op])
 
-    print "\nop_re:"
+    print("\nop_re:")
     for op in self.op_re:
-      print "op:", op, "op_re:", self.op_re[op]
+      print("op:", op, "op_re:", self.op_re[op])
 
 
   def read_mod(self, fn):
@@ -550,10 +607,17 @@ class mod(object):
       matched_op = None
       matched_arg = []
 
+      #print("#DEBUG:", l)
+
       state_transition = self.op_state_transition[self.parse_state]
-      for op in state_transition:
+      state_transition_eval_ord = self.op_state_transition_eval_ord[self.parse_state]
+      #for op in state_transition:
+      for op in state_transition_eval_ord:
         m = re.search( self.op_re[op], l )
         if m:
+
+          #print("#DEBUG: found match:", op, self.op_re[op])
+
           self.parse_state = state_transition[op]
           found_match = True
           matched_op = op
@@ -561,8 +625,10 @@ class mod(object):
           matched_arg = m.groups()
           break
 
+      #print("#DEBUG:", found_match, op, matched_arg)
+
       if not found_match:
-        raise parse_exception("ERROR, couldn't match line '" + str(l) + "', line_no: " +  str(line_no) + " (op:" + str(self.parse_state) + ")" )
+        raise parse_exception("ERROR, couldn't match line '" + str(l) + "', line_no: " +  str(line_no) + " (op:" + str(self.parse_state) + ")"  + ", parse_state: '" + self.parse_state + "'" )
 
       self.op_callback[ op ]( matched_arg )
 
@@ -574,7 +640,7 @@ class mod(object):
 #m.parse_mod(fn)
 if __name__ == "__main__":
   if (len(sys.argv) < 2):
-    print "provide board file"
+    print("provide board file")
     sys.exit(0)
   m = mod()
   m.parrot_flag = True
@@ -583,7 +649,7 @@ if __name__ == "__main__":
 
   def cb_header(self, arg):
     if self.header:
-      print "header",arg
+      print("header",arg)
     pass
 
 
